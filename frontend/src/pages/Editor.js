@@ -1,1 +1,1 @@
-console.log("hello world from Editor.js");
+console.log("hello world from Editor.js first pull request!");
