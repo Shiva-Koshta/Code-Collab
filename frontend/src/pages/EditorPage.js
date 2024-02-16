@@ -1,40 +1,36 @@
 import React from "react";
+import { Navigate } from "react-router-dom";
 import "./Editor.css";
-import Editor from '../components/Editor';
-
+import Editor from "../components/Editor";
+import FileView from "../components/FileView";
 
 const EditorPage = () => {
+  
+  const leaveRoom = () => {
+    <Navigate to ="/"></Navigate>;
+  };
+
   return (
     <div className="mainWrap">
       <div className="aside">
         <div className="asideInner">
           <div className="logo">
-            <img className="logoImage" src="/code-sync.png" alt="logo" />
-            <div>
-                <h3>FILE TREE VIEW HERE...</h3>
-            </div>
+            <img className="logoImage" src="" alt="logo" />
           </div>
-          <h3>Connected</h3>
-          {/* <div className="clientsList">
-            {clients.map((client) => (
-              <Client key={client.socketId} username={client.username} />
-            ))}
-          </div> */}
-        </div>
+          <div className="fileTreeView">
+            <FileView></FileView>
+          </div>
+          </div>
+          <div className="Users">
+          <h3>Connected Users here</h3>
+          </div>
         <button className="btn copyBtn">Copy ROOM ID</button>
-        <button className="btn leaveBtn">Leave</button>
+        <button className="btn leaveBtn" onClick={leaveRoom}>
+          Leave
+        </button>
       </div>
-      {/* onClick={copyRoomId} onClick={leaveRoom} */}
-      {/* <div className="editorWrap">
-        <Editor
-          socketRef={socketRef}
-          roomId={roomId}
-          onCodeChange={(code) => {
-            codeRef.current = code;
-          }}
-        />
-      </div> */}
-      <div className="EditorWrap">
+
+      <div >
         <Editor></Editor>
       </div>
     </div>
