@@ -5,6 +5,6 @@
 /frontend/package-lock.json
 /backend/package-lock.json
 
-# .env file
-/frontend/.env
-/backend/.env
+# # .env file
+# /frontend/.env
+# /backend/.env
