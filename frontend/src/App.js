@@ -1,3 +1,4 @@
+
 import logo from "./logo.svg";
 import "./App.css";
 import Login from "./pages/Login";
@@ -6,6 +7,7 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+
 
 function App() {
   const [user, setUser] = useState(null);
@@ -27,6 +29,7 @@ function App() {
   }, []);
 
   return (
+
     <Routes>
       <Route
         exact
@@ -39,6 +42,7 @@ function App() {
         element={user ? <Navigate to="/" /> : <Login />}
       />
     </Routes>
+
   );
 }
 
