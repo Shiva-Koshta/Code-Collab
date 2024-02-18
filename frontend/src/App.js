@@ -2,11 +2,11 @@
 import logo from "./logo.svg";
 import "./App.css";
 import Login from "./pages/Login";
-import HomePage from "./pages/home";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import Room_Creation from "./pages/Room_Creation";
 
 
 function App() {
@@ -34,7 +34,7 @@ function App() {
       <Route
         exact
         path="/"
-        element={user ? <HomePage /> : <Navigate to="/login" />}
+        element={user ? <Room_Creation /> : <Navigate to="/login" />}
       />
       <Route
         exact
