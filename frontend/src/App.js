@@ -2,13 +2,18 @@
 import logo from "./logo.svg";
 import "./App.css";
 import Login from "./pages/Login";
-import HomePage from "./pages/home";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import Room_Creation from "./pages/Room_Creation";
 
 
+// import './App.css';
+// import Home from './pages/Room_Join';
+// import { BrowserRouter, Routes, Route } from 'react-router-dom';
+// import EditorPage from './pages/EditorPage';
+// import { Toaster } from 'react-hot-toast';
 function App() {
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
@@ -34,7 +39,7 @@ function App() {
       <Route
         exact
         path="/"
-        element={user ? <HomePage /> : <Navigate to="/login" />}
+        element={user ? <Room_Creation /> : <Navigate to="/login" />}
       />
       <Route
         exact
