@@ -4,6 +4,8 @@
     overflow: hidden;
     width: 300px;
     margin: 20px auto;
+    background-color: #140314;
+
   }
   
   .chat-header {
@@ -46,4 +48,6 @@
     border-radius: 4px;
     cursor: pointer;
   }
-  
+  .send-button:hover{
+    background-color: #777474;
+  }
