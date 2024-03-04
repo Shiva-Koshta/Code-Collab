@@ -1,11 +1,19 @@
 require("dotenv").config();
+const mongoose = require("mongoose")
 const express = require("express");
 const cors = require("cors");
 const passport = require("passport");
 const authRoute = require("./routes/auth");
 const cookieSession = require("cookie-session");
 const passportStrategy = require("./passport");
+const { Server } = require('socket.io');
+const http = require('http');
+
+
 const app = express();
+const server = http.createServer(app);
+const port = process.env.PORT || 6969;
+
 app.use(
   cors({
     origin: "http://localhost:3000",
@@ -13,6 +21,14 @@ app.use(
     credentials: true,
   })
 );
+
+const io = new Server(server);
+
+
+io.on('connection', (socket) => {
+  console.log('socket connected', socket.id);
+});
+
 
 // app.use(function (req, res, next) {
 //   res.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
@@ -42,5 +58,21 @@ app.use(passport.session());
 
 app.use("/auth", authRoute);
 
-const port = process.env.PORT || 8080;
-app.listen(port, () => console.log(`Listenting on port ${port}...`));
+app.get("/editor/:id", (req, res) => {
+  console.log(req.body);
+  res.json({
+    message: "You are in room " + ""
+  })
+});
+
+
+
+// connect to database
+mongoose.connect(process.env.MONGO_URL)
+  .then(() => {
+    console.log("connected to database");
+    server.listen(port, () => console.log(`Listenting on port ${port}...`));
+  })
+  .catch((error) => {
+    console.log(error)
+  })
