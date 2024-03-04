@@ -1,4 +1,3 @@
-
 import logo from "./logo.svg";
 import "./App.css";
 import Login from "./pages/Login";
@@ -7,6 +6,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import Room_Creation from "./pages/Room_Creation";
+import Chat from "./components/Chat";
 
 
 // import './App.css';
@@ -35,18 +35,19 @@ function App() {
 
   return (
 
-    <Routes>
-      <Route
-        exact
-        path="/"
-        element={user ? <Room_Creation /> : <Navigate to="/login" />}
-      />
-      <Route
-        exact
-        path="/login"
-        element={user ? <Navigate to="/" /> : <Login />}
-      />
-    </Routes>
+    // <Routes>
+    //   <Route
+    //     exact
+    //     path="/"
+    //     element={user ? <Room_Creation /> : <Navigate to="/login" />}
+    //   />
+    //   <Route
+    //     exact
+    //     path="/login"
+    //     element={user ? <Navigate to="/" /> : <Login />}
+    //   />
+    // </Routes>
+    <Chat/>
 
   );
 }
