@@ -6,17 +6,19 @@ import toast from 'react-hot-toast';
 import Editor from "../components/Editor";
 import FileView from "../components/FileView";
 import { initSocket } from "../socket";
+import { set } from "mongoose";
 
 const EditorPage = () => {
 
   const { roomId } = useParams();
   const socketRef = useRef(null);
   const location = useLocation();
-  const navigate = useNavigate();
+  const reactNavigator = useNavigate();   // formerly navigate
+  const [clients, setClients] = useState([]);
 
   const leaveRoom = () => {
     console.log("in LeaveRoom")
-    navigate('/', {
+    reactNavigator('/', {
       roomId: roomId,
     });
   };
@@ -30,15 +32,51 @@ const EditorPage = () => {
       function handleErrors(e) {
         console.log('socket error', e);
         toast.error('Socket connection failed, try again later.');
-    }
+        reactNavigator('/');
+      }
 
-    socketRef.current.emit(ACTIONS.JOIN, {
-      roomId,
-      username: location.state?.username,
-    });
+      const storedUserData = localStorage.getItem("userData");
+
+      if (storedUserData) {
+        const userData = JSON.parse(storedUserData);
+        socketRef.current.emit(ACTIONS.JOIN, {
+          roomId,
+          username: userData.name,
+        });
+      }
+
+
+      socketRef.current.on(ACTIONS.JOINED, 
+        ({ clients, username, socketId }) => {
+          if (socketId !== socketRef.current.id) {
+            toast.success(`${username} joined the room`);
+            console.log(`${username} joined`);
+          }
+          setClients(clients);
+        }
+      );
+
+      socketRef.current.on(ACTIONS.DISCONNECTED, ({ socketId, username }) => {
+        toast.success(`${username} left the room`);
+        console.log(`${username} left the room`);
+        setClients((prev) => {
+          return prev.filter(
+            client => client.socketId !== socketId
+          );
+        })
+      });
     }
     init();
+    return () => {
+      socketRef.current.disconnect();
+      socketRef.current.off(ACTIONS.JOINED);
+      socketRef.current.off(ACTIONS.DISCONNECTED);
+    }
   }, []);
+
+  if(!location.state) {
+    return <Navigate to="/" />;
+  }
 
   async function copyRoomId() {
     try {
@@ -49,7 +87,9 @@ const EditorPage = () => {
         toast.error('Could not copy the Room ID');
         console.error(err);
     }
-}
+  }
+
+
 
   return (
     <div className="mainWrap">

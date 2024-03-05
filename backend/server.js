@@ -8,6 +8,7 @@ const cookieSession = require("cookie-session");
 const passportStrategy =  require("./passport");
 const { Server } = require('socket.io');
 const http = require('http');
+const ACTIONS = require("../frontend/src/Actions");
 
 
 const app = express();
@@ -25,8 +26,50 @@ app.use(
 const io = new Server(server);
 
 
+// might to needed to store it in redux or database
+const userSocketMap = {};
+
+// this function could be shifted to some other file where all similar functions are written
+function getAllConnectedClients(roomId) {
+  return Array.from(io.sockets.adapter.rooms.get(roomId) || []).map((socketId) => {
+    return {
+      socketId,
+      username: userSocketMap[socketId]
+    };
+  });
+}
+
+
 io.on('connection', (socket) => {
-  console.log('socket connected', socket.id);
+  console.log('Socket connected', socket.id);
+
+  
+  socket.on(ACTIONS.JOIN, ({ roomId, username }) => {
+    userSocketMap[socket.id] = username;
+    socket.join(roomId);
+    const clients = getAllConnectedClients(roomId);
+    clients.forEach(({ socketId }) => {
+      io.to(socketId).emit(ACTIONS.JOINED, {
+        clients,
+        username,
+        socketId: socket.id
+      });
+    });
+  });
+
+  socket.on('disconnecting', () => {
+    const rooms = [...socket.rooms];
+    rooms.forEach((roomId) => {
+      socket.in(roomId).emit(ACTIONS.DISCONNECTED, {
+        socketId: socket.id,
+        username: userSocketMap[socket.id],
+      });
+    })
+    delete userSocketMap[socket.id];
+    socket.leave();
+  });
+
+
 });
 
 
