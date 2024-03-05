@@ -13,8 +13,9 @@ const EditorPage = () => {
   const { roomId } = useParams();
   const socketRef = useRef(null);
   const location = useLocation();
-  const reactNavigator = useNavigate();   // formerly navigate
+  const reactNavigator = useNavigate();
   const [clients, setClients] = useState([]);
+  const [storedUserData, setStoredUserData] = useState([]); 
 
   const leaveRoom = () => {
     console.log("in LeaveRoom")
@@ -22,7 +23,7 @@ const EditorPage = () => {
       roomId: roomId,
     });
   };
-
+  const [connectedUsernames, setConnectedUsernames] = useState([]);
   useEffect(() => {
     const init = async () => {
       socketRef.current = await initSocket();
@@ -35,24 +36,24 @@ const EditorPage = () => {
         reactNavigator('/');
       }
 
-      const storedUserData = localStorage.getItem("userData");
-
-      if (storedUserData) {
-        const userData = JSON.parse(storedUserData);
+      const userData = localStorage.getItem("userData"); 
+      if (userData) {
+        console.log(JSON.parse(userData).name);
+        setStoredUserData(JSON.parse(userData)); 
         socketRef.current.emit(ACTIONS.JOIN, {
           roomId,
-          username: userData.name,
+          username: JSON.parse(userData).name,
         });
       }
 
-
-      socketRef.current.on(ACTIONS.JOINED, 
+      socketRef.current.on(ACTIONS.JOINED,
         ({ clients, username, socketId }) => {
           if (socketId !== socketRef.current.id) {
             toast.success(`${username} joined the room`);
             console.log(`${username} joined`);
           }
           setClients(clients);
+          setConnectedUsernames(clients.map(client => client.username));
         }
       );
 
@@ -60,10 +61,12 @@ const EditorPage = () => {
         toast.success(`${username} left the room`);
         console.log(`${username} left the room`);
         setClients((prev) => {
-          return prev.filter(
+          const updatedClients = prev.filter(
             client => client.socketId !== socketId
           );
-        })
+          setConnectedUsernames(updatedClients.map(client => client.username));
+          return updatedClients;
+        });
       });
     }
     init();
@@ -74,22 +77,20 @@ const EditorPage = () => {
     }
   }, []);
 
-  if(!location.state) {
+  if (!location.state) {
     return <Navigate to="/" />;
   }
 
   async function copyRoomId() {
     try {
-        await navigator.clipboard.writeText(roomId);
+      await navigator.clipboard.writeText(roomId);
 
-        toast.success('Room ID has been copied to your clipboard');
+      toast.success('Room ID has been copied to your clipboard');
     } catch (err) {
-        toast.error('Could not copy the Room ID');
-        console.error(err);
+      toast.error('Could not copy the Room ID');
+      console.error(err);
     }
   }
-
-
 
   return (
     <div className="mainWrap">
@@ -101,10 +102,15 @@ const EditorPage = () => {
           <div className="fileTreeView">
             <FileView></FileView>
           </div>
-          </div>
           <div className="Users">
             <h3>Connected Users here</h3>
+            {connectedUsernames.map(username => (
+              <div key={username}>{username}</div>
+            ))}
           </div>
+
+
+        </div>
         <button className="btn copyBtn" onClick={copyRoomId}>Copy ROOM ID</button>
         <button className="btn leaveBtn" onClick={leaveRoom}>
           Leave
