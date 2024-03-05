@@ -1,4 +1,4 @@
-.chat-container {
+/* .chat-container {
     border: 1px solid #ccc;
     border-radius: 8px;
     overflow: hidden;
@@ -6,48 +6,72 @@
     margin: 20px auto;
     background-color: #140314;
 
-  }
-  
-  .chat-header {
-    background-color:#4aee88;;
-    color: #fff;
-    padding: 10px;
-  }
-  
-  .chat-messages {
-    padding: 10px;
-  }
-  
-  .chat-message {
-    margin-bottom: 8px;
-    padding: 8px;
-    border-radius: 4px;
-    background-color: #f0f0f0;
-  }
-  
-  .chat-input {
-    display: flex;
-    align-items: center;
-    padding: 10px;
-    border-top: 1px solid #ccc;
-  }
-  
-  .input-field {
-    flex: 1;
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    margin-right: 8px;
-  }
-  
-  .send-button {
-    background-color:#4aee88;
-    color: #fff;
-    border: none;
-    padding: 8px 16px;
-    border-radius: 4px;
-    cursor: pointer;
-  }
-  .send-button:hover{
-    background-color: #777474;
-  }
+  } */
+.chat-popup {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 300px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: #fff;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.chat-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  border-bottom: 1px solid #ccc;
+  background-color: #4aee88;
+  ;
+  color: #fff;
+}
+
+.chat-messages {
+  max-height: 200px;
+  overflow-y: auto;
+  padding: 10px;
+}
+.close-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.chat-message {
+  margin-bottom: 8px;
+  padding: 8px;
+  border-radius: 4px;
+  background-color: #f0f0f0;
+}
+
+.chat-input {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  border-top: 1px solid #ccc;
+}
+
+.input-field {
+  flex: 1;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin-right: 8px;
+}
+
+
+.send-button {
+  background-color: #4aee88;
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.send-button:hover {
+  background-color: #777474;
+}
