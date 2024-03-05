@@ -5,14 +5,14 @@ const cors = require("cors");
 const passport = require("passport");
 const authRoute = require("./routes/auth");
 const cookieSession = require("cookie-session");
-const passportStrategy = require("./passport");
+const passportStrategy =  require("./passport");
 const { Server } = require('socket.io');
 const http = require('http');
 
 
 const app = express();
 const server = http.createServer(app);
-const port = process.env.PORT || 6969;
+const port = process.env.PORT || 8080;
 
 app.use(
   cors({
@@ -58,21 +58,15 @@ app.use(passport.session());
 
 app.use("/auth", authRoute);
 
-app.get("/editor/:id", (req, res) => {
-  console.log(req.body);
-  res.json({
-    message: "You are in room " + ""
-  })
-});
-
-
 
 // connect to database
-mongoose.connect(process.env.MONGO_URL)
-  .then(() => {
-    console.log("connected to database");
-    server.listen(port, () => console.log(`Listenting on port ${port}...`));
-  })
-  .catch((error) => {
-    console.log(error)
-  })
+// mongoose.connect(process.env.MONGO_URL)
+//   .then(() => {
+//     console.log("connected to database");
+//     server.listen(port, () => console.log(`Listenting on port ${port}...`));
+//   })
+//   .catch((error) => {
+//     console.log(error)
+//   })
+
+server.listen(port, () => console.log(`Listenting on port ${port}...`));
