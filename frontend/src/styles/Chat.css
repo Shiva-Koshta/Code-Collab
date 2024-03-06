@@ -51,7 +51,8 @@
   display: flex;
   align-items: center;
   padding: 10px;
-  border-top: 1px solid #ccc;
+  border-top: 1px solid hsl(0, 0%, 80%);
+  text-overflow:clip;
 }
 
 .input-field {
@@ -60,6 +61,7 @@
   border: 1px solid #ccc;
   border-radius: 4px;
   margin-right: 8px;
+   
 }
 
 
