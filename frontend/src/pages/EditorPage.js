@@ -7,7 +7,7 @@ import Editor from "../components/Editor";
 import FileView from "../components/FileView";
 import { initSocket } from "../socket";
 import { set } from "mongoose";
-
+import { Toaster } from 'react-hot-toast';
 const EditorPage = () => {
 
   const { roomId } = useParams();
@@ -48,8 +48,13 @@ const EditorPage = () => {
 
       socketRef.current.on(ACTIONS.JOINED,
         ({ clients, username, socketId }) => {
-          if (socketId !== socketRef.current.id) {
-            toast.success(`${username} joined the room`);
+          if (socketId !== socketRef.current.id && socketId != socketRef.current.id) {
+            toast.success(
+              <div style={{ display: "flex", alignItems: "center" }}>
+                <span role="img" aria-label="enter" style={{ marginRight: "8px" }}>➡️</span>
+                <span><strong>{username}</strong> entered the room</span>
+              </div>
+            );
             console.log(`${username} joined`);
           }
           setClients(clients);
@@ -58,7 +63,13 @@ const EditorPage = () => {
       );
 
       socketRef.current.on(ACTIONS.DISCONNECTED, ({ socketId, username }) => {
-        toast.success(`${username} left the room`);
+        toast.success(
+          <div style={{ display: "flex", alignItems: "center" }}>
+            <span role="img" aria-label="enter" style={{ marginRight: "8px" }}>⬅️</span>
+            <span><strong>{username}</strong> left the room</span>
+          </div>
+        );
+        
         console.log(`${username} left the room`);
         setClients((prev) => {
           const updatedClients = prev.filter(
@@ -94,6 +105,7 @@ const EditorPage = () => {
 
   return (
     <div className="mainWrap">
+      <Toaster />
       <div className="aside">
         <div className="asideInner">
           <div className="logo">
@@ -120,6 +132,7 @@ const EditorPage = () => {
       <div >
         <Editor></Editor>
       </div>
+      {/* <ToastContainer /> */}
     </div>
   );
 };
