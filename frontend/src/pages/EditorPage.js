@@ -136,13 +136,14 @@ const EditorPage = () => {
             />
             <FileView></FileView>
           </div>
-          <div className="Users">
-            <h3>Connected Users here</h3>
-            {connectedUsernames.map((username) => (
-              <div key={username}>{username}</div>
-            ))}
-          </div>
         </div>
+        <div className="Users">
+          <h3>Connected Users here</h3>
+          {connectedUsernames.map((username,) => (
+            <div className="Userlist"key={username}>{username}</div>
+          ))}
+        </div>
+
         <button className="btn copyBtn" onClick={copyRoomId}>
           Copy ROOM ID
         </button>
