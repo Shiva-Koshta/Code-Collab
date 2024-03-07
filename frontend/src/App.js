@@ -19,8 +19,6 @@ import Chat from "./components/Chat";
 function App() {
   const [user, setUser] = useState(null);
 
-
-
   useEffect(() => {
     const getUser = async () => {
       try {
@@ -37,6 +35,7 @@ function App() {
 
   return (
     // <BrowserRouter>
+
       <Routes>
         <Route
           exact
@@ -54,6 +53,7 @@ function App() {
         />
       </Routes>
     // </BrowserRouter>
+
   );
 }
 
