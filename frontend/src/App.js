@@ -8,6 +8,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import Room_Creation from "./pages/Room_Creation";
 import EditorPage from "./pages/EditorPage";
+import Chat from "./components/Chat";
 
 
 // import './App.css';
@@ -17,8 +18,6 @@ import EditorPage from "./pages/EditorPage";
 // import { Toaster } from 'react-hot-toast';
 function App() {
   const [user, setUser] = useState(null);
-
-  
 
   useEffect(() => {
     const getUser = async () => {
@@ -35,7 +34,8 @@ function App() {
   }, []);
 
   return (
-    <BrowserRouter>
+    // <BrowserRouter>
+
       <Routes>
         <Route
           exact
@@ -52,7 +52,8 @@ function App() {
           element={<EditorPage />}
         />
       </Routes>
-    </BrowserRouter>
+    // </BrowserRouter>
+
   );
 }
 
