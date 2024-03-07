@@ -1,9 +1,9 @@
-
 .loginContainer {
     position: relative;
     width: 100%;
     height: 100vh;
-    background:#140314;
+    background-color: #222;
+    color: #fff; 
   }
   .loginPage {
     position: absolute;
@@ -30,10 +30,11 @@
   
   .panel-container {
     position: fixed;
-    left: 50px;
+    /* left: 50px; */
     width: 60%;
     height: 100%;
     display: flex;
+    background:#222;
   }
   .panel {
     display: flex;
@@ -42,7 +43,7 @@
     text-align: center;
   }
   .right-panel .image{
-    max-width: 60vw;
+    max-width: 100vw;
     max-height: 100vh;
     width: auto; 
     height: auto;
@@ -83,4 +84,5 @@
       width: 95%;
     }
   }
-  
+  .loginHeading{
+    font-size:490%;  }
