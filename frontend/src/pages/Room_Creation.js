@@ -3,10 +3,10 @@ import { v4 as uuidV4 } from 'uuid';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import "../styles/Room_Creation.css";
+import axios from "axios";
 
 
 const Room_Creation = () => {
-
   const navigate = useNavigate();
 
   const [roomId, setRoomId] = useState('');
@@ -49,11 +49,19 @@ const Room_Creation = () => {
     }
 
     //this will navigate to the editor page
+    // axios.post("http://localhost:8080/createroom", { "roomId" : roomId})
     navigate(`/editor/${roomId}`, {
       state: {
         userName,
       },
     });
+    // axios.get("https://localhost:8080/editor/:id", {"roomId" : roomId})
+    //   .then(res => {
+    //     console.log("Response:", res.data);
+    //   })
+    //   .catch(error => {
+    //     console.error("Axios request failed:", error.message);
+    //   })
   };
 
   const handleInputEnter = (e) => {
@@ -85,7 +93,7 @@ const Room_Creation = () => {
           <div className="imageWrapper">
           <img src={userimage} alt="profile" className="profileImage"/>
           </div>
-          <h2> {userName && <p>Hello, {userName}!</p>}</h2>
+          <h2> {userName && <p>Hello, {userName}</p>}</h2>
             <h4 className="mainLabel">Join a Room</h4>
             <div className="inputGroup">
               <input
