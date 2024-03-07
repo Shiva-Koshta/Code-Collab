@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import Room_Creation from "./pages/Room_Creation";
-
+import EditorPage from "./pages/EditorPage";
 
 // import './App.css';
 // import Home from './pages/Room_Join';
@@ -45,6 +45,11 @@ function App() {
         exact
         path="/login"
         element={user ? <Navigate to="/" /> : <Login />}
+      />
+       <Route
+        exact
+        path="/editor/:roomId"
+        element={user ? <EditorPage/> : <Login />}
       />
     </Routes>
 
