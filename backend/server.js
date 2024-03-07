@@ -60,13 +60,11 @@ app.use("/auth", authRoute);
 
 
 // connect to database
-// mongoose.connect(process.env.MONGO_URL)
-//   .then(() => {
-//     console.log("connected to database");
-//     server.listen(port, () => console.log(`Listenting on port ${port}...`));
-//   })
-//   .catch((error) => {
-//     console.log(error)
-//   })
-
-server.listen(port, () => console.log(`Listenting on port ${port}...`));
+mongoose.connect(process.env.MONGO_URL)
+  .then(() => {
+    console.log("connected to database");
+    server.listen(port, () => console.log(`Listenting on port ${port}...`));
+  })
+  .catch((error) => {
+    console.log(error)
+  })
