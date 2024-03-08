@@ -38,6 +38,7 @@ function App() {
 
   return (
     <BrowserRouter>
+
       <Routes>
         <Route
           exact
@@ -52,6 +53,7 @@ function App() {
         <Route path="/editor/:roomId" element={<EditorPage />} />
       </Routes>
     </BrowserRouter>
+
   );
 }
 
