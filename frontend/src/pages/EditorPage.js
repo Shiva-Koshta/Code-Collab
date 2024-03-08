@@ -139,8 +139,10 @@ const EditorPage = () => {
         </div>
         <div className="Users">
           <h3>Connected Users here</h3>
-          {connectedUsernames.map((username,) => (
-            <div className="Userlist"key={username}>{username}</div>
+          {connectedUsernames.map((username) => (
+            <div className="Userlist" key={username}>
+              {username}
+            </div>
           ))}
         </div>
 
@@ -152,7 +154,11 @@ const EditorPage = () => {
         </button>
       </div>
       <div>
-        <Editor fileContent={fileContent}></Editor>
+        <Editor
+          fileContent={fileContent}
+          socketRef={socketRef}
+          roomId={roomId}
+        ></Editor>
       </div>
     </div>
   );

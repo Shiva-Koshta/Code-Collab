@@ -1,8 +1,13 @@
-
 import logo from "./logo.svg";
 import "./App.css";
 import Login from "./pages/Login";
-import { Routes, Route, Navigate, Router, BrowserRouter } from "react-router-dom";
+import {
+  Routes,
+  Route,
+  Navigate,
+  Router,
+  BrowserRouter,
+} from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
@@ -33,8 +38,7 @@ function App() {
   }, []);
 
   return (
-    // <BrowserRouter>
-
+    <BrowserRouter>
       <Routes>
         <Route
           exact
@@ -46,13 +50,9 @@ function App() {
           path="/login"
           element={user ? <Room_Creation /> : <Login />}
         />
-        <Route
-          path="/editor/:roomId"
-          element={<EditorPage />}
-        />
+        <Route path="/editor/:roomId" element={<EditorPage />} />
       </Routes>
-    // </BrowserRouter>
-
+    </BrowserRouter>
   );
 }
 
