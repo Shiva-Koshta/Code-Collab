@@ -32,7 +32,7 @@ const Editor = ({ fileContent, socketRef, roomId }) => {
       }
 
       editorRef.current.on("change", (instance, changes) => {
-        console.log(changes);
+        // console.log(changes);
         const { origin } = changes;
         const code = instance.getValue();
         if (origin !== "setValue") {
@@ -48,7 +48,7 @@ const Editor = ({ fileContent, socketRef, roomId }) => {
   useEffect(() => {
     if (socketRef.current) {
       socketRef.current.on(ACTIONS.CODE_CHANGE, ({ code }) => {
-        console.log("hi");
+        //console.log("hi");
         if (code !== null) {
           editorRef.current.setValue(code);
         }
@@ -56,9 +56,9 @@ const Editor = ({ fileContent, socketRef, roomId }) => {
     }
   }, [socketRef.current]);
   useEffect(() => {
-    console.log("file added");
+    //console.log("file added");
     if (fileContent) {
-      console.log(fileContent);
+      //console.log(fileContent);
       var code = fileContent;
       socketRef.current.emit(ACTIONS.CODE_CHANGE, {
         roomId,
