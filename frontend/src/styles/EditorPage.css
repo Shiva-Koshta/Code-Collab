@@ -1,0 +1,38 @@
+.editor-page-grid {
+    /* display: grid;
+    grid-template-rows: 1fr 2fr 1fr;
+    grid-template-columns: 1fr 2fr 1fr;
+    height: 100vh; */
+    display: grid;
+    grid-template-columns: 1fr 6fr 1fr; /* Divide the page into four columns */
+    height: 100vh;
+  }
+  
+  .aside {
+    grid-row: 1 / span 3;
+    grid-column: 1 / span 1;
+    background: #1c1e29;
+    padding: 16px;
+    color: #fff;
+  }
+  
+  .editor-container {
+    /* grid-row: 1 / span 3;
+    grid-column: 2 / span 2;
+    overflow-y: auto; */
+    overflow-y: auto; /* Enable vertical scrolling for the editor */
+  }
+  
+  .chat-container {
+    /* grid-row: 1 / span 3;
+    grid-column: 4 / span 1;
+    background: #fff; */
+    background: #fff;
+    height: 100vh; /* Make the chat container fill the entire height of the viewport */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    /* padding: 20px; */
+    box-sizing: border-box;
+  }
+  

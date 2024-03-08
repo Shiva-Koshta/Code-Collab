@@ -8,7 +8,6 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import Room_Creation from "./pages/Room_Creation";
 import EditorPage from "./pages/EditorPage";
-import Chat from "./components/Chat";
 
 
 // import './App.css';
@@ -34,7 +33,7 @@ function App() {
   }, []);
 
   return (
-    // <BrowserRouter>
+    <BrowserRouter>
 
       <Routes>
         <Route
@@ -52,7 +51,7 @@ function App() {
           element={<EditorPage />}
         />
       </Routes>
-    // </BrowserRouter>
+    </BrowserRouter>
 
   );
 }
