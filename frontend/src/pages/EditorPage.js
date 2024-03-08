@@ -10,7 +10,6 @@ import { Toaster } from 'react-hot-toast';
 import '../styles/EditorPage.css';
 import '../styles/Chat.css';
 
-
 const EditorPage = () => {
   const { roomId } = useParams();
   const socketRef = useRef(null);
@@ -22,12 +21,17 @@ const EditorPage = () => {
   const [messages, setMessages] = useState([]);
   const [inputText, setInputText] = useState('');
   const [isOpen, setIsOpen] = useState(true);
+
   const handleMessageSend = () => {
+    console.log(storedUserData);
     if (inputText.trim() !== '') {
-      setMessages([...messages, { text: inputText }]);
+      const message = { text: inputText };
+      socketRef.current.emit(ACTIONS.MESSAGE_SEND, { roomId, message, sender: storedUserData.sub, sendname: storedUserData.name });
       setInputText('');
     }
   };
+  
+
   const leaveRoom = () => {
     console.log("in LeaveRoom")
     reactNavigator('/', {
@@ -46,7 +50,6 @@ const EditorPage = () => {
         toast.error('Socket connection failed, try again later.');
         reactNavigator('/');
       }
-
       const userData = localStorage.getItem("userData");
       if (userData) {
         console.log(JSON.parse(userData).name);
@@ -56,7 +59,6 @@ const EditorPage = () => {
           username: JSON.parse(userData).name,
         });
       }
-
       socketRef.current.on(ACTIONS.JOINED, ({ clients, username, socketId }) => {
         if (socketId !== socketRef.current.id && socketId != socketRef.current.id) {
           toast.success(
@@ -70,30 +72,38 @@ const EditorPage = () => {
         setClients(clients);
         setConnectedUsernames(clients.map(client => client.username));
       });
-
-      socketRef.current.on(ACTIONS.DISCONNECTED, ({ socketId, username }) => {
+  
+      socketRef.current.on(ACTIONS.DISCONNECTED, ({ username }) => {
         toast.success(
           <div style={{ display: "flex", alignItems: "center" }}>
             <span role="img" aria-label="enter" style={{ marginRight: "8px" }}>⬅️</span>
             <span><strong>{username}</strong> left the room</span>
           </div>
         );
-
         console.log(`${username} left the room`);
         setClients(prev => {
-          const updatedClients = prev.filter(client => client.socketId !== socketId);
+          const updatedClients = prev.filter(client => client.username !== username);
           setConnectedUsernames(updatedClients.map(client => client.username));
           return updatedClients;
         });
       });
+      socketRef.current.on(ACTIONS.MESSAGE_RECEIVE, ({ text, sender, sendname }) => {
+        console.log(`${sender}: ${text}`);
+        console.log(storedUserData);
+        console.log(userData);
+        setMessages(prev => [...prev, { text, sender, sentByCurrentUser: sender === JSON.parse(userData).sub, sendname }]);
+      });      
     };
+  
     init();
+  
     return () => {
-      socketRef.current.disconnect();
-      socketRef.current.off(ACTIONS.JOINED);
-      socketRef.current.off(ACTIONS.DISCONNECTED);
+      if (socketRef.current) {
+        socketRef.current.disconnect();
+      }
     };
-  }, []);
+  }, [roomId]); // Include roomId as a dependency to rejoin room when it changes
+  
 
   if (!location.state) {
     return <Navigate to="/" />;
@@ -142,17 +152,16 @@ const EditorPage = () => {
         <div className="chat-popup">
           <div className="chat-header">
             <h2>Chat</h2>
-            {/* <button onClick={handleCloseChat} className="close-button">
-                            X
-                        </button> */}
           </div>
           <div className="chat-messages">
             {messages.map((message, index) => (
-              <div key={index} className="chat-message">
-                {message.text}
+              
+              <div key={index} className={` ${message.sentByCurrentUser ? 'sent_by_user' : 'chat-message'}`}>
+                <span className="message-sender">{message.sentByCurrentUser ? 'You' : message.sendname}:</span> {message.text}
               </div>
             ))}
           </div>
+
           <div className="chat-input">
             <input
               type="text"

@@ -69,7 +69,17 @@ io.on('connection', (socket) => {
     socket.leave();
   });
 
+  socket.on(ACTIONS.JOIN, ({ roomId }) => {
+    socket.join(roomId);
+    console.log(`User joined room ${roomId}`);
+  });
 
+  socket.on(ACTIONS.MESSAGE_SEND, ({ roomId, message, sender, sendname }) => {
+    console.log(sender);
+    console.log(sendname);
+    io.to(roomId).emit(ACTIONS.MESSAGE_RECEIVE, { text: message.text, sender, sendname });
+  });
+  
 });
 
 
