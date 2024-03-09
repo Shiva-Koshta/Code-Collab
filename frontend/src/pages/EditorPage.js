@@ -1,15 +1,19 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Navigate, useLocation, useNavigate, useParams } from "react-router-dom";
+import {
+  Navigate,
+  useLocation,
+  useNavigate,
+  useParams,
+} from "react-router-dom";
 import "./Editor.css";
 import ACTIONS from "../Actions";
-import toast from 'react-hot-toast';
+import toast from "react-hot-toast";
 import Editor from "../components/Editor";
 import FileView from "../components/FileView";
 import { initSocket } from "../socket";
-import { Toaster } from 'react-hot-toast';
-import '../styles/EditorPage.css';
-import '../styles/Chat.css';
-
+import { Toaster } from "react-hot-toast";
+import "../styles/EditorPage.css";
+import "../styles/Chat.css";
 
 const EditorPage = () => {
   const { roomId } = useParams();
@@ -20,31 +24,45 @@ const EditorPage = () => {
   const [storedUserData, setStoredUserData] = useState([]);
   const [connectedUsernames, setConnectedUsernames] = useState([]);
   const [messages, setMessages] = useState([]);
-  const [inputText, setInputText] = useState('');
+  const [inputText, setInputText] = useState("");
+  const [fileContent, setFileContent] = useState("");
   const [isOpen, setIsOpen] = useState(true);
   const handleMessageSend = () => {
-    if (inputText.trim() !== '') {
+    if (inputText.trim() !== "") {
       setMessages([...messages, { text: inputText }]);
-      setInputText('');
+      setInputText("");
     }
   };
   const leaveRoom = () => {
-    console.log("in LeaveRoom")
-    reactNavigator('/', {
+    console.log("in LeaveRoom");
+    reactNavigator("/", {
       roomId: roomId,
     });
+  };
+  const handleFileChange = (event) => {
+    console.log("reached");
+    const file = event.target.files[0];
+    const reader = new FileReader();
+
+    reader.onload = (e) => {
+      const content = e.target.result;
+      setFileContent(content);
+      console.log(content);
+    };
+
+    reader.readAsText(file);
   };
 
   useEffect(() => {
     const init = async () => {
       socketRef.current = await initSocket();
-      socketRef.current.on('connect_error', (err) => handleErrors(err));
-      socketRef.current.on('connect_failed', (err) => handleErrors(err));
+      socketRef.current.on("connect_error", (err) => handleErrors(err));
+      socketRef.current.on("connect_failed", (err) => handleErrors(err));
 
       function handleErrors(e) {
-        console.log('socket error', e);
-        toast.error('Socket connection failed, try again later.');
-        reactNavigator('/');
+        console.log("socket error", e);
+        toast.error("Socket connection failed, try again later.");
+        reactNavigator("/");
       }
 
       const userData = localStorage.getItem("userData");
@@ -57,32 +75,54 @@ const EditorPage = () => {
         });
       }
 
-      socketRef.current.on(ACTIONS.JOINED, ({ clients, username, socketId }) => {
-        if (socketId !== socketRef.current.id && socketId != socketRef.current.id) {
-          toast.success(
-            <div style={{ display: "flex", alignItems: "center" }}>
-              <span role="img" aria-label="enter" style={{ marginRight: "8px" }}>➡️</span>
-              <span><strong>{username}</strong> entered the room</span>
-            </div>
-          );
-          console.log(`${username} joined`);
+      socketRef.current.on(
+        ACTIONS.JOINED,
+        ({ clients, username, socketId }) => {
+          if (
+            socketId !== socketRef.current.id &&
+            socketId != socketRef.current.id
+          ) {
+            toast.success(
+              <div style={{ display: "flex", alignItems: "center" }}>
+                <span
+                  role="img"
+                  aria-label="enter"
+                  style={{ marginRight: "8px" }}
+                >
+                  ➡️
+                </span>
+                <span>
+                  <strong>{username}</strong> entered the room
+                </span>
+              </div>
+            );
+            console.log(`${username} joined`);
+          }
+          setClients(clients);
+          setConnectedUsernames(clients.map((client) => client.username));
         }
-        setClients(clients);
-        setConnectedUsernames(clients.map(client => client.username));
-      });
+      );
 
       socketRef.current.on(ACTIONS.DISCONNECTED, ({ socketId, username }) => {
         toast.success(
           <div style={{ display: "flex", alignItems: "center" }}>
-            <span role="img" aria-label="enter" style={{ marginRight: "8px" }}>⬅️</span>
-            <span><strong>{username}</strong> left the room</span>
+            <span role="img" aria-label="enter" style={{ marginRight: "8px" }}>
+              ⬅️
+            </span>
+            <span>
+              <strong>{username}</strong> left the room
+            </span>
           </div>
         );
 
         console.log(`${username} left the room`);
-        setClients(prev => {
-          const updatedClients = prev.filter(client => client.socketId !== socketId);
-          setConnectedUsernames(updatedClients.map(client => client.username));
+        setClients((prev) => {
+          const updatedClients = prev.filter(
+            (client) => client.socketId !== socketId
+          );
+          setConnectedUsernames(
+            updatedClients.map((client) => client.username)
+          );
           return updatedClients;
         });
       });
@@ -102,9 +142,9 @@ const EditorPage = () => {
   async function copyRoomId() {
     try {
       await navigator.clipboard.writeText(roomId);
-      toast.success('Room ID has been copied to your clipboard');
+      toast.success("Room ID has been copied to your clipboard");
     } catch (err) {
-      toast.error('Could not copy the Room ID');
+      toast.error("Could not copy the Room ID");
       console.error(err);
     }
   }
@@ -119,23 +159,38 @@ const EditorPage = () => {
             <img className="logoImage" src="" alt="logo" />
           </div>
           <div className="fileTreeView">
+            <label className="fileLabel" for="file_input">
+              Upload file
+            </label>
+            <input
+              className="FileInput"
+              id="file_input"
+              type="file"
+              onChange={handleFileChange}
+            />
             <FileView></FileView>
           </div>
           <div className="Users">
             <h3>Connected Users here</h3>
-            {connectedUsernames.map(username => (
+            {connectedUsernames.map((username) => (
               <div key={username}>{username}</div>
             ))}
           </div>
         </div>
-        <button className="btn copyBtn" onClick={copyRoomId}>Copy ROOM ID</button>
+        <button className="btn copyBtn" onClick={copyRoomId}>
+          Copy ROOM ID
+        </button>
         <button className="btn leaveBtn" onClick={leaveRoom}>
           Leave
         </button>
       </div>
 
       <div className="editor-container">
-        <Editor />
+        <Editor
+          fileContent={fileContent}
+          socketRef={socketRef}
+          roomId={roomId}
+        />
       </div>
 
       <div className="chat-container">
