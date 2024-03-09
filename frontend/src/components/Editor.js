@@ -25,17 +25,12 @@ const Editor = ({ fileContent, socketRef, roomId }) => {
 
       if (fileContent) {
         editorRef.current.setValue(fileContent);
-        // socketRef.current.emit(ACTIONS.CODE_CHANGE, {
-        //   roomId,
-        //   fileContent,
-        // }); // Set file content to CodeMirror editor
       }
 
       editorRef.current.on("change", (instance, changes) => {
-        // console.log(changes);
         const { origin } = changes;
         const code = instance.getValue();
-        if (origin !== "setValue") {
+        if (origin !== "setValue" && socketRef && socketRef.current) {
           socketRef.current.emit(ACTIONS.CODE_CHANGE, {
             roomId,
             code,
@@ -43,39 +38,29 @@ const Editor = ({ fileContent, socketRef, roomId }) => {
         }
       });
     }
+
     init();
-  }, [fileContent]);
+  }, [fileContent, socketRef, roomId]);
+
   useEffect(() => {
-    if (socketRef.current) {
+    if (socketRef && socketRef.current) {
       socketRef.current.on(ACTIONS.CODE_CHANGE, ({ code }) => {
-        //console.log("hi");
-        if (code !== null) {
+        if (code !== null && editorRef && editorRef.current) {
           editorRef.current.setValue(code);
         }
       });
     }
-  }, [socketRef.current]);
+  }, [socketRef, roomId]);
+
   useEffect(() => {
-    //console.log("file added");
-    if (fileContent) {
-      //console.log(fileContent);
+    if (fileContent && socketRef && socketRef.current) {
       var code = fileContent;
       socketRef.current.emit(ACTIONS.CODE_CHANGE, {
         roomId,
         code,
       });
     }
-  }, [fileContent]);
-  // useEffect(() => {
-  //   if (socketRef.current) {
-  //     console.log("hi");
-  //     socketRef.current.on(ACTIONS.SYNC_CHANGE, ({ code }) => {
-  //       if (code !== null) {
-  //         editorRef.current.setValue(code);
-  //       }
-  //     });
-  //   }
-  // }, [socketRef.current]);
+  }, [fileContent, socketRef, roomId]);
 
   return <textarea id="realEditor"></textarea>;
 };
