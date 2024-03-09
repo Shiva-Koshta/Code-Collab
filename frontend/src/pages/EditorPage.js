@@ -102,7 +102,7 @@ const EditorPage = () => {
         socketRef.current.disconnect();
       }
     };
-  }, [roomId]); // Include roomId as a dependency to rejoin room when it changes
+  }, [roomId]);
   
 
   if (!location.state) {
@@ -118,6 +118,12 @@ const EditorPage = () => {
       console.error(err);
     }
   }
+
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      handleMessageSend();
+    }
+  };
 
   return (
     <div className="editor-page-grid">
@@ -167,6 +173,7 @@ const EditorPage = () => {
               type="text"
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
+              onKeyPress={handleKeyPress}
               placeholder="Type your message..."
               className="input-field"
             />
