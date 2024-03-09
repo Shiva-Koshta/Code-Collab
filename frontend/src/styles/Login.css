@@ -1,9 +1,12 @@
-
-.loginContainer {
+  .loginHeading{
+    font-size: 490%;
+  }
+  .loginContainer {
     position: relative;
     width: 100%;
     height: 100vh;
-    background:#140314;
+    background-color: #222;
+    color: #fff; 
   }
   .loginPage {
     position: absolute;
@@ -30,10 +33,10 @@
   
   .panel-container {
     position: fixed;
-    left: 50px;
     width: 60%;
     height: 100%;
     display: flex;
+    background:#222;
   }
   .panel {
     display: flex;
@@ -42,22 +45,22 @@
     text-align: center;
   }
   .right-panel .image{
-    max-width: 60vw;
+    max-width: 100vw;
     max-height: 100vh;
     width: auto; 
     height: auto;
   }
   
   .footerLinks {
-    margin-top: 20px;
     position: fixed;
-    bottom: 50px;
+    bottom: 10px;
   }
   
   .footerLinks a {
     color: #fff;
     text-decoration: none;
-    margin: 25px;
+    text-overflow: clip;
+    margin: 10px;
   }
   
   .footerLinks a:hover{
@@ -65,14 +68,19 @@
     color: #8b898b;
   }
   
-  @media (max-width: 779px) {
+  @media (max-width: 1000px) {
     .container {
       width: 100vw;
       height: 100vh;
     }
+    .loginHeading{
+      font-size: 320%;
+    }
   }
-  @media (max-width: 635px) {
-  
+  @media (max-width: 735px) {
+    .loginHeading{
+      font-size: 250%;
+    }
     .loginForm {
       width: 100%;
     }
@@ -83,4 +91,3 @@
       width: 95%;
     }
   }
-  
