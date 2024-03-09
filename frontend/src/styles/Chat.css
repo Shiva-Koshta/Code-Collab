@@ -59,6 +59,16 @@
   overflow-wrap: break-word;
 }
 
+.sent_by_user{
+  margin-bottom: 8px;
+  margin-right: 28px;
+  padding: 8px;
+  border-radius: 4px;
+  background-color: #bcf0d0;
+  word-wrap: break-word;
+  max-width: 210px;
+  overflow-wrap: break-word;
+}
 .chat-input {
   display: flex;
   align-items: center;
