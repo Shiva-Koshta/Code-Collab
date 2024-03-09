@@ -20,6 +20,7 @@ const EditorPage = () => {
   const [connectedUsernames, setConnectedUsernames] = useState([]);
   const [messages, setMessages] = useState([]);
   const [inputText, setInputText] = useState('');
+  const [fileContent, setFileContent] = useState("");
   const [isOpen, setIsOpen] = useState(true);
 
   const handleMessageSend = () => {
@@ -38,7 +39,19 @@ const EditorPage = () => {
       roomId: roomId,
     });
   };
+  const handleFileChange = (event) => {
+    console.log("reached");
+    const file = event.target.files[0];
+    const reader = new FileReader();
 
+    reader.onload = (e) => {
+      const content = e.target.result;
+      setFileContent(content);
+      console.log(content);
+    };
+
+    reader.readAsText(file);
+  };
   useEffect(() => {
     const init = async () => {
       socketRef.current = await initSocket();
@@ -135,6 +148,15 @@ const EditorPage = () => {
             <img className="logoImage" src="" alt="logo" />
           </div>
           <div className="fileTreeView">
+            <label className="fileLabel" for="file_input">
+              Upload file
+            </label>
+            <input
+              className="FileInput"
+              id="file_input"
+              type="file"
+              onChange={handleFileChange}
+            />
             <FileView></FileView>
           </div>
           <div className="Users">
@@ -151,7 +173,11 @@ const EditorPage = () => {
       </div>
 
       <div className="editor-container">
-        <Editor />
+        <Editor
+          fileContent={fileContent}
+          socketRef={socketRef}
+          roomId={roomId}
+        />
       </div>
 
       <div className="chat-container">
