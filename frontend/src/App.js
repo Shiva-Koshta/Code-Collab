@@ -2,6 +2,7 @@
 import logo from "./logo.svg";
 import "./App.css";
 import Login from "./pages/Login";
+import Faq from "./pages/Faq";
 import { Routes, Route, Navigate, Router, BrowserRouter } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "axios";
@@ -45,6 +46,7 @@ function App() {
           path="/login"
           element={user ? <Room_Creation /> : <Login />}
         />
+        <Route path="/faq" element={<Faq />} />
         <Route
           path="/editor/:roomId"
           element={<EditorPage />}
