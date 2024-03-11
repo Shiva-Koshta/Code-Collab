@@ -1,4 +1,3 @@
-
 import logo from "./logo.svg";
 import "./App.css";
 import Login from "./pages/Login";
@@ -8,6 +7,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import Room_Creation from "./pages/Room_Creation";
 import EditorPage from "./pages/EditorPage";
+import About from "./pages/About";
 
 
 // import './App.css';
@@ -50,6 +50,10 @@ function App() {
         <Route
           path="/editor/:roomId"
           element={<EditorPage />}
+        />
+        <Route
+          path="/about-us"
+          element={<About/>}
         />
       </Routes>
     </BrowserRouter>

@@ -45,7 +45,7 @@ const goToPage = (url) => {
     {/* first div */}
     <div>
     <nav className="navbar">
-        <button className="navbar-button" onClick={() => goToPage('/aboutus')}>About Us</button>
+        <button className="navbar-button" onClick={() => goToPage('/about-us')}>About Us</button>
         <button className="navbar-button"  onClick={() => goToPage('/faq')}>FAQ</button>
 
       </nav>
