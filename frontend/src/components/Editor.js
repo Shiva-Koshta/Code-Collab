@@ -10,6 +10,15 @@ import ACTIONS from "../Actions";
 const Editor = ({ fileContent, socketRef, roomId }) => {
   const editorRef = useRef(null);
 
+  useEffect(() => {  
+    if (!editorRef.current) return;
+
+    editorRef.current.setValue(""); // to avoid repetition of old instances
+    if (fileContent) {
+      editorRef.current.setValue(fileContent); 
+    }
+  }, [fileContent]);
+
   useEffect(() => {
     async function init() {
       editorRef.current = Codemirror.fromTextArea(
@@ -44,7 +53,7 @@ const Editor = ({ fileContent, socketRef, roomId }) => {
       });
     }
     init();
-  }, [fileContent]);
+  }, []);
   useEffect(() => {
     if (socketRef.current) {
       socketRef.current.on(ACTIONS.CODE_CHANGE, ({ code }) => {

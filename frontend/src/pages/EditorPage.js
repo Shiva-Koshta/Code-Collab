@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Navigate, useLocation, useNavigate, useParams } from "react-router-dom";
-import "./Editor.css";
 import ACTIONS from "../Actions";
 import toast from 'react-hot-toast';
 import Editor from "../components/Editor";
@@ -162,12 +161,12 @@ const EditorPage = () => {
           <div className="Users">
             <h3>Connected Users here</h3>
             {connectedUsernames.map(username => (
-              <div key={username}>{username}</div>
+              <div className="UserList" key={username}>{username}</div>
             ))}
           </div>
         </div>
-        <button className="btn copyBtn" onClick={copyRoomId}>Copy ROOM ID</button>
-        <button className="btn leaveBtn" onClick={leaveRoom}>
+        <button className="btn-edit " onClick={copyRoomId}>Copy ROOM ID</button>
+        <button className="btn-edit leavebtn" onClick={leaveRoom}>
           Leave
         </button>
       </div>
