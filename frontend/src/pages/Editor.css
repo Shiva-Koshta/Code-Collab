@@ -10,7 +10,7 @@
 }
 
 .leaveBtn {
-    background: #4aed88;
+    background: #ee0c0c;
     width: 100%;
     margin-left: auto;
     margin-top: 20px;
@@ -18,7 +18,17 @@
 }
 
 .leaveBtn:hover {
+    background: #a50808;
+}
+
+.copyBtn {
+    background: #4aed88;
+    width: 100%;
+    margin-left: auto;
+}
+.copyBtn:hover {
     background: #2b824c;
+    transform: scale(1.1);
 }
 
 .mainWrap {
