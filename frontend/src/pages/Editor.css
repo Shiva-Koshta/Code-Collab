@@ -5,6 +5,7 @@
     font-size: 16px;
     font-weight: bold;
     cursor: pointer;
+    width: 100%;
     transition: all 0.3s ease-in-out;
 }
 
@@ -13,6 +14,7 @@
     width: 100%;
     margin-left: auto;
     margin-top: 20px;
+    margin-bottom: 30px;
 }
 
 .leaveBtn:hover {
@@ -28,8 +30,8 @@
     background: #1c1e29;
     padding: 16px;
     color: #fff;
-    display: flex;
-    /* height: 100vh; */
+    display: flex; 
+    height: 100vh;
     flex-direction: column;
 }
 .asideInner {
