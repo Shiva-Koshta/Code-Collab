@@ -2,6 +2,7 @@ import React from "react";
 import mainlogo from "../res/bg.png";
 import GoogleButton from "react-google-button";
 import "../styles/Login.css";
+import { Link } from "react-router-dom";
 const Login = () => {
   const googleAuth = () => {
     window.open(`${process.env.REACT_APP_API_URL}/auth/google`, "_self");
@@ -15,7 +16,7 @@ const Login = () => {
             <GoogleButton onClick={googleAuth} />
             <div className="footerLinks">
               <a href="/about-us">About Us</a>
-              <a href="/faq">FAQ</a>
+              <Link to="/Faq">FAQ</Link>
               <a href="/help">Help</a>
             </div>
           </div>

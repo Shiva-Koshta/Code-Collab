@@ -1,0 +1,72 @@
+// Faq.js
+import React, { useState } from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faChevronUp, faChevronDown } from '@fortawesome/free-solid-svg-icons';
+import faqData from './faqdata';
+
+const Faq = () => {
+  const [openCategory, setOpenCategory] = useState(null);
+
+  const handleCategoryToggle = (categoryIndex) => {
+    setOpenCategory((prevIndex) => (prevIndex === categoryIndex ? null : categoryIndex));
+  };
+
+  return (
+    <div>
+      {/* Blue banner with "FAQ" */}
+      <div style={{ backgroundColor: '#136163', padding: '10px', color: 'white', fontSize: '24px', fontWeight: 'bold', textAlign: 'left', fontFamily: 'Arial, sans-serif', boxShadow: '0px 0px 10px 0px rgba(255, 255, 255, 0.3)' }}>
+        FAQ
+      </div>
+
+      {/* FAQ content */}
+      <div style={{ backgroundColor: '#140314', minHeight: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+        <div style={{ width: '80%', fontFamily: 'Helvetica, sans-serif' }}>
+          {faqData.map((category, index) => (
+            <div
+              key={index}
+              style={{
+                marginBottom: '20px',
+                borderRadius: '10px',
+                overflow: 'hidden',
+                transition: 'background-color 0.3s, color 0.3s, box-shadow 0.3s', // Add smooth transitions
+                boxShadow: '0px 0px 10px 0px rgba(255, 255, 255, 0.5)', // Add box shadow
+              }}
+            >
+              <div
+                onClick={() => handleCategoryToggle(index)}
+                style={{
+                  backgroundColor: openCategory === index ? '#136163' : 'black',
+                  color: openCategory === index ? 'white' : '#136163',
+                  padding: '10px',
+                  cursor: 'pointer',
+                  fontSize: '18px',
+                  fontWeight: 'bold',
+                  marginBottom: '10px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between', // Align icon to the right
+                  transition: 'background-color 0.3s, color 0.3s', // Add smooth transitions
+                }}
+              >
+                {category.category}{' '}
+                <FontAwesomeIcon icon={openCategory === index ? faChevronUp : faChevronDown} />
+              </div>
+              {openCategory === index && (
+                <div style={{ color: 'white', backgroundColor: 'black', padding: '10px', fontSize: '16px', lineHeight: '1.6', boxShadow: '0px 0px 5px 0px rgba(255, 255, 255, 0.1)' }}>
+                  {category.questions.map((question, subIndex) => (
+                    <div key={subIndex} className="mb-4">
+                      <h5 style={{ color: 'white', marginBottom: '8px', fontSize: '18px' }}>{question.question}</h5>
+                      <p>{question.answer}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Faq;
