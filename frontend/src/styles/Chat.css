@@ -7,6 +7,15 @@
     /* margin: 5px auto; */
     
     background-color: #140314;
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 300px; /* Adjust the width as needed */
+    background-color: white; /* Set background color */
+    z-index: 9999; /* Set a high z-index to ensure it appears above other elements */
+    overflow-y: auto; /* Add scrollbar if content overflows */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Add a shadow for better visibility */
 
   }
 .chat-popup {
@@ -102,4 +111,32 @@
 
 .send-button:hover {
   background-color: #777474;
+}
+
+
+.chatBtn {
+  background: #07aadb;
+  width: 100%;
+  margin-left: auto;
+  margin-top: 20px;
+  margin-bottom: 30px;
+}
+.chatBtn:hover {
+  background: #0e6e8b;
+  transform: scale(1.1);
+}
+.close-icon {
+  position: absolute;
+  top: 5px;
+  right: 10px;
+  background: none;
+  border: 1px solid #000000;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 16px;
+  color: #555;
+}
+
+.close-icon:hover {
+  color: #000;
 }
