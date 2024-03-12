@@ -20,13 +20,17 @@ const About = () => {
               </p>
             </div>
           </div>
-          <div className="flex flex-col w-1/2 left-2 gap-8 ml-20 pl-4">
-            <h2 className="text-red-300 font-bold text-5xl satisfy-regular text-left">Contact Us</h2>
-            <div className="text-left grid grid-cols-2 justify-center">
-              <p className="text-red-100 text-2xl font-bold  my-1">Email: </p>
-              <p className="text-red-100 text-2xl my-1">xyz@gmail.com</p>
-              <p className="text-red-100 text-2xl my-1 font-bold">Phone no: </p>
-              <p className="text-red-100 text-2xl my-1">1234567890</p>
+          <div className="flex flex-col left-2 gap-8 pr-4 text-left">
+            <h2 className="text-red-300 font-bold text-5xl satisfy-regular text-end">Contact Us</h2>
+            <div className="flex flex-col text-right">
+              <div className="flex justify-end gap-4">
+                <p className="text-red-100 poppins-medium-italic text-2xl font-bold  my-1">Email: </p>
+                <p className="text-red-100 poppins-medium-italic text-2xl my-1">xyz@gmail.com</p>
+              </div>
+              <div className="flex justify-end gap-4">
+                <p className="text-red-100 poppins-medium-italic text-2xl my-1 font-bold">Phone no: </p>
+                <p className="text-red-100 poppins-medium-italic text-2xl my-1">1234567890</p>
+              </div>
             </div>
           </div>
         </div>
