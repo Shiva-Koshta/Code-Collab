@@ -13,7 +13,6 @@ const Login = () => {
         <div className="loginPage">
           <div className="loginForm">
             <h1 className="loginHeading">Login here</h1>
-            {/* <button className="btn signInGoogle"> Sign in with Google</button> */}
             <GoogleButton onClick={googleAuth} />
             <div className="footerLinks">
               <a href="/about-us">About Us</a>

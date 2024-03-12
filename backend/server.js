@@ -56,7 +56,15 @@ io.on('connection', (socket) => {
       });
     });
   });
-
+  socket.on(ACTIONS.CODE_CHANGE, ({ roomId, code }) => {
+    //console.log("code", code);
+    socket.in(roomId).emit(ACTIONS.CODE_CHANGE, { code });
+  });
+  socket.on(ACTIONS.SYNC_CODE, ({ socketId, code }) => {
+    // console.log("yes code syncing");
+    io.to(socketId).emit(ACTIONS.CODE_CHANGE, { code });
+  });
+  
   socket.on('disconnecting', () => {
     const rooms = [...socket.rooms];
     rooms.forEach((roomId) => {
@@ -69,7 +77,17 @@ io.on('connection', (socket) => {
     socket.leave();
   });
 
+  socket.on(ACTIONS.JOIN, ({ roomId }) => {
+    socket.join(roomId);
+    console.log(`User joined room ${roomId}`);
+  });
 
+  socket.on(ACTIONS.MESSAGE_SEND, ({ roomId, message, sender, sendname }) => {
+    console.log(sender);
+    console.log(sendname);
+    io.to(roomId).emit(ACTIONS.MESSAGE_RECEIVE, { text: message.text, sender, sendname });
+  });
+  
 });
 
 
