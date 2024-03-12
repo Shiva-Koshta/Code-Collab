@@ -20,6 +20,7 @@ const EditorPage = () => {
   const [messages, setMessages] = useState([]);
   const [inputText, setInputText] = useState('');
   const [fileContent, setFileContent] = useState("");
+  const fileRef=useRef(null);
   const [isOpen, setIsOpen] = useState(true);
 
   const handleMessageSend = () => {
@@ -42,14 +43,16 @@ const EditorPage = () => {
     console.log("reached");
     const file = event.target.files[0];
     const reader = new FileReader();
-
+    var content="";
     reader.onload = (e) => {
-      const content = e.target.result;
+     content = e.target.result;
       setFileContent(content);
-      console.log(content);
+      // console.log(content);
+      fileRef.current = content;
     };
 
     reader.readAsText(file);
+    // console.log("fileref here:",fileRef.current);
   };
   useEffect(() => {
     const init = async () => {
@@ -173,7 +176,7 @@ const EditorPage = () => {
 
       <div className="editor-container">
         <Editor
-          fileContent={fileContent}
+          fileRef={fileRef}
           socketRef={socketRef}
           roomId={roomId}
         />
