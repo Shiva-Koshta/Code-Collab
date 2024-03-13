@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Navigate, useLocation, useNavigate, useParams } from "react-router-dom";
-import "./Editor.css";
+// import "./Editor.css";
 import ACTIONS from "../Actions";
 import toast from 'react-hot-toast';
 import Editor from "../components/Editor";
@@ -21,6 +21,8 @@ const EditorPage = () => {
   const [messages, setMessages] = useState([]);
   const [inputText, setInputText] = useState('');
   const [fileContent, setFileContent] = useState("");
+  const fileRef=useRef(null);
+  const [isOpen, setIsOpen] = useState(true);
   // const [isOpen, setIsOpen] = useState(true);
   const [isChatOpen, setIsChatOpen] = useState(false); // State to control chat window
 
@@ -47,14 +49,16 @@ const EditorPage = () => {
     console.log("reached");
     const file = event.target.files[0];
     const reader = new FileReader();
-
+    var content="";
     reader.onload = (e) => {
-      const content = e.target.result;
+     content = e.target.result;
       setFileContent(content);
-      console.log(content);
+      // console.log(content);
+      fileRef.current = content;
     };
 
     reader.readAsText(file);
+    // console.log("fileref here:",fileRef.current);
   };
   useEffect(() => {
     const init = async () => {
@@ -168,7 +172,7 @@ const EditorPage = () => {
           <div className="Users">
             <h3>Connected Users here</h3>
             {connectedUsernames.map(username => (
-              <div key={username}>{username}</div>
+              <div className="UserList" key={username}>{username}</div>
             ))}
           </div>
 
@@ -177,8 +181,8 @@ const EditorPage = () => {
         <div>
         <button className="btn chatBtn" onClick={toggleChat} >Chat</button>
         </div>
-        <button className="btn copyBtn" onClick={copyRoomId}>Copy ROOM ID</button>
-        <button className="btn leaveBtn" onClick={leaveRoom}>
+        <button className="btn-edit copyBtn" onClick={copyRoomId}>Copy ROOM ID</button>
+        <button className="btn-edit leaveBtn" onClick={leaveRoom}>
           Leave
         </button>
       </div>
@@ -187,7 +191,7 @@ const EditorPage = () => {
        
       <div className="editor-container">
         <Editor
-          fileContent={fileContent}
+          fileRef={fileRef}
           socketRef={socketRef}
           roomId={roomId}
          
