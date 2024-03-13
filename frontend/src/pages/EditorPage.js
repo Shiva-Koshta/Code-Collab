@@ -141,6 +141,15 @@ const EditorPage = () => {
       handleMessageSend();
     }
   };
+  const handleDownloadFile = () => {
+    const element = document.createElement("a");
+    const file = new Blob([fileContent], { type: "text/plain" });
+    element.href = URL.createObjectURL(file);
+    element.download = "file.txt";
+    document.body.appendChild(element);
+    element.click();
+    document.body.removeChild(element);
+  };
 
   return (
     <div className="editor-page-grid">
@@ -161,7 +170,12 @@ const EditorPage = () => {
               type="file"
               onChange={handleFileChange}
             />
-            
+            <label className="fileLabel" for="file_input">Download file</label>
+            <div className="downloadFile">
+              <button onClick={handleDownloadFile}>Download</button>
+            </div>
+
+
             <FileView></FileView>
           </div>
 
@@ -175,7 +189,7 @@ const EditorPage = () => {
 
         </div>
         <div>
-        <button className="btn chatBtn" onClick={toggleChat} >Chat</button>
+          <button className="btn chatBtn" onClick={toggleChat} >Chat</button>
         </div>
         <button className="btn copyBtn" onClick={copyRoomId}>Copy ROOM ID</button>
         <button className="btn leaveBtn" onClick={leaveRoom}>
@@ -184,13 +198,13 @@ const EditorPage = () => {
       </div>
 
 
-       
+
       <div className="editor-container">
         <Editor
           fileContent={fileContent}
           socketRef={socketRef}
           roomId={roomId}
-         
+
         />
       </div>
 
@@ -222,10 +236,6 @@ const EditorPage = () => {
           </div>
         </div>
       )}
-
-
-
-
     </div>
 
   );
