@@ -57,7 +57,7 @@ io.on('connection', (socket) => {
     });
   });
   socket.on(ACTIONS.CODE_CHANGE, ({ roomId, code }) => {
-    console.log("code", code);
+    // console.log("code", code);
     socket.in(roomId).emit(ACTIONS.CODE_CHANGE, { code });
   });
   socket.on(ACTIONS.SYNC_CODE, ({ socketId, code }) => {
