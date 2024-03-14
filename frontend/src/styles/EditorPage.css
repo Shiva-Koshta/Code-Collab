@@ -1,11 +1,11 @@
 .editor-page-grid {
-    /* display: grid;
+  /* display: grid;
     grid-template-rows: 1fr 2fr 1fr;
     grid-template-columns: 1fr 2fr 1fr;
     height: 100vh; */
     display: grid;
-    grid-template-columns: 1fr 6fr 1fr; /* Divide the page into four columns */
-    height: 100vh;
+    grid-template-columns: 1fr 6fr; /* Divide the page into four columns */
+    /* height: 100vh; */
   }
   
   .aside {
@@ -19,9 +19,7 @@
   
   
   .editor-container {
-    /* grid-row: 1 / span 3;
-    grid-column: 2 / span 2;
-    overflow-y: auto; */
+   
     overflow-y: auto; 
   }
   
@@ -29,14 +27,92 @@
     /* grid-row: 1 / span 3;
     grid-column: 4 / span 1;
     background: #fff; */
-    background: #fff;
-    height: 100vh; /* Make the chat container fill the entire height of the viewport */
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    /* padding: 20px; */
-    /* max-width: 100%;  */
-    box-sizing: border-box;
-    /* overflow-y: auto; */
-  }
-  
+  background: #fff;
+  height: 100vh; /* Make the chat container fill the entire height of the viewport */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  /* padding: 20px; */
+  /* max-width: 100%;  */
+  box-sizing: border-box;
+  /* overflow-y: auto; */
+}
+
+.btn-edit {
+  border: none;
+  padding: 10px;
+  border-radius: 5px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  width: 100%;
+  transition: all 0.3s ease-in-out;
+}
+.leaveBtn {
+  background: #ee0c0c;
+  width: 100%;
+  margin-left: auto;
+  margin-top: 20px;
+  margin-bottom: 30px;
+}
+
+.leaveBtn:hover {
+  background: #a50808;
+}
+
+.copyBtn {
+  background: #4aed88;
+  width: 100%;
+  margin-left: auto;
+}
+.copyBtn:hover {
+  background: #2b824c;
+  transform: scale(1.1);
+}
+
+.aside {
+  background: #1c1e29;
+  padding: 16px;
+  color: #fff;
+  display: flex;
+  height: 100vh;
+  flex-direction: column;
+}
+.asideInner {
+  flex: 1;
+  border-bottom: 2px solid #2b824c;
+  margin-bottom: 10px;
+}
+
+.Users {
+  margin-bottom: 20px;
+  border-top: 2px solid #2b824c;
+}
+.UserList{
+    font-size: 1rem; 
+    color: #080808;
+    font-weight: 700; 
+    padding: 5px 10px; 
+    background-color: #2b824c; 
+    border-radius: 5px; 
+    margin-bottom: 5px; 
+}
+
+.fileTreeView {
+}
+
+.logo {
+  border-bottom: 1px solid #424242;
+  padding-bottom: 10px;
+}
+
+.logoImage {
+  height: 60px;
+}
+
+.CodeMirror {
+  min-height: calc(100vh);
+  font-size: 20px;
+  line-height: 1.6;
+  padding-top: 20px;
+}

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { v4 as uuidV4 } from 'uuid';
-import toast from 'react-hot-toast';
+import toast, { Toaster } from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import "../styles/Room_Creation.css";
 import axios from "axios";
@@ -77,7 +77,7 @@ const Room_Creation = () => {
   return (
     <div>
       <div>
-
+      <Toaster/>
         {/* first div */}
         <div>
           <nav className="navbar">

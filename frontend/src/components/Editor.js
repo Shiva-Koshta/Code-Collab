@@ -7,8 +7,34 @@ import "codemirror/addon/edit/closetag";
 import "codemirror/addon/edit/closebrackets";
 import ACTIONS from "../Actions";
 
-const Editor = ({ fileContent, socketRef, roomId }) => {
+const Editor = ({ fileRef, socketRef, roomId}) => {
   const editorRef = useRef(null);
+
+  useEffect(() => {  
+    // console.log("hi");
+    if (!editorRef.current) return;
+
+    editorRef.current.setValue(""); // to avoid repetition of old instances
+    // console.log("fileref  current:",fileRef.current);
+    if (fileRef.current) {
+      editorRef.current.setValue(fileRef.current); 
+    }
+  }, [fileRef.current]);
+  
+  
+
+  useEffect(() => {
+    //console.log("file added");
+    if (fileRef.current) {
+      //console.log(fileRef.current);
+      var code = fileRef.current;
+      socketRef.current.emit(ACTIONS.CODE_CHANGE, {
+        roomId,
+        code,
+      });
+    }
+  },[fileRef.current]);
+
 
   useEffect(() => {
     async function init() {
@@ -23,11 +49,11 @@ const Editor = ({ fileContent, socketRef, roomId }) => {
         }
       );
 
-      if (fileContent) {
-        editorRef.current.setValue(fileContent);
+      if (fileRef.current) {
+        editorRef.current.setValue(fileRef.current);
         // socketRef.current.emit(ACTIONS.CODE_CHANGE, {
         //   roomId,
-        //   fileContent,
+        //   fileRef.current,
         // }); // Set file content to CodeMirror editor
       }
 
@@ -46,7 +72,7 @@ const Editor = ({ fileContent, socketRef, roomId }) => {
 
     }
     init();
-  }, [fileContent]);
+  }, []);
   useEffect(() => {
     editorRef.current.on("cursorActivity", (instance) => {
       const cursor = instance.getCursor();
@@ -77,17 +103,23 @@ const Editor = ({ fileContent, socketRef, roomId }) => {
       });
     }
   }, [socketRef.current]);
-  useEffect(() => {
-    //console.log("file added");
-    if (fileContent) {
-      //console.log(fileContent);
-      var code = fileContent;
-      socketRef.current.emit(ACTIONS.CODE_CHANGE, {
-        roomId,
-        code,
-      });
-    }
-  }, [fileContent]);
+  // useEffect(() => {
+  //   console.log(newusernameRef.current);
+  //   if (socketRef.current && newusernameRef.current !== null) {
+      
+  //     if (newusernameRef.current === "RITESH PATIL") {
+  //       console.log("entered here");
+  //       console.log(newusernameRef.current);
+  //       var code = editorRef.current.getValue();
+  //       console.log("code1 :",code);
+  //       socketRef.current.emit(ACTIONS.CODE_CHANGE, {
+  //         roomId,
+  //         code,
+  //       });
+  //     }
+  //   }
+  // }, [newuserRef.current, socketRef.current, newusernameRef.current]);
+  
   // useEffect(() => {
   //   if (socketRef.current) {
   //     console.log("hi");

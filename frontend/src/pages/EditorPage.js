@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Navigate, useLocation, useNavigate, useParams } from "react-router-dom";
-import "./Editor.css";
+// import "./Editor.css";
 import ACTIONS from "../Actions";
 import toast from 'react-hot-toast';
 import Editor from "../components/Editor";
@@ -21,7 +21,10 @@ const EditorPage = () => {
   const [messages, setMessages] = useState([]);
   const [inputText, setInputText] = useState('');
   const [fileContent, setFileContent] = useState("");
+  const fileRef=useRef(null);
   const [isOpen, setIsOpen] = useState(true);
+  // const [isOpen, setIsOpen] = useState(true);
+  const [isChatOpen, setIsChatOpen] = useState(false); // State to control chat window
 
   const handleMessageSend = () => {
     console.log(storedUserData);
@@ -31,7 +34,10 @@ const EditorPage = () => {
       setInputText('');
     }
   };
-  
+
+  const toggleChat = () => {
+    setIsChatOpen(prevState => !prevState); // Toggle chat window
+  };
 
   const leaveRoom = () => {
     console.log("in LeaveRoom")
@@ -43,14 +49,16 @@ const EditorPage = () => {
     console.log("reached");
     const file = event.target.files[0];
     const reader = new FileReader();
-
+    var content="";
     reader.onload = (e) => {
-      const content = e.target.result;
+     content = e.target.result;
       setFileContent(content);
-      console.log(content);
+      // console.log(content);
+      fileRef.current = content;
     };
 
     reader.readAsText(file);
+    // console.log("fileref here:",fileRef.current);
   };
   useEffect(() => {
     const init = async () => {
@@ -85,7 +93,7 @@ const EditorPage = () => {
         setClients(clients);
         setConnectedUsernames(clients.map(client => client.username));
       });
-  
+
       socketRef.current.on(ACTIONS.DISCONNECTED, ({ username }) => {
         toast.success(
           <div style={{ display: "flex", alignItems: "center" }}>
@@ -108,16 +116,16 @@ const EditorPage = () => {
       });      
 
     };
-  
+
     init();
-  
+
     return () => {
       if (socketRef.current) {
         socketRef.current.disconnect();
       }
     };
   }, [roomId]);
-  
+
 
   if (!location.state) {
     return <Navigate to="/" />;
@@ -158,59 +166,73 @@ const EditorPage = () => {
               type="file"
               onChange={handleFileChange}
             />
+            
             <FileView></FileView>
           </div>
+
           <div className="Users">
             <h3>Connected Users here</h3>
             {connectedUsernames.map(username => (
-              <div key={username}>{username}</div>
+              <div className="UserList" key={username}>{username}</div>
             ))}
           </div>
+
+
         </div>
-        <button className="btn copyBtn" onClick={copyRoomId}>Copy ROOM ID</button>
-        <button className="btn leaveBtn" onClick={leaveRoom}>
+        <div>
+        <button className="btn chatBtn" onClick={toggleChat} >Chat</button>
+        </div>
+        <button className="btn-edit copyBtn" onClick={copyRoomId}>Copy ROOM ID</button>
+        <button className="btn-edit leaveBtn" onClick={leaveRoom}>
           Leave
         </button>
       </div>
 
+
+       
       <div className="editor-container">
         <Editor
-          fileContent={fileContent}
+          fileRef={fileRef}
           socketRef={socketRef}
           roomId={roomId}
+         
         />
       </div>
 
-      <div className="chat-container">
-        <div className="chat-popup">
-          <div className="chat-header">
-            <h2>Chat</h2>
-          </div>
-          <div className="chat-messages">
-            {messages.map((message, index) => (
-              
-              <div key={index} className={` ${message.sentByCurrentUser ? 'sent_by_user' : 'chat-message'}`}>
-                <span className="message-sender">{message.sentByCurrentUser ? 'You' : message.sendname}:</span> {message.text}
-              </div>
-            ))}
-          </div>
-
-          <div className="chat-input">
-            <input
-              type="text"
-              value={inputText}
-              onChange={(e) => setInputText(e.target.value)}
-              onKeyPress={handleKeyPress}
-              placeholder="Type your message..."
-              className="input-field"
-            />
-            <button onClick={handleMessageSend} className="send-button">
-              Send
-            </button>
+      {isChatOpen && (
+        <div className="chat-container">
+          <div className="chat-popup">
+            <div className="chat-header">
+              <h2>Chat</h2>
+              <button className="close-icon" onClick={() => setIsChatOpen(false)}>X</button>
+            </div>
+            <div className="chat-messages">
+              {messages.map((message, index) => (
+                <div key={index} className={` ${message.sentByCurrentUser ? 'sent_by_user' : 'chat-message'}`}>
+                  <span className="message-sender">{message.sentByCurrentUser ? 'You' : message.sendname}:</span> {message.text}
+                </div>
+              ))}
+            </div>
+            <div className="chat-input">
+              <input
+                type="text"
+                value={inputText}
+                onChange={(e) => setInputText(e.target.value)}
+                onKeyPress={handleKeyPress}
+                placeholder="Type your message..."
+                className="input-field"
+              />
+              <button onClick={handleMessageSend} className="send-button">Send</button>
+            </div>
           </div>
         </div>
-      </div>
+      )}
+
+
+
+
     </div>
+
   );
 };
 
