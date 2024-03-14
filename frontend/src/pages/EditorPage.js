@@ -106,6 +106,7 @@ const EditorPage = () => {
         console.log(userData);
         setMessages(prev => [...prev, { text, sender, sentByCurrentUser: sender === JSON.parse(userData).sub, sendname }]);
       });      
+
     };
   
     init();
