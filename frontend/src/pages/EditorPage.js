@@ -22,11 +22,11 @@ const EditorPage = () => {
   const [messages, setMessages] = useState([]);
   const [inputText, setInputText] = useState('');
   const [fileContent, setFileContent] = useState("");
-  const fileRef=useRef(null);
+  // const fileRef=useRef(null);
   const [isOpen, setIsOpen] = useState(true);
   // const [isOpen, setIsOpen] = useState(true);
   const [isChatOpen, setIsChatOpen] = useState(false); // State to control chat window
-
+  const [contentChanged, setContentChanged] = useState(false);
   const handleMessageSend = () => {
     console.log(storedUserData);
     if (inputText.trim() !== '') {
@@ -50,16 +50,18 @@ const EditorPage = () => {
     console.log("reached");
     const file = event.target.files[0];
     const reader = new FileReader();
-    var content="";
+      setContentChanged(!contentChanged);
+      // console.log(contentChanged);
     reader.onload = (e) => {
-     content = e.target.result;
+     const content = e.target.result;
       setFileContent(content);
       // console.log(content);
-      fileRef.current = content;
+      // fileRef.current = content;
     };
-
-    reader.readAsText(file);
-    // console.log("fileref here:",fileRef.current);
+    if(file)
+    {reader.readAsText(file);}
+    // console.log("fileref here:",fileContent);
+    event.target.value = null;
   };
   useEffect(() => {
     const init = async () => {
@@ -82,7 +84,7 @@ const EditorPage = () => {
         });
       }
       socketRef.current.on(ACTIONS.JOINED, ({ clients, username, socketId }) => {
-        if (socketId !== socketRef.current.id && socketId != socketRef.current.id) {
+        if (socketId !== socketRef.current.id) {
           toast.success(
             <div style={{ display: "flex", alignItems: "center" }}>
               <span role="img" aria-label="enter" style={{ marginRight: "8px" }}>➡️</span>
@@ -168,11 +170,12 @@ const EditorPage = () => {
             </p>
             <input
               className="mb-3"
+              style={{color: "#1c1e29"}}
               id="file_input"
               type="file"
               onChange={handleFileChange}
             />
-            
+
             <FileView></FileView>
           </div>
 
@@ -195,10 +198,10 @@ const EditorPage = () => {
        
       <div className="overflow-y-auto">
         <Editor
-          fileRef={fileRef}
+          fileContent={fileContent}
           socketRef={socketRef}
           roomId={roomId}
-         
+          contentChanged={contentChanged}
         />
       </div>
 

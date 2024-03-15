@@ -7,7 +7,7 @@ import "codemirror/addon/edit/closetag";
 import "codemirror/addon/edit/closebrackets";
 import ACTIONS from "../Actions";
 
-const Editor = ({ fileRef, socketRef, roomId}) => {
+const Editor = ({ fileContent, socketRef, roomId, contentChanged}) => {
   const editorRef = useRef(null);
 
   useEffect(() => {  
@@ -16,24 +16,24 @@ const Editor = ({ fileRef, socketRef, roomId}) => {
 
     editorRef.current.setValue(""); // to avoid repetition of old instances
     // console.log("fileref  current:",fileRef.current);
-    if (fileRef.current) {
-      editorRef.current.setValue(fileRef.current); 
+    if (fileContent) {
+      editorRef.current.setValue(fileContent); 
     }
-  }, [fileRef.current]);
+  }, [fileContent,contentChanged]);
   
   
 
   useEffect(() => {
     //console.log("file added");
-    if (fileRef.current) {
-      //console.log(fileRef.current);
-      var code = fileRef.current;
+    if (fileContent) {
+      console.log(fileContent);
+      var code = fileContent;
       socketRef.current.emit(ACTIONS.CODE_CHANGE, {
         roomId,
         code,
       });
     }
-  },[fileRef.current]);
+  },[fileContent,contentChanged]);
 
 
   useEffect(() => {
@@ -49,8 +49,8 @@ const Editor = ({ fileRef, socketRef, roomId}) => {
         }
       );
 
-      if (fileRef.current) {
-        editorRef.current.setValue(fileRef.current);
+      if (fileContent) {
+        editorRef.current.setValue(fileContent);
         // socketRef.current.emit(ACTIONS.CODE_CHANGE, {
         //   roomId,
         //   fileRef.current,
