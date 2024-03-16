@@ -17,7 +17,7 @@ const Login = () => {
             <div className="footerLinks">
               <a href="/about-us">About Us</a>
               <Link to="/Faq">FAQ</Link>
-              <a href="/help">Help</a>
+              <Link to="/help">Help</Link>
             </div>
           </div>
         </div>
