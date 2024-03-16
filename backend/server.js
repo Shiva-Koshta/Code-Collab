@@ -1,16 +1,15 @@
 require("dotenv").config();
-const mongoose = require("mongoose")
+const mongoose = require("mongoose");
 const express = require("express");
 const cors = require("cors");
 const passport = require("passport");
 const authRoute = require("./routes/auth");
 const cookieSession = require("cookie-session");
-const passportStrategy =  require("./passport");
-const { Server } = require('socket.io');
-const http = require('http');
+const passportStrategy = require("./passport");
+const { Server } = require("socket.io");
+const http = require("http");
 const ACTIONS = require("../frontend/src/Actions");
-
-
+const RoomCodeMap = require("./models/RoomCodeMap");
 const app = express();
 const server = http.createServer(app);
 const port = process.env.PORT || 8080;
@@ -22,28 +21,38 @@ app.use(
     credentials: true,
   })
 );
+const bodyParser = require("body-parser");
+app.use(bodyParser.json());
+const roomCodeMap = {};
 
 const io = new Server(server);
 
-
 // might to needed to store it in redux or database
 const userSocketMap = {};
-
+// mongoose
+//   .connect(process.env.MONGO_URL)
+//   .then(() => {
+//     console.log("connected to database");
+//     server.listen(port, () => console.log(`Listenting on port ${port}...`));
+//   })
+//   .catch((error) => {
+//     console.log(error);
+//   });
 // this function could be shifted to some other file where all similar functions are written
 function getAllConnectedClients(roomId) {
-  return Array.from(io.sockets.adapter.rooms.get(roomId) || []).map((socketId) => {
-    return {
-      socketId,
-      username: userSocketMap[socketId]
-    };
-  });
+  return Array.from(io.sockets.adapter.rooms.get(roomId) || []).map(
+    (socketId) => {
+      return {
+        socketId,
+        username: userSocketMap[socketId],
+      };
+    }
+  );
 }
 
+io.on("connection", (socket) => {
+  console.log("Socket connected", socket.id);
 
-io.on('connection', (socket) => {
-  console.log('Socket connected', socket.id);
-
-  
   socket.on(ACTIONS.JOIN, ({ roomId, username }) => {
     userSocketMap[socket.id] = username;
     socket.join(roomId);
@@ -52,27 +61,40 @@ io.on('connection', (socket) => {
       io.to(socketId).emit(ACTIONS.JOINED, {
         clients,
         username,
-        socketId: socket.id
+        socketId: socket.id,
       });
     });
   });
   socket.on(ACTIONS.CODE_CHANGE, ({ roomId, code }) => {
-    //console.log("code", code);
+    // Save or update the code in the database
+    RoomCodeMap.findOneAndUpdate(
+      { roomId },
+      { code },
+      { new: true, upsert: true }
+    )
+      .then((updatedMap) => {
+        //console.log("Code updated in database:");
+      })
+      .catch((error) => {
+        //console.error("Error updating code in database:", error);
+      });
+
+    // Emit the code change to other sockets in the room
     socket.in(roomId).emit(ACTIONS.CODE_CHANGE, { code });
   });
   socket.on(ACTIONS.SYNC_CODE, ({ socketId, code }) => {
     // console.log("yes code syncing");
     io.to(socketId).emit(ACTIONS.CODE_CHANGE, { code });
   });
-  
-  socket.on('disconnecting', () => {
+
+  socket.on("disconnecting", () => {
     const rooms = [...socket.rooms];
     rooms.forEach((roomId) => {
       socket.in(roomId).emit(ACTIONS.DISCONNECTED, {
         socketId: socket.id,
         username: userSocketMap[socket.id],
       });
-    })
+    });
     delete userSocketMap[socket.id];
     socket.leave();
   });
@@ -85,11 +107,13 @@ io.on('connection', (socket) => {
   socket.on(ACTIONS.MESSAGE_SEND, ({ roomId, message, sender, sendname }) => {
     console.log(sender);
     console.log(sendname);
-    io.to(roomId).emit(ACTIONS.MESSAGE_RECEIVE, { text: message.text, sender, sendname });
+    io.to(roomId).emit(ACTIONS.MESSAGE_RECEIVE, {
+      text: message.text,
+      sender,
+      sendname,
+    });
   });
-  
 });
-
 
 // app.use(function (req, res, next) {
 //   res.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
@@ -118,16 +142,35 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 app.use("/auth", authRoute);
+app.post("/receivecode", (req, res) => {
+  const { roomId } = req.body;
 
+  // Retrieve the code from the database
+  RoomCodeMap.findOne({ roomId })
+    .then((roomMap) => {
+      if (roomMap) {
+        res.json({ code: roomMap.code });
+      } else {
+        res
+          .status(404)
+          .json({ error: "Code not found for the specified room" });
+      }
+    })
+    .catch((error) => {
+      console.error("Error retrieving code from database:", error);
+      res.status(500).json({ error: "Internal server error" });
+    });
+});
 
-// connect to database
-// mongoose.connect(process.env.MONGO_URL)
-//   .then(() => {
-//     console.log("connected to database");
-//     server.listen(port, () => console.log(`Listenting on port ${port}...`));
-//   })
-//   .catch((error) => {
-//     console.log(error)
-//   })
+//connect to database
+mongoose
+  .connect(process.env.MONGO_URL)
+  .then(() => {
+    console.log("connected to database");
+    // server.listen(port, () => console.log(`Listenting on port ${port}...`));
+  })
+  .catch((error) => {
+    console.log(error);
+  });
 
 server.listen(port, () => console.log(`Listenting on port ${port}...`));

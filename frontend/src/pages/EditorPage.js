@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Navigate, useLocation, useNavigate, useParams } from "react-router-dom";
-import "./Editor.css";
+// import "./Editor.css";
 import ACTIONS from "../Actions";
 import toast from 'react-hot-toast';
 import Editor from "../components/Editor";
@@ -9,6 +9,7 @@ import { initSocket } from "../socket";
 import { Toaster } from 'react-hot-toast';
 import '../styles/EditorPage.css';
 import '../styles/Chat.css';
+import logo from '../images/Logo.png'
 
 const EditorPage = () => {
   const { roomId } = useParams();
@@ -21,9 +22,11 @@ const EditorPage = () => {
   const [messages, setMessages] = useState([]);
   const [inputText, setInputText] = useState('');
   const [fileContent, setFileContent] = useState("");
+  // const fileRef=useRef(null);
+  const [isOpen, setIsOpen] = useState(true);
   // const [isOpen, setIsOpen] = useState(true);
   const [isChatOpen, setIsChatOpen] = useState(false); // State to control chat window
-
+  const [contentChanged, setContentChanged] = useState(false);
   const handleMessageSend = () => {
     console.log(storedUserData);
     if (inputText.trim() !== '') {
@@ -47,14 +50,18 @@ const EditorPage = () => {
     console.log("reached");
     const file = event.target.files[0];
     const reader = new FileReader();
-
+      setContentChanged(!contentChanged);
+      // console.log(contentChanged);
     reader.onload = (e) => {
-      const content = e.target.result;
+     const content = e.target.result;
       setFileContent(content);
-      console.log(content);
+      // console.log(content);
+      // fileRef.current = content;
     };
-
-    reader.readAsText(file);
+    if(file)
+    {reader.readAsText(file);}
+    // console.log("fileref here:",fileContent);
+    event.target.value = null;
   };
   useEffect(() => {
     const init = async () => {
@@ -77,7 +84,7 @@ const EditorPage = () => {
         });
       }
       socketRef.current.on(ACTIONS.JOINED, ({ clients, username, socketId }) => {
-        if (socketId !== socketRef.current.id && socketId != socketRef.current.id) {
+        if (socketId !== socketRef.current.id) {
           toast.success(
             <div style={{ display: "flex", alignItems: "center" }}>
               <span role="img" aria-label="enter" style={{ marginRight: "8px" }}>➡️</span>
@@ -143,54 +150,58 @@ const EditorPage = () => {
   };
 
   return (
-    <div className="editor-page-grid">
+    <div className="" style={{display: "grid", gridTemplateColumns: "1fr 6fr"}}>
       <Toaster />
 
-      <div className="aside">
-        <div className="asideInner">
-          <div className="logo">
-            <img className="logoImage" src="" alt="logo" />
+      <div 
+        className="flex flex-col justify-between h-screen text-white p-4 pb-5"
+        style={{backgroundColor: "#1c1e29"}}
+      >
+        <div className="logo flex gap-6">
+          <img className="h-24" src={logo} alt="logo" />
+          <div className="flex flex-col justify-center">
+            <h2 className="text-4xl madimi-one-regular">Code Collab</h2>
           </div>
+        </div>
+        <div className="flex flex-col justify-between h-full">
           <div className="fileTreeView">
-            <label className="fileLabel" for="file_input">
+            <p className="my-3 text-lg font-bold" for="file_input">
               Upload file
-            </label>
+            </p>
             <input
-              className="FileInput"
+              className="mb-3"
+              style={{color: "#1c1e29"}}
               id="file_input"
               type="file"
               onChange={handleFileChange}
             />
-            
+
             <FileView></FileView>
           </div>
 
           <div className="Users">
-            <h3>Connected Users here</h3>
+            <h3 className="my-3 font-bold text-lg">Connected Users here</h3>
             {connectedUsernames.map(username => (
-              <div key={username}>{username}</div>
+              <div className="UserList" key={username}>{username}</div>
             ))}
           </div>
-
-
         </div>
         <div>
-        <button className="btn chatBtn" onClick={toggleChat} >Chat</button>
+          <button className="btn chatBtn" onClick={toggleChat} >Chat</button>
+          <button className="btn-edit copyBtn" onClick={copyRoomId}>Copy ROOM ID</button>
+          <button className="btn-edit leaveBtn" onClick={leaveRoom}>
+            Leave
+          </button>
         </div>
-        <button className="btn copyBtn" onClick={copyRoomId}>Copy ROOM ID</button>
-        <button className="btn leaveBtn" onClick={leaveRoom}>
-          Leave
-        </button>
       </div>
 
-
        
-      <div className="editor-container">
+      <div className="overflow-y-auto">
         <Editor
           fileContent={fileContent}
           socketRef={socketRef}
           roomId={roomId}
-         
+          contentChanged={contentChanged}
         />
       </div>
 
