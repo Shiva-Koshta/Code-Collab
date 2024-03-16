@@ -7,21 +7,19 @@ import "codemirror/addon/edit/closetag";
 import "codemirror/addon/edit/closebrackets";
 import ACTIONS from "../Actions";
 
-const Editor = ({ fileContent, socketRef, roomId, contentChanged}) => {
+const Editor = ({ fileContent, socketRef, roomId, contentChanged }) => {
   const editorRef = useRef(null);
 
-  useEffect(() => {  
+  useEffect(() => {
     // console.log("hi");
     if (!editorRef.current) return;
 
     editorRef.current.setValue(""); // to avoid repetition of old instances
     // console.log("fileref  current:",fileRef.current);
     if (fileContent) {
-      editorRef.current.setValue(fileContent); 
+      editorRef.current.setValue(fileContent);
     }
-  }, [fileContent,contentChanged]);
-  
-  
+  }, [fileContent, contentChanged]);
 
   useEffect(() => {
     //console.log("file added");
@@ -33,8 +31,7 @@ const Editor = ({ fileContent, socketRef, roomId, contentChanged}) => {
         code,
       });
     }
-  },[fileContent,contentChanged]);
-
+  }, [fileContent, contentChanged]);
 
   useEffect(() => {
     async function init() {
@@ -81,10 +78,39 @@ const Editor = ({ fileContent, socketRef, roomId, contentChanged}) => {
       });
     }
   }, [socketRef.current]);
+  useEffect(() => {
+    // Fetch code from the backend using room ID
+    if (roomId) {
+      console.log(JSON.stringify({ roomId }));
+      async function fetchCode() {
+        try {
+          const response = await fetch(`http://localhost:8080/receivecode`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ roomId }),
+          });
+          if (response.ok) {
+            const { code } = await response.json();
+            if (code !== null) {
+              editorRef.current.setValue(code);
+            }
+          } else {
+            console.error("Failed to fetch code");
+          }
+        } catch (error) {
+          console.error("Error fetching code:", error);
+        }
+      }
+
+      fetchCode();
+    }
+  }, [roomId]);
   // useEffect(() => {
   //   console.log(newusernameRef.current);
   //   if (socketRef.current && newusernameRef.current !== null) {
-      
+
   //     if (newusernameRef.current === "RITESH PATIL") {
   //       console.log("entered here");
   //       console.log(newusernameRef.current);
@@ -97,7 +123,7 @@ const Editor = ({ fileContent, socketRef, roomId, contentChanged}) => {
   //     }
   //   }
   // }, [newuserRef.current, socketRef.current, newusernameRef.current]);
-  
+
   // useEffect(() => {
   //   if (socketRef.current) {
   //     console.log("hi");
