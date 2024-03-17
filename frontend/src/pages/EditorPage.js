@@ -30,6 +30,7 @@ const EditorPage = () => {
   const [contentChanged, setContentChanged] = useState(false);
   const [downloadFileExtension, setFileExtension] = useState("");
   const [downloadFileName, setFileName] = useState("");
+
   const handleMessageSend = () => {
     console.log(storedUserData);
     if (inputText.trim() !== '') {
@@ -150,6 +151,15 @@ const EditorPage = () => {
       handleMessageSend();
     }
   };
+  const handleDownloadFile = () => {
+    const element = document.createElement("a");
+    const file = new Blob([fileContent], { type: "text/plain" });
+    element.href = URL.createObjectURL(file);
+    element.download = `${downloadFileName}.${downloadFileExtension}`;
+    document.body.appendChild(element);
+    element.click();
+    document.body.removeChild(element);
+  };
 
   const handleDownloadFile = () => {
     const myContent = editorRef.current.getValue();
@@ -188,6 +198,7 @@ const EditorPage = () => {
               type="file"
               onChange={handleFileChange}
             />
+
             <p className="my-3 text-lg font-bold" for="file_input">
               Download file
             </p>
@@ -220,15 +231,18 @@ const EditorPage = () => {
         </div>
         <div>
           <button className="btn chatBtn" onClick={toggleChat} >Chat</button>
+
           <button className="btn-edit copyBtn" onClick={copyRoomId}>Copy ROOM ID</button>
           <button className="btn-edit leaveBtn" onClick={leaveRoom}>
             Leave
           </button>
+
         </div>
       </div>
 
 
       <div className="overflow-y-auto">
+
         <Editor
           handleDownloadFile={handleDownloadFile}
           fileContent={fileContent}
@@ -236,6 +250,7 @@ const EditorPage = () => {
           roomId={roomId}
           contentChanged={contentChanged}
           editorRef = {editorRef}
+
         />
       </div>
 
@@ -267,10 +282,6 @@ const EditorPage = () => {
           </div>
         </div>
       )}
-
-
-
-
     </div>
 
   );
