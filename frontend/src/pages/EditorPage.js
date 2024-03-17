@@ -12,6 +12,7 @@ import '../styles/Chat.css';
 import logo from '../images/Logo.png'
 
 const EditorPage = () => {
+  const editorRef = useRef(null);
   const { roomId } = useParams();
   const socketRef = useRef(null);
   const location = useLocation();
@@ -27,6 +28,9 @@ const EditorPage = () => {
   // const [isOpen, setIsOpen] = useState(true);
   const [isChatOpen, setIsChatOpen] = useState(false); // State to control chat window
   const [contentChanged, setContentChanged] = useState(false);
+  const [downloadFileExtension, setFileExtension] = useState("");
+  const [downloadFileName, setFileName] = useState("");
+
   const handleMessageSend = () => {
     console.log(storedUserData);
     if (inputText.trim() !== '') {
@@ -50,16 +54,15 @@ const EditorPage = () => {
     console.log("reached");
     const file = event.target.files[0];
     const reader = new FileReader();
-      setContentChanged(!contentChanged);
-      // console.log(contentChanged);
+    setContentChanged(!contentChanged);
+    // console.log(contentChanged);
     reader.onload = (e) => {
-     const content = e.target.result;
+      const content = e.target.result;
       setFileContent(content);
       // console.log(content);
       // fileRef.current = content;
     };
-    if(file)
-    {reader.readAsText(file);}
+    if (file) { reader.readAsText(file); }
     // console.log("fileref here:",fileContent);
     event.target.value = null;
   };
@@ -149,13 +152,25 @@ const EditorPage = () => {
     }
   };
 
+
+  const handleDownloadFile = () => {
+    const myContent = editorRef.current.getValue();
+    const element = document.createElement("a");
+    const file = new Blob([myContent], { type: `text/plain` });
+    element.href = URL.createObjectURL(file);
+    element.download = `${downloadFileName}.${downloadFileExtension}`;
+    document.body.appendChild(element);
+    element.click();
+    document.body.removeChild(element);
+  };
+
   return (
-    <div className="" style={{display: "grid", gridTemplateColumns: "1fr 6fr"}}>
+    <div className="" style={{ display: "grid", gridTemplateColumns: "1fr 6fr" }}>
       <Toaster />
 
-      <div 
+      <div
         className="flex flex-col justify-between h-screen text-white p-4 pb-5"
-        style={{backgroundColor: "#1c1e29"}}
+        style={{ backgroundColor: "#1c1e29" }}
       >
         <div className="logo flex gap-6">
           <img className="h-24" src={logo} alt="logo" />
@@ -170,12 +185,32 @@ const EditorPage = () => {
             </p>
             <input
               className="mb-3"
-              style={{color: "#1c1e29"}}
+              style={{ color: "#1c1e29" }}
               id="file_input"
               type="file"
               onChange={handleFileChange}
             />
 
+            <p className="my-3 text-lg font-bold" for="file_input">
+              Download file
+            </p>
+            <input type="text" value={downloadFileName} onChange={(e) => setFileName(e.target.value)} placeholder="Enter file name" className="mb-3" style={{ color: "#1c1e29" }} />
+            <select value={downloadFileExtension} onChange={(e) => setFileExtension(e.target.value)} className="mb-3" style={{ color: "#1c1e29" }}>
+              <option value="txt">Text</option>
+              <option value="json">JSON</option>
+              <option value="py">Python</option>
+              <option value="html">HTML</option>
+              <option value="css">CSS</option>
+              <option value="java">Java</option>
+              <option value="cpp">C++</option>
+              <option value="c">C</option>
+              {/* <option value="png">PNG</option>
+              <option value="jpeg">JPEG</option>
+              <option value="pdf">PDF</option>
+              <option value="zip">zip</option> */}
+              <option value="js">Javascript</option>
+            </select>
+            <button className="btn chatBtn" onClick={() => handleDownloadFile()} >Download</button>
             <FileView></FileView>
           </div>
 
@@ -188,20 +223,26 @@ const EditorPage = () => {
         </div>
         <div>
           <button className="btn chatBtn" onClick={toggleChat} >Chat</button>
+
           <button className="btn-edit copyBtn" onClick={copyRoomId}>Copy ROOM ID</button>
           <button className="btn-edit leaveBtn" onClick={leaveRoom}>
             Leave
           </button>
+
         </div>
       </div>
 
-       
+
       <div className="overflow-y-auto">
+
         <Editor
+          handleDownloadFile={handleDownloadFile}
           fileContent={fileContent}
           socketRef={socketRef}
           roomId={roomId}
           contentChanged={contentChanged}
+          editorRef = {editorRef}
+
         />
       </div>
 
@@ -233,10 +274,6 @@ const EditorPage = () => {
           </div>
         </div>
       )}
-
-
-
-
     </div>
 
   );
