@@ -23,6 +23,8 @@ const EditorPage = () => {
   const [fileContent, setFileContent] = useState("");
   // const [isOpen, setIsOpen] = useState(true);
   const [isChatOpen, setIsChatOpen] = useState(false); // State to control chat window
+  const [downloadFileExtension , setFileExtension] = useState("");
+  const [downloadFileName , setFileName] = useState("");
 
   const handleMessageSend = () => {
     console.log(storedUserData);
@@ -145,7 +147,7 @@ const EditorPage = () => {
     const element = document.createElement("a");
     const file = new Blob([fileContent], { type: "text/plain" });
     element.href = URL.createObjectURL(file);
-    element.download = "file.txt";
+    element.download = `${downloadFileName}.${downloadFileExtension}`;
     document.body.appendChild(element);
     element.click();
     document.body.removeChild(element);
@@ -172,6 +174,22 @@ const EditorPage = () => {
             />
             <label className="fileLabel" for="file_input">Download file</label>
             <div className="downloadFile">
+            <input type="text" value={downloadFileName} onChange={(e) => setFileName(e.target.value)} placeholder="Enter file name"/>
+            <select value = {downloadFileExtension} onChange={(e) => setFileExtension(e.target.value)}>
+              <option value ="txt">Text</option>
+              <option value = "json">JSON</option>
+              <option value = "py">Python</option>
+              <option value = "html">HTML</option>
+              <option value = "css">CSS</option>
+              <option value = "java">Java</option>
+              <option value = "cpp">C++</option>
+              <option value = "c">C</option>
+              {/* <option value = "zip">zip</option>
+              <option value = "png">PNG</option>
+              <option value = "pdf">PDF</option>
+              <option value = "jpg">JPEG</option> */}
+              <option value = "js">Javascript</option>
+            </select>
               <button onClick={handleDownloadFile}>Download</button>
             </div>
 
