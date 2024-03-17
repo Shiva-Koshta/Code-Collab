@@ -19,8 +19,15 @@ const EditorPage = () => {
   const [clients, setClients] = useState([]);
   const [storedUserData, setStoredUserData] = useState([]);
   const [connectedUsernames, setConnectedUsernames] = useState([]);
-  const [messages, setMessages] = useState([]);
-  const [inputText, setInputText] = useState('');
+ // const [messages, setMessages] = useState([]);
+ const [messages, setMessages] = useState(() => {
+      const storedMessages = localStorage.getItem(`messages_${roomId}`);
+      return storedMessages ? JSON.parse(storedMessages) : [];
+     });
+  const CHAT_LIMIT = 15; // Global variable for chat limit    
+   
+ 
+ const [inputText, setInputText] = useState('');
   const [fileContent, setFileContent] = useState("");
   // const fileRef=useRef(null);
   const [isOpen, setIsOpen] = useState(true);
@@ -112,10 +119,13 @@ const EditorPage = () => {
         });
       });
       socketRef.current.on(ACTIONS.MESSAGE_RECEIVE, ({ text, sender, sendname }) => {
-        console.log(`${sender}: ${text}`);
-        console.log(storedUserData);
-        console.log(userData);
-        setMessages(prev => [...prev, { text, sender, sentByCurrentUser: sender === JSON.parse(userData).sub, sendname }]);
+        const newMessage = { text, sender, sentByCurrentUser: sender === JSON.parse(userData).sub, sendname };
+        setMessages(prevMessages => {
+          const updatedMessages = [...prevMessages, newMessage].slice(-CHAT_LIMIT);
+         localStorage.setItem(`messages_${roomId}`, JSON.stringify(updatedMessages));
+          return updatedMessages;
+        });  
+      
       });
     };
 
@@ -213,7 +223,7 @@ const EditorPage = () => {
               <button className="close-icon" onClick={() => setIsChatOpen(false)}>X</button>
             </div>
             <div className="chat-messages">
-              {messages.map((message, index) => (
+              {messages.slice(-CHAT_LIMIT).map((message, index) => (
                 <div key={index} className={` ${message.sentByCurrentUser ? 'sent_by_user' : 'chat-message'}`}>
                   <span className="message-sender">{message.sentByCurrentUser ? 'You' : message.sendname}:</span> {message.text}
                 </div>
