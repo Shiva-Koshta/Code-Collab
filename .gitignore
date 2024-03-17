@@ -8,5 +8,7 @@
 # # .env file
 # /frontend/.env
 # /backend/.env
-frontend/.env
-backend/.env
+# frontend/.env
+# backend/.env
+
+.env

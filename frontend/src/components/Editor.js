@@ -7,8 +7,30 @@ import "codemirror/addon/edit/closetag";
 import "codemirror/addon/edit/closebrackets";
 import ACTIONS from "../Actions";
 
-const Editor = ({ fileContent, socketRef, roomId }) => {
-  const editorRef = useRef(null);
+const Editor = ({ handleDownloadFile, fileContent, socketRef, roomId, contentChanged ,editorRef }) => {
+
+  useEffect(() => {
+    // console.log("hi");
+    if (!editorRef.current) return;
+
+    editorRef.current.setValue(""); // to avoid repetition of old instances
+    // console.log("fileref  current:",fileRef.current);
+    if (fileContent) {
+      editorRef.current.setValue(fileContent);
+    }
+  }, [fileContent, contentChanged]);
+
+  useEffect(() => {
+    //console.log("file added");
+    if (fileContent) {
+      console.log(fileContent);
+      var code = fileContent;
+      socketRef.current.emit(ACTIONS.CODE_CHANGE, {
+        roomId,
+        code,
+      });
+    }
+  }, [fileContent, contentChanged]);
 
   useEffect(() => {
     async function init() {
@@ -27,7 +49,7 @@ const Editor = ({ fileContent, socketRef, roomId }) => {
         editorRef.current.setValue(fileContent);
         // socketRef.current.emit(ACTIONS.CODE_CHANGE, {
         //   roomId,
-        //   fileContent,
+        //   fileRef.current,
         // }); // Set file content to CodeMirror editor
       }
 
@@ -44,7 +66,7 @@ const Editor = ({ fileContent, socketRef, roomId }) => {
       });
     }
     init();
-  }, [fileContent]);
+  }, []);
   useEffect(() => {
     if (socketRef.current) {
       socketRef.current.on(ACTIONS.CODE_CHANGE, ({ code }) => {
@@ -56,16 +78,51 @@ const Editor = ({ fileContent, socketRef, roomId }) => {
     }
   }, [socketRef.current]);
   useEffect(() => {
-    //console.log("file added");
-    if (fileContent) {
-      //console.log(fileContent);
-      var code = fileContent;
-      socketRef.current.emit(ACTIONS.CODE_CHANGE, {
-        roomId,
-        code,
-      });
+    // Fetch code from the backend using room ID
+    if (roomId) {
+      console.log(JSON.stringify({ roomId }));
+      async function fetchCode() {
+        try {
+          const response = await fetch(`http://localhost:8080/receivecode`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ roomId }),
+          });
+          if (response.ok) {
+            const { code } = await response.json();
+            if (code !== null) {
+              editorRef.current.setValue(code);
+            }
+          } else {
+            console.error("Failed to fetch code");
+          }
+        } catch (error) {
+          console.error("Error fetching code:", error);
+        }
+      }
+
+      fetchCode();
     }
-  }, [fileContent]);
+  }, [roomId]);
+  // useEffect(() => {
+  //   console.log(newusernameRef.current);
+  //   if (socketRef.current && newusernameRef.current !== null) {
+
+  //     if (newusernameRef.current === "RITESH PATIL") {
+  //       console.log("entered here");
+  //       console.log(newusernameRef.current);
+  //       var code = editorRef.current.getValue();
+  //       console.log("code1 :",code);
+  //       socketRef.current.emit(ACTIONS.CODE_CHANGE, {
+  //         roomId,
+  //         code,
+  //       });
+  //     }
+  //   }
+  // }, [newuserRef.current, socketRef.current, newusernameRef.current]);
+
   // useEffect(() => {
   //   if (socketRef.current) {
   //     console.log("hi");

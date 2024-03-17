@@ -2,7 +2,10 @@
 import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronUp, faChevronDown } from '@fortawesome/free-solid-svg-icons';
+import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
 import faqData from './faqdata';
+import '../index';
+import { useNavigate } from 'react-router-dom';
 
 const Faq = () => {
   const [openCategory, setOpenCategory] = useState(null);
@@ -10,12 +13,18 @@ const Faq = () => {
   const handleCategoryToggle = (categoryIndex) => {
     setOpenCategory((prevIndex) => (prevIndex === categoryIndex ? null : categoryIndex));
   };
-
+  
+  const navigate = useNavigate();
   return (
     <div>
       {/* Blue banner with "FAQ" */}
-      <div style={{ backgroundColor: '#136163', padding: '10px', color: 'white', fontSize: '24px', fontWeight: 'bold', textAlign: 'left', fontFamily: 'Arial, sans-serif', boxShadow: '0px 0px 10px 0px rgba(255, 255, 255, 0.3)' }}>
-        FAQ
+      <div className="flex justify-start gap-5" style={{ backgroundColor: '#136163', padding: '10px', color: 'white', fontSize: '24px', fontWeight: 'bold', textAlign: 'left', fontFamily: 'Arial, sans-serif', boxShadow: '0px 0px 10px 0px rgba(255, 255, 255, 0.3)' }}>
+        <HomeOutlinedIcon
+          className="text-slate-300 cursor-pointer ml-8"
+          fontSize="large"
+          onClick={() => navigate("/")}
+          />
+        <p className='ml-8 text-3xl madimi-one-regular'>FAQ</p>
       </div>
 
       {/* FAQ content */}
