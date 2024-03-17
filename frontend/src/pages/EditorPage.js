@@ -35,8 +35,12 @@ const EditorPage = () => {
   // const [isOpen, setIsOpen] = useState(true);
   const [isChatOpen, setIsChatOpen] = useState(false); // State to control chat window
   const [contentChanged, setContentChanged] = useState(false);
+
+  const [unreadMessages, setUnreadMessages] = useState(-1);
+
   const [downloadFileExtension, setFileExtension] = useState("");
   const [downloadFileName, setFileName] = useState("");
+
 
   const handleMessageSend = () => {
     console.log(storedUserData);
@@ -49,8 +53,13 @@ const EditorPage = () => {
 
   const toggleChat = () => {
     setIsChatOpen(prevState => !prevState); // Toggle chat window
+    setUnreadMessages(-1);
   };
-
+  useEffect(() => {
+    if (!isChatOpen) {
+      setUnreadMessages(prevCount => prevCount + 1);
+    }
+  }, [messages, isChatOpen]);
   const leaveRoom = () => {
     console.log("in LeaveRoom")
     reactNavigator('/', {
@@ -232,7 +241,8 @@ const EditorPage = () => {
           </div>
         </div>
         <div>
-          <button className="btn chatBtn" onClick={toggleChat} >Chat</button>
+
+          <button className="btn chatBtn" onClick={toggleChat} >Chat {unreadMessages > 0 && <span className="unread-messages" style={{ color : "red" , borderRadius : "50%", border: "black", background:"white"}}>{unreadMessages}</span>}</button>
 
           <button className="btn-edit copyBtn" onClick={copyRoomId}>Copy ROOM ID</button>
           <button className="btn-edit leaveBtn" onClick={leaveRoom}>
