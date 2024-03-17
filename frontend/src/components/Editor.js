@@ -68,17 +68,19 @@ const Editor = ({ fileRef, socketRef, roomId}) => {
           });
         }
       });
-
-
     }
     init();
   }, []);
   useEffect(() => {
     editorRef.current.on("cursorActivity", (instance) => {
       const cursor = instance.getCursor();
-      const userData = JSON.parse(localStorage.getItem('userData'));
-      const cursorData = {cursor: {line: cursor.line, ch: cursor.ch}, user: {email: userData.email, name: userData.name}, tab: null};
-      console.log('cursorData:');
+      const userData = JSON.parse(localStorage.getItem("userData"));
+      const cursorData = {
+        cursor: { line: cursor.line, ch: cursor.ch },
+        user: { email: userData.email, name: userData.name },
+        tab: null,
+      };
+      console.log("cursorData transmitted by user: "+cursorData.user.name );
       console.log(cursorData);
       // console.log('userData:');
       // console.log(userData);
@@ -87,7 +89,7 @@ const Editor = ({ fileRef, socketRef, roomId}) => {
         cursorData,
       });
     });
-  }, [editorRef]);
+  }, [editorRef]);
   useEffect(() => {
     if (socketRef.current) {
       socketRef.current.on(ACTIONS.CODE_CHANGE, ({ code }) => {
@@ -96,10 +98,11 @@ const Editor = ({ fileRef, socketRef, roomId}) => {
           editorRef.current.setValue(code);
         }
       });
-      socketRef.current.on(ACTIONS.CURSOR_CHANGE, ({ cursor }) => {
+      socketRef.current.on(ACTIONS.CURSOR_CHANGE, ({ cursorData }) => {
         // Update cursor position in the editor
-        console.log('somebodyz cursor changed', cursor)
-        // editorRef.current.setCursor(cursor);
+        console.log("cursorData retrieved from user: "+cursorData.user.name)
+        console.log(cursorData)
+        
       });
     }
   }, [socketRef.current]);
