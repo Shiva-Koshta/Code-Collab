@@ -151,15 +151,7 @@ const EditorPage = () => {
       handleMessageSend();
     }
   };
-  const handleDownloadFile = () => {
-    const element = document.createElement("a");
-    const file = new Blob([fileContent], { type: "text/plain" });
-    element.href = URL.createObjectURL(file);
-    element.download = `${downloadFileName}.${downloadFileExtension}`;
-    document.body.appendChild(element);
-    element.click();
-    document.body.removeChild(element);
-  };
+
 
   const handleDownloadFile = () => {
     const myContent = editorRef.current.getValue();
