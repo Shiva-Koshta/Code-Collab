@@ -55,7 +55,7 @@ const Editor = ({ fileContent, socketRef, roomId, contentChanged }) => {
       }
 
       editorRef.current.on("change", (instance, changes) => {
-        // console.log(changes);
+        console.log(changes);
         const { origin } = changes;
         const code = instance.getValue();
         if (origin !== "setValue") {
@@ -69,12 +69,37 @@ const Editor = ({ fileContent, socketRef, roomId, contentChanged }) => {
     init();
   }, []);
   useEffect(() => {
+    editorRef.current.on("cursorActivity", (instance) => {
+      const cursor = instance.getCursor();
+      const userData = JSON.parse(localStorage.getItem("userData"));
+      const cursorData = {
+        cursor: { line: cursor.line, ch: cursor.ch },
+        user: { email: userData.email, name: userData.name },
+        tab: null,
+      };
+      console.log("cursorData transmitted by user: "+cursorData.user.name );
+      console.log(cursorData);
+      // console.log('userData:');
+      // console.log(userData);
+      socketRef.current.emit(ACTIONS.CURSOR_CHANGE, {
+        roomId,
+        cursorData,
+      });
+    });
+  }, [editorRef]);
+  useEffect(() => {
     if (socketRef.current) {
       socketRef.current.on(ACTIONS.CODE_CHANGE, ({ code }) => {
         //console.log("hi");
         if (code !== null) {
           editorRef.current.setValue(code);
         }
+      });
+      socketRef.current.on(ACTIONS.CURSOR_CHANGE, ({ cursorData }) => {
+        // Update cursor position in the editor
+        console.log("cursorData retrieved from user: "+cursorData.user.name)
+        console.log(cursorData)
+        
       });
     }
   }, [socketRef.current]);
