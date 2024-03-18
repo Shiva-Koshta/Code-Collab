@@ -11,6 +11,8 @@ import { useNavigate } from "react-router-dom";
 import Room_Creation from "./pages/Room_Creation";
 import EditorPage from "./pages/EditorPage";
 import HelpPage from "./pages/HelpPage";
+import About from './pages/About';
+
 
 // import './App.css';
 // import Home from './pages/Room_Join';
@@ -55,6 +57,12 @@ function App() {
           element={<EditorPage />}
         />
         <Route path="/help" element={<HelpPage />} />
+
+        <Route
+          path="/about-us"
+          element={<About/>}
+        />
+
 
       </Routes>
     </BrowserRouter>
