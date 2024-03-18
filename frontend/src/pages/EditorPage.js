@@ -197,12 +197,13 @@ const EditorPage = () => {
       </div>
 
        
-      <div className="overflow-y-auto">
+      <div className={"overflow-y-auto"} style={{ width: isChatOpen ? `calc(100% - 300px)` : '100%' }}>
         <Editor
           fileContent={fileContent}
           socketRef={socketRef}
           roomId={roomId}
           contentChanged={contentChanged}
+          // cursorInfoList={cursorInfoList}
         />
       </div>
 
