@@ -39,11 +39,6 @@ const EditorPage = () => {
 
   const [unreadMessages, setUnreadMessages] = useState(-1);
 
-  const [isDownloadTrue, setIsDownloadTrue] = useState(true);
-
-  const [downloadFileExtension, setFileExtension] = useState("");
-  const [downloadFileName, setFileName] = useState("");
-
   
 
 
@@ -160,7 +155,6 @@ const EditorPage = () => {
     }
   };
 
-
   const handleDownloadFile = () => {
     const myContent = editorRef.current.getValue();
     const element = document.createElement("a");
@@ -174,27 +168,6 @@ const EditorPage = () => {
 
   return (
     <div className="flex flex-col justify-center">
-      {isDownloadTrue && (
-        <div className="z-999 ">
-          <input type="text" value={downloadFileName} onChange={(e) => setFileName(e.target.value)} placeholder="Enter file name" className="mb-3" style={{ color: "#1c1e29" }} />
-          <select value={downloadFileExtension} onChange={(e) => setFileExtension(e.target.value)} className="mb-3" style={{ color: "#1c1e29" }}>
-            <option value="txt">Select type</option>
-            <option value="txt">Text</option>
-            <option value="json">JSON</option>
-            <option value="py">Python</option>
-            <option value="html">HTML</option>
-            <option value="css">CSS</option>
-            <option value="java">Java</option>
-            <option value="cpp">C++</option>
-            <option value="c">C</option>
-            {/* <option value="png">PNG</option>
-            <option value="jpeg">JPEG</option>
-            <option value="pdf">PDF</option>
-            <option value="zip">zip</option> */}
-            <option value="js">Javascript</option>
-          </select>
-        </div>
-      )}
       <div className="grid grid-cols-6" >
         <Toaster />
 
@@ -209,17 +182,7 @@ const EditorPage = () => {
             </div>
           </div>
           <div className="flex flex-col justify-between h-full">
-            <div className="fileTreeView">
-              <p className="my-3 text-lg font-bold" for="file_input">
-                Download file
-              </p>
-              <div className="flex gap-4">
-                
-              </div>
-              <button className="btn chatBtn" onClick={() => handleDownloadFile()} >Download</button>
-              <FileView fileContent={fileContent} setFileContent={setFileContent} setIsDownloadTrue={setIsDownloadTrue}/>
-            </div>
-
+            <FileView fileContent={fileContent} setFileContent={setFileContent} editorRef={editorRef}/>
             <div className="Users">
               <h3 className="my-3 font-bold text-lg">Connected Users here</h3>
               {connectedUsernames.map(username => (
