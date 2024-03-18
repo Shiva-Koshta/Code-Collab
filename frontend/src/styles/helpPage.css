@@ -1,14 +1,14 @@
-body {
+.xwz{
     background-image: url("https://img.freepik.com/premium-photo/colorful-line-wave-background-geometric-banner-flyer-wallpaper-template_665280-5059.jpg?w=360");
     color: #ffffff;
     background-size: cover;
     font-family: 'Roboto', sans-serif;
-    overflow-y: scroll;
+    /* overflow-y: scroll; */
 }
 /* #root{
     overflow-y: scroll;
 } */
-.container {
+.smpct {
     max-width: 90%;
     margin: 0 auto;
     
@@ -16,56 +16,56 @@ body {
     /* overflow-y: auto; */
 }
 
-.heading {
+.hdng {
     font-size: 36px;
     font-weight: bold;
     margin-top: 50px;
     margin-bottom: 30px;
 }
 
-.step {
+.stt {
     margin-bottom: 40px;
 }
 
-.step-content {
+.sttcntnt {
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
-.step-info {
+.stinfo {
     flex: 1;
 }
 
-.step-info h2 {
+.stinfo h2 {
     font-size: 24px;
     font-weight: bold;
     margin-bottom: 10px;
 }
 
-.step-info p {
+.stinfo p {
     font-size: 18px;
     margin-bottom: 10px;
 }
 
-.step-image {
+.stimge {
     flex: 1;
     text-align: center;
     margin: 30px;
 }
 
-.step-image img {
+.stimge img {
     max-width: 100%;
     border-radius: 5px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
 }
 
-.form {
+.frm {
     display: flex;
     flex-direction: column;
 }
 
-.form-group {
+.frmgp {
     margin-bottom: 20px;
 }
 
@@ -88,7 +88,7 @@ textarea {
     resize: vertical;
 }
 
-.btn-submit {
+.btnsub {
     width: 100%;
     padding: 10px;
     background-color: #007bff;
@@ -101,6 +101,6 @@ textarea {
     margin-bottom: 50px;
 }
 
-.btn-submit:hover {
+.btnsub:hover {
     background-color: #0056b3;
 }
