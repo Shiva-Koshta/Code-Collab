@@ -1,5 +1,5 @@
 import React from "react";
-import BackgroundImage6 from "../images/BackgroundImage6.png";
+import BackgroundImage from "../images/BackgroundImage6.png";
 import "../index";
 import Logo from "../images/Logo.png";
 import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
@@ -10,10 +10,12 @@ const About = () => {
     const navigate = useNavigate();
 	return (
 		<div
-			className="about-us-container flex flex-col gap-32 h-screen w-screen bg-cover"
-			style={{ backgroundImage: `url(${BackgroundImage6})` }}>
+			className="about-us-container flex flex-col gap-32 h-screen min-h-screen p-5 w-screen bg-cover"
+			style={{
+				backgroundColor: "#1c1e29",
+			}}>
             
-            <div className="flex justify-start gap-5 border-2 border-gray-600" style={{ backgroundColor: '#111', padding: '10px', color: 'white', fontSize: '24px', fontWeight: 'bold', textAlign: 'left', fontFamily: 'Arial, sans-serif', boxShadow: '0px 0px 10px 0px rgba(255, 255, 255, 0.3)' }}>
+            <div className="flex justify-start gap-5 border-2 border-gray-600" style={{ backgroundColor: '#111', padding: '10px', color: 'white', fontSize: '24px', fontWeight: 'bold', textAlign: 'left', fontFamily: 'Arial, sans-serif' }}>
                 <HomeOutlinedIcon
                 className="text-slate-300 cursor-pointer ml-8"
                 fontSize="large"

@@ -13,6 +13,8 @@ import logo from '../images/Logo.png'
 
 const EditorPage = () => {
   const editorRef = useRef(null);
+  const [fileContent, setFileContent] = useState("");
+
   const { roomId } = useParams();
   const socketRef = useRef(null);
   const location = useLocation();
@@ -29,17 +31,16 @@ const EditorPage = () => {
    
  
  const [inputText, setInputText] = useState('');
-  const [fileContent, setFileContent] = useState("");
+  
   // const fileRef=useRef(null);
   const [isOpen, setIsOpen] = useState(true);
   // const [isOpen, setIsOpen] = useState(true);
   const [isChatOpen, setIsChatOpen] = useState(false); // State to control chat window
-  const [contentChanged, setContentChanged] = useState(false);
 
   const [unreadMessages, setUnreadMessages] = useState(-1);
-
   const [downloadFileExtension, setFileExtension] = useState("");
   const [downloadFileName, setFileName] = useState("");
+  
 
 
   const handleMessageSend = () => {
@@ -61,27 +62,11 @@ const EditorPage = () => {
     }
   }, [messages, isChatOpen]);
   const leaveRoom = () => {
-    console.log("in LeaveRoom")
     reactNavigator('/', {
       roomId: roomId,
     });
   };
-  const handleFileChange = (event) => {
-    console.log("reached");
-    const file = event.target.files[0];
-    const reader = new FileReader();
-    setContentChanged(!contentChanged);
-    // console.log(contentChanged);
-    reader.onload = (e) => {
-      const content = e.target.result;
-      setFileContent(content);
-      // console.log(content);
-      // fileRef.current = content;
-    };
-    if (file) { reader.readAsText(file); }
-    // console.log("fileref here:",fileContent);
-    event.target.value = null;
-  };
+  
   useEffect(() => {
     const init = async () => {
       socketRef.current = await initSocket();
@@ -171,7 +156,6 @@ const EditorPage = () => {
     }
   };
 
-
   const handleDownloadFile = () => {
     const myContent = editorRef.current.getValue();
     const element = document.createElement("a");
@@ -184,116 +168,82 @@ const EditorPage = () => {
   };
 
   return (
-    <div className="" style={{ display: "grid", gridTemplateColumns: "1fr 6fr" }}>
-      <Toaster />
+    <div className="flex flex-col justify-center">
+      <div className="grid grid-cols-10" >
+        <Toaster />
 
-      <div
-        className="flex flex-col justify-between h-screen text-white p-4 pb-5"
-        style={{ backgroundColor: "#1c1e29" }}
-      >
-        <div className="logo flex gap-6">
-          <img className="h-24" src={logo} alt="logo" />
-          <div className="flex flex-col justify-center">
-            <h2 className="text-4xl madimi-one-regular">Code Collab</h2>
+        <div
+          className="col-span-2 flex flex-col justify-between h-screen text-white p-4 pb-5"
+          style={{ backgroundColor: "#1c1e29" }}
+          >
+          <div className="logo flex items-center">
+            <img className="h-20" src={logo} alt="logo" />
+            <div className="flex flex-col w-full">
+              <p className="text-4xl md:text-2xl text-center lg:text-3xl xl:text-4xl madimi-one-regular whitespace-nowrap">Code Collab</p>
+            </div>
+          </div>
+          <div className="flex flex-col justify-between h-full">
+            <FileView fileContent={fileContent} setFileContent={setFileContent} editorRef={editorRef}/>
+            <div className="Users">
+              <h3 className="my-3 font-bold text-lg">Connected Users here</h3>
+              {connectedUsernames.map(username => (
+                <div className="UserList" key={username}>{username}</div>
+                ))}
+            </div>
+          </div>
+          <div>
+            <div className="flex gap-2">
+              <button className="btn chatBtn" onClick={toggleChat} >Chat {unreadMessages > 0 && <span className="unread-messages" style={{ color : "red" , borderRadius : "50%", border: "black", background:"white"}}>{unreadMessages}</span>}</button>
+              <button className="btn-edit copyBtn" onClick={copyRoomId}>Copy ROOM ID</button>
+            </div>
+            <button className="btn-edit leaveBtn" onClick={leaveRoom}>
+              Leave
+            </button>
+
           </div>
         </div>
-        <div className="flex flex-col justify-between h-full">
-          <div className="fileTreeView">
-            <p className="my-3 text-lg font-bold" for="file_input">
-              Upload file
-            </p>
-            <input
-              className="mb-3"
-              style={{ color: "#1c1e29" }}
-              id="file_input"
-              type="file"
-              onChange={handleFileChange}
+
+
+        <div className="col-span-8 overflow-y-auto">
+          <Editor
+            handleDownloadFile={handleDownloadFile}
+            socketRef={socketRef}
+            roomId={roomId}
+            fileContent={fileContent}
+            setFileContent={setFileContent}
+            editorRef = {editorRef}
             />
-
-            <p className="my-3 text-lg font-bold" for="file_input">
-              Download file
-            </p>
-            <input type="text" value={downloadFileName} onChange={(e) => setFileName(e.target.value)} placeholder="Enter file name" className="mb-3" style={{ color: "#1c1e29" }} />
-            <select value={downloadFileExtension} onChange={(e) => setFileExtension(e.target.value)} className="mb-3" style={{ color: "#1c1e29" }}>
-              <option value="txt">Text</option>
-              <option value="json">JSON</option>
-              <option value="py">Python</option>
-              <option value="html">HTML</option>
-              <option value="css">CSS</option>
-              <option value="java">Java</option>
-              <option value="cpp">C++</option>
-              <option value="c">C</option>
-              {/* <option value="png">PNG</option>
-              <option value="jpeg">JPEG</option>
-              <option value="pdf">PDF</option>
-              <option value="zip">zip</option> */}
-              <option value="js">Javascript</option>
-            </select>
-            <button className="btn chatBtn" onClick={() => handleDownloadFile()} >Download</button>
-            <FileView></FileView>
-          </div>
-
-          <div className="Users">
-            <h3 className="my-3 font-bold text-lg">Connected Users here</h3>
-            {connectedUsernames.map(username => (
-              <div className="UserList" key={username}>{username}</div>
-            ))}
-          </div>
         </div>
-        <div>
 
-          <button className="btn chatBtn" onClick={toggleChat} >Chat {unreadMessages > 0 && <span className="unread-messages" style={{ color : "red" , borderRadius : "50%", border: "black", background:"white"}}>{unreadMessages}</span>}</button>
-
-          <button className="btn-edit copyBtn" onClick={copyRoomId}>Copy ROOM ID</button>
-          <button className="btn-edit leaveBtn" onClick={leaveRoom}>
-            Leave
-          </button>
-
-        </div>
+        {isChatOpen && (
+          <div className="chat-container">
+            <div className="chat-popup">
+              <div className="chat-header">
+                <h2>Chat</h2>
+                <button className="close-icon" onClick={() => setIsChatOpen(false)}>X</button>
+              </div>
+              <div className="chat-messages">
+                {messages.slice(-CHAT_LIMIT).map((message, index) => (
+                  <div key={index} className={` ${message.sentByCurrentUser ? 'sent_by_user' : 'chat-message'}`}>
+                    <span className="message-sender">{message.sentByCurrentUser ? 'You' : message.sendname}:</span> {message.text}
+                  </div>
+                ))}
+              </div>
+              <div className="chat-input">
+                <input
+                  type="text"
+                  value={inputText}
+                  onChange={(e) => setInputText(e.target.value)}
+                  onKeyPress={handleKeyPress}
+                  placeholder="Type your message..."
+                  className="input-field"
+                  />
+                <button onClick={handleMessageSend} className="send-button">Send</button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
-
-
-      <div className="overflow-y-auto">
-
-        <Editor
-          handleDownloadFile={handleDownloadFile}
-          fileContent={fileContent}
-          socketRef={socketRef}
-          roomId={roomId}
-          contentChanged={contentChanged}
-          editorRef = {editorRef}
-
-        />
-      </div>
-
-      {isChatOpen && (
-        <div className="chat-container">
-          <div className="chat-popup">
-            <div className="chat-header">
-              <h2>Chat</h2>
-              <button className="close-icon" onClick={() => setIsChatOpen(false)}>X</button>
-            </div>
-            <div className="chat-messages">
-              {messages.slice(-CHAT_LIMIT).map((message, index) => (
-                <div key={index} className={` ${message.sentByCurrentUser ? 'sent_by_user' : 'chat-message'}`}>
-                  <span className="message-sender">{message.sentByCurrentUser ? 'You' : message.sendname}:</span> {message.text}
-                </div>
-              ))}
-            </div>
-            <div className="chat-input">
-              <input
-                type="text"
-                value={inputText}
-                onChange={(e) => setInputText(e.target.value)}
-                onKeyPress={handleKeyPress}
-                placeholder="Type your message..."
-                className="input-field"
-              />
-              <button onClick={handleMessageSend} className="send-button">Send</button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
 
   );
