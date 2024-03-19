@@ -5,6 +5,7 @@ const cors = require('cors')
 const passport = require('passport')
 const authRoute = require('./routes/auth')
 const cookieSession = require('cookie-session')
+// eslint-disable-next-line no-unused-vars
 const passportStrategy = require('./passport')
 const { Server } = require('socket.io')
 const http = require('http')
@@ -24,7 +25,6 @@ app.use(
 )
 const bodyParser = require('body-parser')
 app.use(bodyParser.json())
-const roomCodeMap = {}
 
 const io = new Server(server)
 
@@ -99,7 +99,8 @@ io.on('connection', (socket) => {
         // console.log("Code updated in database:");
       })
       .catch((error) => {
-        // console.error("Error updating code in database:", error);
+         console.error("Error retrieving code from database:", error)
+         res.status(500).json({ error: "Internal server error" })
       })
 
     // Emit the code change to other sockets in the room
