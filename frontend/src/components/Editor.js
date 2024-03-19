@@ -7,34 +7,58 @@ import "codemirror/addon/edit/closetag";
 import "codemirror/addon/edit/closebrackets";
 import ACTIONS from "../Actions";
 
-const Editor = ({ fileRef, socketRef, roomId}) => {
+const Editor = ({
+  fileContent,
+  socketRef,
+  roomId,
+  contentChanged,
+  // cursorInfoList,
+}) => {
   const editorRef = useRef(null);
-
-  useEffect(() => {  
+  useEffect(() => {
+    // Create style element
+    const style = document.createElement("style");
+    style.textContent = `
+      @keyframes blinkCursor {
+        0%, 100% {
+          opacity: 1;
+        }
+        100% {
+          opacity: 0;
+        }
+      }
+    `;
+  
+    // Append style to document head
+    document.head.appendChild(style);
+  
+    // Clean up function to remove style element when component unmounts
+    return () => {
+      document.head.removeChild(style);
+    };
+  }, []);
+  useEffect(() => {
     // console.log("hi");
     if (!editorRef.current) return;
 
     editorRef.current.setValue(""); // to avoid repetition of old instances
     // console.log("fileref  current:",fileRef.current);
-    if (fileRef.current) {
-      editorRef.current.setValue(fileRef.current); 
+    if (fileContent) {
+      editorRef.current.setValue(fileContent);
     }
-  }, [fileRef.current]);
-  
-  
+  }, [fileContent, contentChanged]);
 
   useEffect(() => {
     //console.log("file added");
-    if (fileRef.current) {
-      //console.log(fileRef.current);
-      var code = fileRef.current;
+    if (fileContent) {
+      console.log(fileContent);
+      var code = fileContent;
       socketRef.current.emit(ACTIONS.CODE_CHANGE, {
         roomId,
         code,
       });
     }
-  },[fileRef.current]);
-
+  }, [fileContent, contentChanged]);
 
   useEffect(() => {
     async function init() {
@@ -49,8 +73,8 @@ const Editor = ({ fileRef, socketRef, roomId}) => {
         }
       );
 
-      if (fileRef.current) {
-        editorRef.current.setValue(fileRef.current);
+      if (fileContent) {
+        editorRef.current.setValue(fileContent);
         // socketRef.current.emit(ACTIONS.CODE_CHANGE, {
         //   roomId,
         //   fileRef.current,
@@ -102,14 +126,90 @@ const Editor = ({ fileRef, socketRef, roomId}) => {
         // Update cursor position in the editor
         console.log("cursorData retrieved from user: "+cursorData.user.name)
         console.log(cursorData)
-        
+        // document.querySelectorAll(`.cursor-marker-${cursorData.user.email}`).forEach((node) => {
+        //     node.remove();
+        // });
+        renderCursors(cursorData);
       });
     }
   }, [socketRef.current]);
+  useEffect(() => {
+    // Fetch code from the backend using room ID
+    if (roomId) {
+      console.log(JSON.stringify({ roomId }));
+      async function fetchCode() {
+        try {
+          const response = await fetch(`http://localhost:8080/receivecode`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ roomId }),
+          });
+          if (response.ok) {
+            const { code } = await response.json();
+            if (code !== null) {
+              editorRef.current.setValue(code);
+            }
+          } else {
+            console.error("Failed to fetch code");
+          }
+        } catch (error) {
+          console.error("Error fetching code:", error);
+        }
+      }
+
+      fetchCode();
+    }
+  }, [roomId]);
+
+  const getRandomColor = () => {
+    const letters = "0123456789ABCDEF";
+    let color = "#";
+    for (let i = 0; i < 6; i++) {
+      color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+  };
+  // Function to render cursors
+  const renderCursors = (cursorInfoList) => {
+    if (cursorInfoList) {
+      const { cursor,tab, user } = cursorInfoList;
+      const { ch, line } = cursor;
+      // const cursorMarkerId = `cursor-marker-${user.email}`;
+      // let cursorMarker = document.getElementById(cursorMarkerId);
+      // Create a cursor marker element if not present
+      // if (!cursorMarker){
+        const prevCursorMarkers = document.querySelectorAll(`.cursor-marker[title="${user.name}"]`);
+      prevCursorMarkers.forEach((marker) => marker.remove());
+
+      const cursorMarker = document.createElement("div");
+      cursorMarker.className = "cursor-marker";
+      cursorMarker.style.position = "absolute";
+      cursorMarker.classList.add("h-8", "w-px");
+
+      cursorMarker.style.backgroundColor = getRandomColor(); // Assign a random color
+      cursorMarker.title = user.name;
+
+      // Append cursor marker to CodeMirror editor container
+      editorRef.current.getWrapperElement().appendChild(cursorMarker);
+      cursorMarker.style.animation = "blinkCursor 1s infinite";
+      // }
+
+      cursorMarker.style.left = `${
+        editorRef.current.charCoords({ line, ch }).left
+      -324}px`;
+      cursorMarker.style.top = `${
+        editorRef.current.charCoords({ line, ch }).top
+      }px`;
+      // console.log(editorRef.current.charCoords({ line, ch }).top);
+      // Define CSS keyframes for blinking effect
+    }
+  };
   // useEffect(() => {
   //   console.log(newusernameRef.current);
   //   if (socketRef.current && newusernameRef.current !== null) {
-      
+
   //     if (newusernameRef.current === "RITESH PATIL") {
   //       console.log("entered here");
   //       console.log(newusernameRef.current);
@@ -122,7 +222,7 @@ const Editor = ({ fileRef, socketRef, roomId}) => {
   //     }
   //   }
   // }, [newuserRef.current, socketRef.current, newusernameRef.current]);
-  
+
   // useEffect(() => {
   //   if (socketRef.current) {
   //     console.log("hi");
@@ -133,6 +233,15 @@ const Editor = ({ fileRef, socketRef, roomId}) => {
   //     });
   //   }
   // }, [socketRef.current]);
+
+  // Clean up cursor markers when component unmounts
+  useEffect(() => {
+    return () => {
+      document
+        .querySelectorAll(".cursor-marker")
+        .forEach((node) => node.remove());
+    };
+  }, []);
 
   return <textarea id="realEditor"></textarea>;
 };
