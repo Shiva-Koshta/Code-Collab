@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined';
 import { IconButton } from '@mui/material';
+import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
 
 const FileView = ({fileContent,setFileContent, editorRef}) => {
 
@@ -72,19 +73,32 @@ const FileView = ({fileContent,setFileContent, editorRef}) => {
               className='cursor-pointer'
               onClick={() => {
                 if(!isDownloadTrue) setIsDownloadTrue(true)
-                else {
-                  handleDownloadFile()
-                  setIsDownloadTrue(false)
-                }
               }}
             />
           </div>
         </div>
         {isDownloadTrue && (
-          <div className="absolute top-10">
-            <input type="text" value={downloadFileName} onChange={(e) => setFileName(e.target.value)} placeholder="Enter file name" className="mb-3" style={{ color: "#1c1e29" }} />
-            <select value={downloadFileExtension} onChange={(e) => setFileExtension(e.target.value)} className="mb-3" style={{ color: "#1c1e29" }}>
-              <option value="txt">Select type</option>
+          <div className="absolute top-10 bg-slate-700 p-4 rounded-lg shadow-md shadow-slate-400">
+            <div className='flex justify-end mb-4'>
+              <CloseOutlinedIcon
+                className='absolute top-2 right-2 cursor-pointer text-gray-300'
+                onClick={() => {setIsDownloadTrue(false)}}
+              />
+            </div>
+            <input
+              type="text" 
+              value={downloadFileName} 
+              onChange={(e) => setFileName(e.target.value)} 
+              placeholder="Enter file name" 
+              className="mb-3 px-2 py-1 w-full bg-slate-300 rounded border-2 opacity border-gray-400 focus:outline-none focus:border-blue-500" 
+              style={{ color: "#1c1e29", '::placeholder': { color: '#1c1e29' } }} 
+            />
+            <select 
+              value={downloadFileExtension} 
+              onChange={(e) => setFileExtension(e.target.value)} 
+              className="mb-3 px-2 py-1 w-full bg-slate-300 rounded border-2 border-gray-400 focus:outline-none focus:border-blue-500" style={{ color: "#1c1e29" }}
+            >
+              <option value="">Select type</option>
               <option value="txt">Text</option>
               <option value="json">JSON</option>
               <option value="py">Python</option>
@@ -93,12 +107,17 @@ const FileView = ({fileContent,setFileContent, editorRef}) => {
               <option value="java">Java</option>
               <option value="cpp">C++</option>
               <option value="c">C</option>
-              {/* <option value="png">PNG</option>
-              <option value="jpeg">JPEG</option>
-              <option value="pdf">PDF</option>
-              <option value="zip">zip</option> */}
               <option value="js">Javascript</option>
             </select>
+            <button
+              className='w-full px-2 py-1 font-semibold bg-blue-600'
+              onClick={() => {
+                handleDownloadFile()
+                setIsDownloadTrue(false)
+              }}
+            >
+              Download
+            </button>
           </div>
         )}
       </div>

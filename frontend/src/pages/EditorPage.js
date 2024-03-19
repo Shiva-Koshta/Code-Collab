@@ -38,7 +38,8 @@ const EditorPage = () => {
   const [isChatOpen, setIsChatOpen] = useState(false); // State to control chat window
 
   const [unreadMessages, setUnreadMessages] = useState(-1);
-
+  const [downloadFileExtension, setFileExtension] = useState("");
+  const [downloadFileName, setFileName] = useState("");
   
 
 
@@ -168,17 +169,17 @@ const EditorPage = () => {
 
   return (
     <div className="flex flex-col justify-center">
-      <div className="grid grid-cols-6" >
+      <div className="grid grid-cols-10" >
         <Toaster />
 
         <div
-          className="col-span-1 flex flex-col justify-between h-screen text-white p-4 pb-5"
+          className="col-span-2 flex flex-col justify-between h-screen text-white p-4 pb-5"
           style={{ backgroundColor: "#1c1e29" }}
           >
           <div className="logo flex">
             <img className="h-20" src={logo} alt="logo" />
-            <div className="flex flex-col justify-center">
-              <h2 className="text-4xl madimi-one-regular ">Code Collab</h2>
+            <div className="flex flex-col w-full justify-center">
+              <p className="text-4xl text-center madimi-one-regular ">Code Collab</p>
             </div>
           </div>
           <div className="flex flex-col justify-between h-full">
@@ -203,7 +204,7 @@ const EditorPage = () => {
         </div>
 
 
-        <div className="col-span-5 overflow-y-auto">
+        <div className="col-span-8 overflow-y-auto">
           <Editor
             handleDownloadFile={handleDownloadFile}
             socketRef={socketRef}
