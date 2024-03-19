@@ -7,8 +7,15 @@ import "codemirror/addon/edit/closetag";
 import "codemirror/addon/edit/closebrackets";
 import ACTIONS from "../Actions";
 
-const Editor = ({ handleDownloadFile, fileContent, socketRef, roomId, contentChanged ,editorRef }) => {
-
+const Editor = ({
+  handleDownloadFile,
+  fileContent,
+  socketRef,
+  roomId,
+  contentChanged,
+  editorRef,
+}) => {
+  localStorage.setItem("roomid", roomId);
   useEffect(() => {
     // console.log("hi");
     if (!editorRef.current) return;

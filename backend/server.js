@@ -10,6 +10,7 @@ const { Server } = require("socket.io");
 const http = require("http");
 const ACTIONS = require("../frontend/src/Actions");
 const RoomCodeMap = require("./models/RoomCodeMap");
+const RoomUserCount = require("./models/RoomUserCount");
 const app = express();
 const server = http.createServer(app);
 const port = process.env.PORT || 8080;
@@ -53,17 +54,39 @@ function getAllConnectedClients(roomId) {
 io.on("connection", (socket) => {
   console.log("Socket connected", socket.id);
 
-  socket.on(ACTIONS.JOIN, ({ roomId, username }) => {
+  socket.on(ACTIONS.JOIN, async ({ roomId, username }) => {
+    // Add the user to the socket map
     userSocketMap[socket.id] = username;
+
+    // Join the room
     socket.join(roomId);
-    const clients = getAllConnectedClients(roomId);
-    clients.forEach(({ socketId }) => {
-      io.to(socketId).emit(ACTIONS.JOINED, {
-        clients,
-        username,
-        socketId: socket.id,
+
+    // Increment the user count for the room
+    try {
+      // Find the document for the room ID and update the user count
+      console.log("hi");
+      const updatedRoom = await RoomUserCount.findOneAndUpdate(
+        { roomId },
+        { $inc: { userCount: 1 } }, // Increment userCount by 1
+        { new: true, upsert: true } // Return the updated document and create if it doesn't exist
+      );
+      console.log(updatedRoom);
+
+      // Get all connected clients for the room
+      const clients = getAllConnectedClients(roomId);
+
+      // Emit the JOINED event to all clients in the room
+      clients.forEach(({ socketId }) => {
+        io.to(socketId).emit(ACTIONS.JOINED, {
+          clients,
+          username,
+          socketId: socket.id,
+          userCount: updatedRoom.userCount, // Pass the updated user count to clients
+        });
       });
-    });
+    } catch (error) {
+      console.error("Error updating user count:", error);
+    }
   });
   socket.on(ACTIONS.CODE_CHANGE, ({ roomId, code }) => {
     // Save or update the code in the database
@@ -97,6 +120,24 @@ io.on("connection", (socket) => {
     });
     delete userSocketMap[socket.id];
     socket.leave();
+  });
+
+  socket.on("disconnecting", () => {
+    // Iterate through each room the socket is connected to
+    socket.rooms.forEach((roomId) => {
+      // Find the document for the room ID, decrement the userCount, and return the updated document
+      RoomUserCount.findOneAndUpdate(
+        { roomId },
+        { $inc: { userCount: -1 } }, // Decrement userCount by 1
+        { new: true } // Return the updated document
+      )
+        .then((updatedRoom) => {
+          console.log("User count updated:", updatedRoom);
+        })
+        .catch((error) => {
+          console.error("Error updating user count:", error);
+        });
+    });
   });
 
   socket.on(ACTIONS.JOIN, ({ roomId }) => {
@@ -161,7 +202,36 @@ app.post("/receivecode", (req, res) => {
       res.status(500).json({ error: "Internal server error" });
     });
 });
+//check and delete the room data if no user in the room
+app.post("/delete-entry", async (req, res) => {
+  console.log("hit");
+  const { roomId } = req.body;
 
+  try {
+    // Check if the user count for the room is zero
+    const room = await RoomUserCount.findOne({ roomId });
+
+    if (!room) {
+      return res.status(200).json({ message: "Room not found" });
+    }
+
+    if (room.userCount !== 0) {
+      return res.status(200).json({ message: "done" });
+    }
+
+    // If user count is zero, delete the entry from RoomCodeMap
+    const deletedRoomCodeMap = await RoomCodeMap.findOneAndDelete({ roomId });
+
+    if (!deletedRoomCodeMap) {
+      return res.status(404).json({ error: "Room code map entry not found" });
+    }
+
+    return res.json({ message: "Room code map entry deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting room code map entry:", error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+});
 //connect to database
 mongoose
   .connect(process.env.MONGO_URL)
