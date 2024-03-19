@@ -176,10 +176,10 @@ const EditorPage = () => {
           className="col-span-2 flex flex-col justify-between h-screen text-white p-4 pb-5"
           style={{ backgroundColor: "#1c1e29" }}
           >
-          <div className="logo flex">
+          <div className="logo flex items-center">
             <img className="h-20" src={logo} alt="logo" />
-            <div className="flex flex-col w-full justify-center">
-              <p className="text-4xl text-center madimi-one-regular ">Code Collab</p>
+            <div className="flex flex-col w-full">
+              <p className="text-4xl md:text-2xl text-center lg:text-3xl xl:text-4xl madimi-one-regular whitespace-nowrap">Code Collab</p>
             </div>
           </div>
           <div className="flex flex-col justify-between h-full">
@@ -192,10 +192,10 @@ const EditorPage = () => {
             </div>
           </div>
           <div>
-
-            <button className="btn chatBtn" onClick={toggleChat} >Chat {unreadMessages > 0 && <span className="unread-messages" style={{ color : "red" , borderRadius : "50%", border: "black", background:"white"}}>{unreadMessages}</span>}</button>
-
-            <button className="btn-edit copyBtn" onClick={copyRoomId}>Copy ROOM ID</button>
+            <div className="flex gap-2">
+              <button className="btn chatBtn" onClick={toggleChat} >Chat {unreadMessages > 0 && <span className="unread-messages" style={{ color : "red" , borderRadius : "50%", border: "black", background:"white"}}>{unreadMessages}</span>}</button>
+              <button className="btn-edit copyBtn" onClick={copyRoomId}>Copy ROOM ID</button>
+            </div>
             <button className="btn-edit leaveBtn" onClick={leaveRoom}>
               Leave
             </button>
