@@ -64,13 +64,13 @@ io.on("connection", (socket) => {
     // Increment the user count for the room
     try {
       // Find the document for the room ID and update the user count
-      console.log("hi");
+      //console.log("hi");
       const updatedRoom = await RoomUserCount.findOneAndUpdate(
         { roomId },
         { $inc: { userCount: 1 } }, // Increment userCount by 1
         { new: true, upsert: true } // Return the updated document and create if it doesn't exist
       );
-      console.log(updatedRoom);
+      //console.log(updatedRoom);
 
       // Get all connected clients for the room
       const clients = getAllConnectedClients(roomId);
@@ -132,7 +132,7 @@ io.on("connection", (socket) => {
         { new: true } // Return the updated document
       )
         .then((updatedRoom) => {
-          console.log("User count updated:", updatedRoom);
+         // console.log("User count updated:", updatedRoom);
         })
         .catch((error) => {
           console.error("Error updating user count:", error);
