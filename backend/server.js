@@ -25,6 +25,7 @@ app.use(
 )
 const bodyParser = require('body-parser')
 app.use(bodyParser.json())
+// const roomCodeMap = {}
 
 const io = new Server(server)
 
@@ -99,8 +100,7 @@ io.on('connection', (socket) => {
         // console.log("Code updated in database:");
       })
       .catch((error) => {
-         console.error("Error retrieving code from database:", error)
-         res.status(500).json({ error: "Internal server error" })
+        console.error('Error retrieving code from database:', error)
       })
 
     // Emit the code change to other sockets in the room
@@ -205,7 +205,7 @@ app.post('/receivecode', (req, res) => {
 })
 // check and delete the room data if no user in the room
 app.post('/delete-entry', async (req, res) => {
-  console.log('hit')
+  // console.log("hit");
   const { roomId } = req.body
 
   try {
