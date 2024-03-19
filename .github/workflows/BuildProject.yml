@@ -30,10 +30,8 @@ jobs:
     #     default: '21.x'
     #     cache: 'npm'
     # seeting up npm inside frontend folder
-    - run: apt-get node
+    - run: apt-get nodejs
     - run: apt-get install npm
-
-    - run: npm install -g npm@latest
     - run: npm install
     - run: npm run build --if-present
     # - run: npm test
