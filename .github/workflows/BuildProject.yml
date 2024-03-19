@@ -30,7 +30,6 @@ jobs:
         default: '21.x'
         cache: 'npm'
   
-    - run: cd frontend
-    - run: npm install      
+    - run: cd frontend && npm install      
     - run: npm run build --if-present
     # - run: npm test
