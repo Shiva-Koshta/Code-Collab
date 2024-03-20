@@ -1,11 +1,37 @@
-import React, { useEffect } from 'react'
-import Codemirror from 'codemirror'
-import 'codemirror/lib/codemirror.css'
-import 'codemirror/theme/dracula.css'
-import 'codemirror/mode/javascript/javascript'
-import 'codemirror/addon/edit/closetag'
-import 'codemirror/addon/edit/closebrackets'
-import ACTIONS from '../Actions'
+import React, { useEffect, useRef, useState } from "react";
+import Codemirror from "codemirror";
+import "codemirror/lib/codemirror.css";
+import "codemirror/theme/dracula.css";
+import "codemirror/mode/javascript/javascript";
+import "codemirror/addon/edit/closetag";
+import "codemirror/addon/edit/closebrackets";
+import ACTIONS from "../Actions";
+
+const Editor = ({ handleDownloadFile, socketRef, roomId, editorRef,fileContent,setFileContent }) => {
+
+  // const [fileContent, setFileContent] = useState("")
+  const [contentChanged, setContentChanged] = useState(false)
+
+  // useEffect(() => {
+  //   const handleStorageChange = () => {
+  //     setFileContent(localStorage.getItem('fileContent'))
+  //     setContentChanged(localStorage.getItem('contentChange'))
+  //   }
+
+  //   window.addEventListener('storage', handleStorageChange)
+
+  //   return () => {
+  //     window.removeEventListener('storage', handleStorageChange)
+  //   }
+  // }, [])
+
+  console.log(fileContent)
+  console.log(contentChanged)
+
+  // useEffect(() => {
+  //   setFileContent(localStorage.getItem("fileContent"))
+  //   setContentChanged(localStorage.getItem("contentChanged"))
+  // }, [])
 
 const Editor = ({
   handleDownloadFile,
