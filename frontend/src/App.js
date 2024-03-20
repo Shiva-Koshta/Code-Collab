@@ -1,4 +1,4 @@
-import logo from "./logo.svg";
+
 import "./App.css";
 import Login from "./pages/Login1";
 
@@ -7,15 +7,13 @@ import {
   Routes,
   Route,
   Navigate,
-  Router,
   BrowserRouter,
-  useNavigate,
 } from "react-router-dom";
 
 import { useEffect, useState } from "react";
 import axios from "axios";
 
-import Room_Creation from "./pages/Room_Creation";
+import RoomCreation from "./pages/RoomCreation";
 import EditorPage from "./pages/EditorPage";
 import HelpPage from "./pages/HelpPage";
 import About from "./pages/About";
@@ -48,12 +46,12 @@ function App() {
         <Route
           exact
           path="/"
-          element={user ? <Room_Creation /> : <Navigate to="/login" />}
+          element={user ? <RoomCreation /> : <Navigate to="/login" />}
         />
         <Route
           exact
           path="/login"
-          element={user ? <Room_Creation /> : <Login />}
+          element={user ? <RoomCreation /> : <Login />}
         />
 
         <Route path="/faq" element={<Faq />} />

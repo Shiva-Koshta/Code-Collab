@@ -1,7 +1,6 @@
 import React from "react";
 // import mainlogo from "../res/bg.png";
 import Logo from "../images/Logo.png"
-import BackgroundImage from "../images/BackgroundImage6.png"
 import GoogleButton from "react-google-button";
 import { Link } from "react-router-dom";
 

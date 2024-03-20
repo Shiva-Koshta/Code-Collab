@@ -1,6 +1,4 @@
 import { combineReducers, configureStore } from '@reduxjs/toolkit'
-import roomSlice from './roomSlice'
-import userSlice from './userSlice'
 import userReducer from './userSlice'
 import { persistReducer, persistStore } from 'redux-persist'
 import storage from 'redux-persist/lib/storage'
