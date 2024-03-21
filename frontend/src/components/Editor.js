@@ -7,10 +7,10 @@ import "codemirror/addon/edit/closetag";
 import "codemirror/addon/edit/closebrackets";
 import ACTIONS from "../Actions";
 
-const Editor = ({ handleDownloadFile, socketRef, roomId, editorRef,fileContent,setFileContent }) => {
+const Editor = ({ handleDownloadFile, socketRef, roomId, editorRef,fileContent,setFileContent,contentChanged}) => {
 
   // const [fileContent, setFileContent] = useState("")
-  const [contentChanged, setContentChanged] = useState(false)
+  // const [contentChanged, setContentChanged] = useState(false)
 
   // useEffect(() => {
   //   const handleStorageChange = () => {

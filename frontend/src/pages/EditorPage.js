@@ -10,11 +10,13 @@ import { Toaster } from 'react-hot-toast';
 import '../styles/EditorPage.css';
 import '../styles/Chat.css';
 import logo from '../images/Logo.png'
+import Chat from "../components/Chat";
+import { ChevronLeft, ChevronRight } from '@mui/icons-material';
 
 const EditorPage = () => {
   const editorRef = useRef(null);
   const [fileContent, setFileContent] = useState("");
-
+  const [contentChanged, setContentChanged] = useState(false);
   const { roomId } = useParams();
   const socketRef = useRef(null);
   const location = useLocation();
@@ -36,12 +38,16 @@ const EditorPage = () => {
   const [isOpen, setIsOpen] = useState(true);
   // const [isOpen, setIsOpen] = useState(true);
   const [isChatOpen, setIsChatOpen] = useState(false); // State to control chat window
-
+  const [isLeftDivOpen, setIsLeftDivOpen] = useState(true);
   const [unreadMessages, setUnreadMessages] = useState(-1);
   const [downloadFileExtension, setFileExtension] = useState("");
   const [downloadFileName, setFileName] = useState("");
-  
+  const leftIcon = isLeftDivOpen ? <ChevronLeft /> : <ChevronRight />;
 
+
+  const toggleLeftDiv = () => {
+    setIsLeftDivOpen(prevState => !prevState);
+  };
 
   const handleMessageSend = () => {
     console.log(storedUserData);
@@ -171,9 +177,9 @@ const EditorPage = () => {
     <div className="flex flex-col justify-center">
       <div className="grid grid-cols-10" >
         <Toaster />
-
+        {isLeftDivOpen && (
         <div
-          className="col-span-2 flex flex-col justify-between h-screen text-white p-4 pb-5"
+          className={"col-span-2 flex flex-col justify-between h-screen text-white p-4 pb-5 relative "}
           style={{ backgroundColor: "#1c1e29" }}
           >
           <div className="logo flex items-center">
@@ -183,7 +189,7 @@ const EditorPage = () => {
             </div>
           </div>
           <div className="flex flex-col justify-between h-full">
-            <FileView fileContent={fileContent} setFileContent={setFileContent} editorRef={editorRef}/>
+            <FileView contentChanged={contentChanged} setContentChanged={setContentChanged} fileContent={fileContent} setFileContent={setFileContent} editorRef={editorRef}/>
             <div className="Users">
               <h3 className="my-3 font-bold text-lg">Connected Users here</h3>
               {connectedUsernames.map(username => (
@@ -201,10 +207,13 @@ const EditorPage = () => {
             </button>
 
           </div>
+          <div className="absolute right-0 top-1/2 transform -translate-y-1/2">
+          <button style={{ backgroundColor: "#1c1e29" }} onClick={toggleLeftDiv}>{leftIcon}</button>
         </div>
+        </div>
+        )}
 
-
-        <div className="col-span-8 overflow-y-auto">
+        <div className={`${isLeftDivOpen ? 'col-span-8' : 'col-span-10'} overflow-y-auto `}>
           <Editor
             handleDownloadFile={handleDownloadFile}
             socketRef={socketRef}
@@ -212,36 +221,24 @@ const EditorPage = () => {
             fileContent={fileContent}
             setFileContent={setFileContent}
             editorRef = {editorRef}
+            contentChanged={contentChanged}
             />
+            {!isLeftDivOpen &&(
+              <div className="absolute left-0 top-1/2 transform -translate-y-1/2">
+              <button className="text-white" onClick={toggleLeftDiv}>{leftIcon}</button>
+            </div>
+            )}
         </div>
 
         {isChatOpen && (
-          <div className="chat-container">
-            <div className="chat-popup">
-              <div className="chat-header">
-                <h2>Chat</h2>
-                <button className="close-icon" onClick={() => setIsChatOpen(false)}>X</button>
-              </div>
-              <div className="chat-messages">
-                {messages.slice(-CHAT_LIMIT).map((message, index) => (
-                  <div key={index} className={` ${message.sentByCurrentUser ? 'sent_by_user' : 'chat-message'}`}>
-                    <span className="message-sender">{message.sentByCurrentUser ? 'You' : message.sendname}:</span> {message.text}
-                  </div>
-                ))}
-              </div>
-              <div className="chat-input">
-                <input
-                  type="text"
-                  value={inputText}
-                  onChange={(e) => setInputText(e.target.value)}
-                  onKeyPress={handleKeyPress}
-                  placeholder="Type your message..."
-                  className="input-field"
-                  />
-                <button onClick={handleMessageSend} className="send-button">Send</button>
-              </div>
-            </div>
-          </div>
+          <Chat
+          setIsChatOpen={setIsChatOpen}
+          messages={messages}
+          CHAT_LIMIT={CHAT_LIMIT}
+          inputText={inputText}
+          setInputText={setInputText}
+          handleKeyPress={handleKeyPress}
+          handleMessageSend={handleMessageSend}></Chat>
         )}
       </div>
     </div>

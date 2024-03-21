@@ -4,9 +4,9 @@ import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined';
 import { IconButton } from '@mui/material';
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
 
-const FileView = ({fileContent,setFileContent, editorRef}) => {
+const FileView = ({fileContent,setFileContent, editorRef,contentChanged,setContentChanged}) => {
 
-  const [contentChanged, setContentChanged] = useState(false);
+  // const [contentChanged, setContentChanged] = useState(false);
 
   const [isDownloadTrue, setIsDownloadTrue] = useState(false);
   const [downloadFileExtension, setFileExtension] = useState("");
