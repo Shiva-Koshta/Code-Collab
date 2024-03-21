@@ -3,9 +3,8 @@ import { v4 as uuidV4 } from 'uuid'
 import toast, { Toaster } from 'react-hot-toast'
 import { useNavigate } from 'react-router-dom'
 import '../index'
-import axios from 'axios'
 
-const Room_Creation = () => {
+const RoomCreation = () => {
   const navigate = useNavigate()
 
   const [roomId, setRoomId] = useState('')
@@ -133,7 +132,7 @@ const Room_Creation = () => {
           <div className='flex items-center justify-center mb-5'>
             <img
               src={userimage}
-              alt='profile-image'
+              alt='profile'
               className='w-20 rounded-full object-cover'
             />
           </div>
@@ -197,4 +196,4 @@ const Room_Creation = () => {
   )
 }
 
-export default Room_Creation
+export default RoomCreation
