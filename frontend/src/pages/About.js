@@ -10,7 +10,7 @@ const About = () => {
     <div
       className='about-us-container flex flex-col gap-32 h-screen min-h-screen p-5 w-screen bg-cover'
       style={{
-        backgroundColor: '#1c1e29',
+        backgroundColor: '#1c1e29'
       }}
     >
       <div
