@@ -47,7 +47,7 @@ const EditorPage = () => {
         roomId,
         message,
         sender: storedUserData.sub,
-        sendname: storedUserData.name,
+        sendname: storedUserData.name
       })
       setInputText('')
     }
@@ -64,7 +64,7 @@ const EditorPage = () => {
   }, [messages, isChatOpen])
   const leaveRoom = () => {
     reactNavigator('/', {
-      roomId: roomId,
+      roomId
     })
   }
 
@@ -85,7 +85,7 @@ const EditorPage = () => {
         setStoredUserData(JSON.parse(userData))
         socketRef.current.emit(ACTIONS.JOIN, {
           roomId,
-          username: JSON.parse(userData).name,
+          username: JSON.parse(userData).name
         })
       }
       socketRef.current.on(
@@ -142,7 +142,7 @@ const EditorPage = () => {
             text,
             sender,
             sentByCurrentUser: sender === JSON.parse(userData).sub,
-            sendname,
+            sendname
           }
           setMessages((prevMessages) => {
             const updatedMessages = [...prevMessages, newMessage].slice(
@@ -168,7 +168,7 @@ const EditorPage = () => {
   }, [roomId])
 
   if (!location.state) {
-    return <Navigate to="/" />
+    return <Navigate to='/' />
   }
 
   async function copyRoomId () {
@@ -241,7 +241,7 @@ const EditorPage = () => {
                       color: 'red',
                       borderRadius: '50%',
                       border: 'black',
-                      background: 'white',
+                      background: 'white'
                     }}
                   >
                     {unreadMessages}
