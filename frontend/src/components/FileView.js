@@ -37,7 +37,7 @@ const FileView = ({ fileContent, setFileContent, editorRef }) => {
   const handleDownloadFile = () => {
     const myContent = editorRef.current.getValue()
     const element = document.createElement('a')
-    const file = new Blob([myContent], { type: `text/plain` })
+    const file = new Blob([myContent], { type: 'text/plain' })
     element.href = URL.createObjectURL(file)
     element.download = `${downloadFileName}.${downloadFileExtension}`
     document.body.appendChild(element)
@@ -94,7 +94,7 @@ const FileView = ({ fileContent, setFileContent, editorRef }) => {
               className='mb-3 px-2 py-1 w-full bg-slate-300 rounded border-2 opacity border-gray-400 focus:outline-none focus:border-blue-500'
               style={{
                 color: '#1c1e29',
-                "::placeholder": { color: '#1c1e29' },
+                '::placeholder': { color: '#1c1e29' }
               }}
             />
             <select

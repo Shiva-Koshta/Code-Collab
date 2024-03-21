@@ -45,7 +45,7 @@ const Editor = ({
     // console.log("hi");
     if (!editorRef.current) return
 
-    editorRef.current.setValue("")// to avoid repetition of old instances
+    editorRef.current.setValue('')// to avoid repetition of old instances
     // console.log("fileref  current:",fileRef.current)
     if (fileContent) {
       editorRef.current.setValue(fileContent)
@@ -118,7 +118,7 @@ const Editor = ({
           const response = await fetch('http://localhost:8080/receivecode', {
             method: 'POST',
             headers: {
-              "Content-Type": 'application/json'
+              'Content-Type': 'application/json'
             },
             body: JSON.stringify({ roomId })
           })
