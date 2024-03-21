@@ -162,6 +162,11 @@ app.post("/receivecode", (req, res) => {
     });
 });
 
+app.post("/help", (req, res) => {
+  console.log(req.body)
+  res.status(200).json({ message: "Form submitted" })
+})
+
 //connect to database
 mongoose
   .connect(process.env.MONGO_URL)

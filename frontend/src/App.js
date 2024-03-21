@@ -1,6 +1,6 @@
 import logo from "./logo.svg";
 import "./App.css";
-import Login from "./pages/Login1";
+import Login from "./pages/Login";
 
 import Faq from "./pages/Faq";
 import { Routes, Route, Navigate, Router, BrowserRouter } from "react-router-dom";

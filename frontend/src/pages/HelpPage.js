@@ -21,16 +21,43 @@ const HelpPage = () => {
         });
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        toast.success("Your message has been recorded");
-        console.log(formData);
+        
+        try {
+            const response = await fetch('http://localhost:8080/help', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            });
+
+            if (response.ok) {
+                // Handle success, e.g., show a success message
+                console.log('Form submitted successfully');
+            } else {
+                // Handle error, e.g., show an error message
+                console.error('Form submission failed');
+            }
+            setFormData({
+                name: '',
+                email: '',
+                message: ''
+            });
+
+        } catch (error) {
+            console.error('Error:', error);
+        }
+
+        // Clear form data after submission
         setFormData({
             name: '',
             email: '',
             message: ''
         });
     };
+
     return (
         <div className="xwz">
             <div className="smpct">
@@ -106,23 +133,31 @@ const HelpPage = () => {
                         </div>
                     </div>
                 </div>
-
-                <h1 className="hdng">Contact Us</h1>
-                <form onSubmit={handleSubmit} className="frm">
-                    <div className="frmgp">
-                        <label htmlFor="name">Name</label>
-                        <input type="text" id="name" name="name" value={formData.name} onChange={handleChange} required />
+                <div className='w-full flex justify-center'>
+                    <div className='flex justify-center h-96 w-3/4 gap-6'>
+                        <div className='flex flex-col justify-center w-1/2 gap-6'>
+                            <p className='text-5xl text-center satisfy-regular font-bold'>Contact Us</p>
+                            <p className='text-xl text-center satisfy-regular p-12'>Great things are not done by impulse, but by a series of small things brought together.</p>
+                        </div>
+                        <div className='flex flex-col justify-center w-1/4'>
+                            <form onSubmit={handleSubmit} className="flex flex-col" method='POST'>
+                                <div className="mb-5">
+                                    <label className="text-lg mb-2" htmlFor="name">Name</label>
+                                    <input className='w-full text-gray-700 p-2.5 text-lg border-2 border-solid rounded-md outline-none border-stone-300' type="text" id="name" name="name" value={formData.name} onChange={handleChange} required />
+                                </div>
+                                <div className="frmgp">
+                                    <label className="text-lg mb-2" htmlFor="email">Email</label>
+                                    <input className='w-full text-gray-700 p-2.5 text-lg border-2 border-solid rounded-md outline-none border-stone-300' type="email" id="email" name="email" value={formData.email} onChange={handleChange} required />
+                                </div>
+                                <div className="frmgp">
+                                    <label className="text-lg mb-2" htmlFor="message">Message</label>
+                                    <textarea className='w-full text-gray-700 p-2.5 text-lg border-2 border-solid rounded-md outline-none border-stone-300' id="message" name="message" value={formData.message} onChange={handleChange} required></textarea>
+                                </div>
+                                <button type="submit" className="w-full p-2.5 bg-blue-600 text-white text-lg border-none rounded-md cursor-pointer outline-none mb-6 hover:bg-blue-700">Submit</button>
+                            </form>
+                        </div>
                     </div>
-                    <div className="frmgp">
-                        <label htmlFor="email">Email</label>
-                        <input type="email" id="email" name="email" value={formData.email} onChange={handleChange} required />
-                    </div>
-                    <div className="frmgp">
-                        <label htmlFor="message">Message</label>
-                        <textarea id="message" name="message" value={formData.message} onChange={handleChange} required></textarea>
-                    </div>
-                    <button type="submit" className="btnsub">Submit</button>
-                </form>
+                </div>
                 <Toaster />
             </div>
         </div>
