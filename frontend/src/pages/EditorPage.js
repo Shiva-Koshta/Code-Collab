@@ -12,6 +12,7 @@ import '../styles/Chat.css';
 import logo from '../images/Logo.png'
 import Chat from "../components/Chat";
 import { ChevronLeft, ChevronRight } from '@mui/icons-material';
+import { Hidden } from "@mui/material";
 
 const EditorPage = () => {
   const editorRef = useRef(null);
@@ -177,9 +178,10 @@ const EditorPage = () => {
     <div className="flex flex-col justify-center">
       <div className="grid grid-cols-10" >
         <Toaster />
-        {isLeftDivOpen && (
+        {/* {isLeftDivOpen && ( */}
+
         <div
-          className={"col-span-2 flex flex-col justify-between h-screen text-white p-4 pb-5 relative "}
+          className={`flex flex-col justify-between h-screen text-white p-4 pb-5 relative transition-all duration-500 ease-in-out transform ${isLeftDivOpen ? 'col-span-2 ' : 'hidden'}`}
           style={{ backgroundColor: "#1c1e29" }}
           >
           <div className="logo flex items-center">
@@ -207,24 +209,24 @@ const EditorPage = () => {
             </button>
 
           </div>
-          <div className="absolute right-0 top-1/2 transform -translate-y-1/2">
+          <div className="absolute right-0 top-1/2 transform -translate-y-1/2 transition duration-500 hover:animate-bounce-left">
           <button style={{ backgroundColor: "#1c1e29" }} onClick={toggleLeftDiv}>{leftIcon}</button>
         </div>
         </div>
-        )}
+        {/* )} */}
 
-        <div className={`${isLeftDivOpen ? 'col-span-8' : 'col-span-10'} overflow-y-auto `}>
+        <div className={`${isLeftDivOpen ? 'col-span-8' : 'col-span-10'}  overflow-y-auto relative transition-all duration-300`}>
           <Editor
             handleDownloadFile={handleDownloadFile}
             socketRef={socketRef}
-            roomId={roomId}
+            roomId={roomId} 
             fileContent={fileContent}
             setFileContent={setFileContent}
             editorRef = {editorRef}
             contentChanged={contentChanged}
             />
             {!isLeftDivOpen &&(
-              <div className="absolute left-0 top-1/2 transform -translate-y-1/2">
+              <div className="absolute left-0 top-1/2 transform -translate-y-1/2 transition duration-500 hover:animate-bounce-right">
               <button className="text-white" onClick={toggleLeftDiv}>{leftIcon}</button>
             </div>
             )}
