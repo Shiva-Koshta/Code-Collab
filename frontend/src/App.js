@@ -1,44 +1,44 @@
 
-import "./App.css";
-import Login from "./pages/Login";
+import "./App.css" 
+import Login from "./pages/Login" 
 
-import Faq from "./pages/Faq";
+import Faq from "./pages/Faq" 
 import {
   Routes,
   Route,
   Navigate,
   BrowserRouter,
-} from "react-router-dom";
+} from "react-router-dom" 
 
-import { useEffect, useState } from "react";
-import axios from "axios";
+import { useEffect, useState } from "react" 
+import axios from "axios" 
 
-import RoomCreation from "./pages/RoomCreation";
-import EditorPage from "./pages/EditorPage";
-import HelpPage from "./pages/HelpPage";
-import About from "./pages/About";
+import RoomCreation from "./pages/RoomCreation" 
+import EditorPage from "./pages/EditorPage" 
+import HelpPage from "./pages/HelpPage" 
+import About from "./pages/About" 
 
-// import './App.css';
-// import Home from './pages/Room_Join';
-// import { BrowserRouter, Routes, Route } from 'react-router-dom';
-// import EditorPage from './pages/EditorPage';
-// import { Toaster } from 'react-hot-toast';
+// import './App.css' 
+// import Home from './pages/Room_Join' 
+// import { BrowserRouter, Routes, Route } from 'react-router-dom' 
+// import EditorPage from './pages/EditorPage' 
+// import { Toaster } from 'react-hot-toast' 
 function App() {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(null) 
 
   useEffect(() => {
     const getUser = async () => {
       try {
-        const url = `${process.env.REACT_APP_API_URL}/auth/login/success`;
-        const { data } = await axios.get(url, { withCredentials: true });
-        setUser(data.user._json);
-        localStorage.setItem("userData", JSON.stringify(data.user._json));
+        const url = `${process.env.REACT_APP_API_URL}/auth/login/success` 
+        const { data } = await axios.get(url, { withCredentials: true }) 
+        setUser(data.user._json) 
+        localStorage.setItem("userData", JSON.stringify(data.user._json)) 
       } catch (err) {
-        console.log(err);
+        console.log(err) 
       }
-    };
-    getUser();
-  }, []);
+    } 
+    getUser() 
+  }, []) 
 
   return (
     <BrowserRouter>
@@ -61,7 +61,7 @@ function App() {
         <Route path="/about-us" element={<About />} />
       </Routes>
     </BrowserRouter>
-  );
+  )
 }
 
-export default App;
+export default App
