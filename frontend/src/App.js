@@ -18,20 +18,20 @@ import EditorPage from './pages/EditorPage'
 import HelpPage from './pages/HelpPage'
 import About from './pages/About'
 
-function App (){
-  const [user, setUser] = useState (null) 
+function App () {
+  const [user, setUser] = useState(null)
 
-  useEffect (() => {
+  useEffect(() => {
     const getUser = async () => {
       try {
         const url = `${process.env.REACT_APP_API_URL}/auth/login/success`
         const { data } = await axios.get(url, { withCredentials: true })
         setUser(data.user._json)
-        localStorage.setItem("userData", JSON.stringify(data.user._json))
+        localStorage.setItem('userData', JSON.stringify(data.user._json))
       } catch (err) {
-        console.log (err)
+        console.log(err)
       }
-    } 
+    }
     getUser()
   }, [])
 
