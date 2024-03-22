@@ -181,7 +181,7 @@ const EditorPage = () => {
         {/* {isLeftDivOpen && ( */}
 
         <div
-          className={`flex flex-col justify-between h-screen text-white p-4 pb-5 relative transition-all duration-500 ease-in-out transform ${isLeftDivOpen ? 'col-span-2 ' : 'hidden'}`}
+          className={`flex flex-col justify-between h-screen text-white p-4 pb-5 relative transition-all duration-500 ease-in-out transform ${isLeftDivOpen ? 'col-span-2 ' : '-translate-x-full'}`}
           style={{ backgroundColor: "#1c1e29" }}
           >
           <div className="logo flex items-center">
@@ -215,7 +215,7 @@ const EditorPage = () => {
         </div>
         {/* )} */}
 
-        <div className={`${isLeftDivOpen ? 'col-span-8' : 'col-span-10'}  overflow-y-auto relative transition-all duration-300`}>
+        <div className={`${isLeftDivOpen ? 'col-span-8' : 'w-full absolute top-0 left-0 '}  overflow-y-auto transition-all duration-500 ease-in-out`} >
           <Editor
             handleDownloadFile={handleDownloadFile}
             socketRef={socketRef}
