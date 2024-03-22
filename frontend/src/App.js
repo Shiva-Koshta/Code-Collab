@@ -1,22 +1,22 @@
 
-import "./App.css";
-import Login from "./pages/Login";
+import './App.css'
+import Login from './pages/Login'
 
-import Faq from "./pages/Faq";
+import Faq from './pages/Faq'
 import {
   Routes,
   Route,
   Navigate,
-  BrowserRouter,
-} from "react-router-dom";
+  BrowserRouter
+} from 'react-router-dom'
 
-import { useEffect, useState } from "react";
-import axios from "axios";
+import { useEffect, useState } from 'react'
+import axios from 'axios'
 
-import RoomCreation from "./pages/RoomCreation";
-import EditorPage from "./pages/EditorPage";
-import HelpPage from "./pages/HelpPage";
-import About from "./pages/About";
+import RoomCreation from './pages/RoomCreation'
+import EditorPage from './pages/EditorPage'
+import HelpPage from './pages/HelpPage'
+import About from './pages/About'
 
 // import './App.css';
 // import Home from './pages/Room_Join';
@@ -24,9 +24,9 @@ import About from "./pages/About";
 // import EditorPage from './pages/EditorPage';
 // import { Toaster } from 'react-hot-toast';
 function App() {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(null)
 
-  useEffect(() => {
+  useEffect ( () => {
     const getUser = async () => {
       try {
         const url = `${process.env.REACT_APP_API_URL}/auth/login/success`;
@@ -64,4 +64,4 @@ function App() {
   );
 }
 
-export default App;
+export default App
