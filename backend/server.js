@@ -42,9 +42,12 @@ const userSocketMap = {};
 function getAllConnectedClients(roomId) {
   return Array.from(io.sockets.adapter.rooms.get(roomId) || []).map(
     (socketId) => {
+      console.log(userSocketMap)
       return {
         socketId,
-        username: userSocketMap[socketId],
+        username: userSocketMap[socketId].username,
+        picture: userSocketMap[socketId].picture
+        //consolelog(username)
       };
     }
   );
@@ -53,14 +56,16 @@ function getAllConnectedClients(roomId) {
 io.on("connection", (socket) => {
   console.log("Socket connected", socket.id);
 
-  socket.on(ACTIONS.JOIN, ({ roomId, username }) => {
-    userSocketMap[socket.id] = username;
+  socket.on(ACTIONS.JOIN, ({ roomId, username, picture }) => {
+    userSocketMap[socket.id] = {username, picture};
+    console.log(userSocketMap[socket.id]);
     socket.join(roomId);
     const clients = getAllConnectedClients(roomId);
     clients.forEach(({ socketId }) => {
       io.to(socketId).emit(ACTIONS.JOINED, {
         clients,
         username,
+        picture,
         socketId: socket.id,
       });
     });
@@ -92,7 +97,7 @@ io.on("connection", (socket) => {
     rooms.forEach((roomId) => {
       socket.in(roomId).emit(ACTIONS.DISCONNECTED, {
         socketId: socket.id,
-        username: userSocketMap[socket.id],
+        username: userSocketMap[socket.id].username,
       });
     });
     delete userSocketMap[socket.id];

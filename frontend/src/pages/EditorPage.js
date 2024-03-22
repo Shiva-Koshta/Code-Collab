@@ -85,6 +85,7 @@ const EditorPage = () => {
         socketRef.current.emit(ACTIONS.JOIN, {
           roomId,
           username: JSON.parse(userData).name,
+          picture: JSON.parse(userData).picture,
         });
       }
       socketRef.current.on(ACTIONS.JOINED, ({ clients, username, socketId }) => {
