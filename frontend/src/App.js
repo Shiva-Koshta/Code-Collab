@@ -8,7 +8,7 @@ import {
   Route,
   Navigate,
   BrowserRouter
-} from "react-router-dom"
+} from 'react-router-dom'
 
 import { useEffect, useState } from 'react'
 import axios from 'axios'
@@ -18,12 +18,7 @@ import EditorPage from './pages/EditorPage'
 import HelpPage from './pages/HelpPage'
 import About from './pages/About'
 
-// import './App.css' 
-// import Home from './pages/Room_Join' 
-// import { BrowserRouter, Routes, Route } from 'react-router-dom' 
-// import EditorPage from './pages/EditorPage' 
-// import { Toaster } from 'react-hot-toast' 
-function App () {
+function App (){
   const [user, setUser] = useState (null) 
 
   useEffect (() => {
@@ -37,7 +32,7 @@ function App () {
         console.log (err)
       }
     } 
-    getUser ()
+    getUser()
   }, [])
 
   return (
