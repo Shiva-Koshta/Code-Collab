@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 import Codemirror from 'codemirror'
 import 'codemirror/lib/codemirror.css'
 import 'codemirror/theme/dracula.css'
@@ -7,32 +7,25 @@ import 'codemirror/addon/edit/closetag'
 import 'codemirror/addon/edit/closebrackets'
 import ACTIONS from '../Actions'
 
-const Editor = ({ handleDownloadFile, socketRef, roomId, editorRef,fileContent,setFileContent,contentChanged}) => {
-
+const Editor = ({ handleDownloadFile, socketRef, roomId, editorRef, fileContent, setFileContent, contentChanged }) => {
   // const [fileContent, setFileContent] = useState("")
   // const [contentChanged, setContentChanged] = useState(false)
-
   // useEffect(() => {
   //   const handleStorageChange = () => {
   //     setFileContent(localStorage.getItem('fileContent'))
   //     setContentChanged(localStorage.getItem('contentChange'))
   //   }
-
   //   window.addEventListener('storage', handleStorageChange)
-
   //   return () => {
   //     window.removeEventListener('storage', handleStorageChange)
   //   }
   // }, [])
-
   console.log(fileContent)
   console.log(contentChanged)
-
   // useEffect(() => {
   //   setFileContent(localStorage.getItem("fileContent"))
   //   setContentChanged(localStorage.getItem("contentChanged"))
   // }, [])
-
   localStorage.setItem('roomid', roomId)
   useEffect(() => {
     // console.log("hi");
@@ -44,7 +37,6 @@ const Editor = ({ handleDownloadFile, socketRef, roomId, editorRef,fileContent,s
       editorRef.current.setValue(fileContent)
     }
   }, [fileContent, contentChanged])
-
   useEffect(() => {
     // console.log("file added");
     if (fileContent) {
@@ -56,7 +48,6 @@ const Editor = ({ handleDownloadFile, socketRef, roomId, editorRef,fileContent,s
       })
     }
   }, [fileContent, contentChanged])
-
   useEffect(() => {
     async function init () {
       editorRef.current = Codemirror.fromTextArea(
@@ -127,14 +118,12 @@ const Editor = ({ handleDownloadFile, socketRef, roomId, editorRef,fileContent,s
           console.error('Error fetching code:', error)
         }
       }
-
       fetchCode()
     }
   }, [roomId])
   // useEffect(() => {
   //   console.log(newusernameRef.current)
   //   if (socketRef.current && newusernameRef.current !== null) {
-
   //     if (newusernameRef.current === "RITESH PATIL") {
   //       console.log("entered here")
   //       console.log(newusernameRef.current)
@@ -147,7 +136,6 @@ const Editor = ({ handleDownloadFile, socketRef, roomId, editorRef,fileContent,s
   //     }
   //   }
   // }, [newuserRef.current, socketRef.current, newusernameRef.current])
-
   // useEffect(() => {
   //   if (socketRef.current) {
   //     console.log("hi")
@@ -158,7 +146,6 @@ const Editor = ({ handleDownloadFile, socketRef, roomId, editorRef,fileContent,s
   //     });
   //   }
   // }, [socketRef.current]);
-
   return <textarea id='realEditor' />
 }
 

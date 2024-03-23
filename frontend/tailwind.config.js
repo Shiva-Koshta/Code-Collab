@@ -5,19 +5,19 @@ module.exports = {
     extend: {
       keyframes: {
         bounceLeft: {
-          "0%, 100%": { transform: "translateX(0)" },
-          "50%": { transform: "translateX(-10px)" },
+          '0%, 100%': { transform: 'translateX(0)' },
+          '50%': { transform: 'translateX(-10px)' }
         },
         bounceRight: {
-          "0%, 100%": { transform: "translateX(0)" },
-          "50%": { transform: "translateX(10px)" },
-        },
+          '0%, 100%': { transform: 'translateX(0)' },
+          '50%': { transform: 'translateX(10px)' }
+        }
       },
       animation: {
-        "bounce-left": "bounceLeft 1s infinite",
-        "bounce-right": "bounceRight 1s infinite",
-      },
-    },
+        'bounce-left': 'bounceLeft 1s infinite',
+        'bounce-right': 'bounceRight 1s infinite'
+      }
+    }
   },
   plugins: []
 }

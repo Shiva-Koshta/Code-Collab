@@ -4,14 +4,11 @@ import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined'
 import { IconButton } from '@mui/material'
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined'
 
-const FileView = ({fileContent,setFileContent, editorRef,contentChanged,setContentChanged}) => {
-
+const FileView = ({ fileContent, setFileContent, editorRef, contentChanged, setContentChanged }) => {
   // const [contentChanged, setContentChanged] = useState(false);
-
   const [isDownloadTrue, setIsDownloadTrue] = useState(false)
   const [downloadFileExtension, setFileExtension] = useState('')
   const [downloadFileName, setFileName] = useState('')
-
   const handleFileChange = (event) => {
     console.log('reached')
     // console.log(event)
@@ -19,7 +16,6 @@ const FileView = ({fileContent,setFileContent, editorRef,contentChanged,setConte
     const reader = new FileReader()
     setContentChanged(!contentChanged)
     // console.log(contentChanged)
-
     localStorage.setItem('contentChanged', contentChanged)
     reader.onload = (e) => {
       const content = e.target.result
@@ -66,7 +62,6 @@ const FileView = ({fileContent,setFileContent, editorRef,contentChanged,setConte
               </IconButton>
             </label>
           </div>
-
           <div className='flex flex-col justify-center'>
             <FileDownloadOutlinedIcon
               className='cursor-pointer'
