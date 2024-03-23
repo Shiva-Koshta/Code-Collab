@@ -58,16 +58,16 @@
 
 .leaveBtn:hover {
   background: #a50808;
+  transform: scale(1.01);
 }
 
 .copyBtn {
-  background: #4aed88;
-  width: 100%;
-  margin-left: auto;
+  background: #25bf60;
+  width: 50%;
 }
 .copyBtn:hover {
   background: #2b824c;
-  transform: scale(1.1);
+  transform: scale(1.01);
 }
 
 .aside {
@@ -86,20 +86,20 @@
 
 .Users {
   margin-bottom: 20px;
-  border-top: 2px solid #2b824c;
+  border-top: 2px solid #424242;
 }
 .UserList{
     font-size: 1rem; 
     color: #080808;
     font-weight: 700; 
     padding: 5px 10px; 
-    background-color: #2b824c; 
+    background-color: #4ef990; 
     border-radius: 5px; 
     margin-bottom: 5px; 
 }
 
 .logo {
-  border-bottom: 1px solid #424242;
+  border-bottom: 2px solid #424242;
   padding-bottom: 10px;
 }
 
