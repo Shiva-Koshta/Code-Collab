@@ -1,27 +1,27 @@
-import React, { useState } from 'react';
-import '../styles/helpPage.css';
-import LoginDemo from '../images/LoginDemo.png';
-import SignUp from '../images/SignUp.png';
-import Password from '../images/Password.png';
-import Room from '../images/Room.png';
-import RoomCreation from '../images/RoomCreation.png';
-import ChatBox from '../images/ChatBox.png';
+import React, { useState } from 'react'
+import '../styles/helpPage.css'
+import LoginDemo from '../images/LoginDemo.png'
+import SignUp from '../images/SignUp.png'
+import Password from '../images/Password.png'
+import Room from '../images/Room.png'
+import RoomCreation from '../images/RoomCreation.png'
+import ChatBox from '../images/ChatBox.png'
 const HelpPage = () => {
-	const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState({
 		name: '',
 		email: '',
-		message: '',
-	});
+		message: ''
+	})
 
 	const handleChange = (e) => {
 		setFormData({
 			...formData,
-			[e.target.name]: e.target.value,
-		});
-	};
+			[e.target.name]: e.target.value
+		})
+	}
 
 	const handleSubmit = async (e) => {
-		e.preventDefault();
+		e.preventDefault()
 
 		try {
 			const response = await fetch('http://localhost:8080/help', {
@@ -29,32 +29,32 @@ const HelpPage = () => {
 				headers: {
 					'Content-Type': 'application/json',
 				},
-				body: JSON.stringify(formData),
-			});
+				body: JSON.stringify(formData)
+			})
 
 			if (response.ok) {
 				// Handle success, e.g., show a success message
-				console.log('Form submitted successfully');
+				console.log('Form submitted successfully')
 			} else {
 				// Handle error, e.g., show an error message
-				console.error('Form submission failed');
+				console.error('Form submission failed')
 			}
 			setFormData({
 				name: '',
 				email: '',
-				message: '',
-			});
+				message: ''
+			})
 		} catch (error) {
-			console.error('Error:', error);
+			console.error('Error:', error)
 		}
 
 		// Clear form data after submission
 		setFormData({
 			name: '',
 			email: '',
-			message: '',
-		});
-	};
+			message: ''
+		})
+	}
 
 	return (
 		<div className='xwz'>
@@ -244,7 +244,7 @@ const HelpPage = () => {
 				<Toaster />
 			</div>
 		</div>
-	);
-};
+	)
+}
 
-export default HelpPage;
+export default HelpPage
