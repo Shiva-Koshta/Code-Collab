@@ -1,17 +1,17 @@
-const mongoose = require('mongoose')
+const mongoose = require("mongoose");
 
 const roomCodeMapSchema = new mongoose.Schema({
   roomId: {
     type: String,
     required: true,
-    unique: true
+    unique: true,
   },
   code: {
     type: String,
-    required: true
-  }
-})
+    required: true,
+  },
+});
 
-const RoomCodeMap = mongoose.model('RoomCodeMap', roomCodeMapSchema)
+const RoomCodeMap = mongoose.model("RoomCodeMap", roomCodeMapSchema);
 
-module.exports = RoomCodeMap
+module.exports = RoomCodeMap;

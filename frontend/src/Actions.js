@@ -10,4 +10,4 @@ const ACTIONS = {
     MESSAGE_RECEIVE: 'MESSAGE_RECEIVE',
 };
 
-module.exports = ACTIONS
+module.exports = ACTIONS;
