@@ -55,28 +55,28 @@ const HelpPage = () => {
     
     return (
         <>
-        <div className="xwz">
-            <div className="smpct">
-                <h1 className="hdng text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-8 text-center">Help</h1>
-                <div className="stt">
-                    <div className="sttcntnt flex flex-col lg:flex-row items-center">
-                        <div className="stinfo lg:w-1/2 text-center lg:text-left">
+        <div className="bigger-container">
+            <div className="inner-container">
+                <h1 className="heading text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-8 text-center">Help</h1>
+                <div className="step">
+                    <div className="stepcontent flex flex-col lg:flex-row items-center">
+                        <div className="stepinfo lg:w-1/2 text-center lg:text-left">
                             <h2>Step 1: Login</h2>
                             <p>On the login screen, you will see an option to sign in with your Google account.</p>
                             <p>Click on the "Sign in with Google" button.</p>
                         </div>
-                        <div className="stimge lg:w-1/2">
+                        <div className="stepimage lg:w-1/2">
                             <img src={LoginDemo} alt="Login Demo" />
                         </div>
                     </div>
                 </div>
 
-                <div className="stt">
-                    <div className="sttcntnt flex flex-col lg:flex-row items-center">
-                        <div className="stimge lg:w-1/2">
+                <div className="step">
+                    <div className="stepcontent flex flex-col lg:flex-row items-center">
+                        <div className="stepimage lg:w-1/2">
                             <img src={SignUp} alt="Authenticate Demo" />
                         </div>
-                        <div className="stinfo lg:w-1/2 text-center lg:text-left">
+                        <div className="stepinfo lg:w-1/2 text-center lg:text-left">
                             <h2>Step 2: Authenticate with Google</h2>
                             <p>You will be redirected to Google's authentication page.</p>
                             <p>Enter your Google credentials or use an already saved account.</p>
@@ -84,25 +84,25 @@ const HelpPage = () => {
                     </div>
                 </div>
 
-                <div className="stt">
-                    <div className="sttcntnt flex flex-col lg:flex-row items-center">
-                        <div className="stinfo lg:w-1/2 text-center lg:text-left">
+                <div className="step">
+                    <div className="stepcontent flex flex-col lg:flex-row items-center">
+                        <div className="stepinfo lg:w-1/2 text-center lg:text-left">
                             <h2>Step 3: Password verification</h2>
                             <p>Enter your password and click on ‘Next’ to continue with the sign-in process.</p>
                             <p>If you don’t remember your password, click on the forgot password option.</p>
                         </div>
-                        <div className="stimge lg:w-1/2">
+                        <div className="stepimage lg:w-1/2">
                             <img src={Password} alt="Password Demo" />
                         </div>
                     </div>
                 </div>
 
-                <div className="stt">
-                    <div className="sttcntnt flex flex-col lg:flex-row items-center">
-                        <div className="stimge lg:w-1/2">
+                <div className="step">
+                    <div className="stepcontent flex flex-col lg:flex-row items-center">
+                        <div className="stepimage lg:w-1/2">
                             <img src={RoomCreation} alt="Room Demo" />
                         </div>
-                        <div className="stinfo lg:w-1/2 text-center lg:text-left">
+                        <div className="stepinfo lg:w-1/2 text-center lg:text-left">
                             <h2>Step 4: Room creation and Joining</h2>
                             <p>If you have a room ID available, enter it in the "Room ID” option and click on ‘Join’.</p>
                             <p>If you want to create a new room, click on the “Create New Room option”.</p>
@@ -111,9 +111,9 @@ const HelpPage = () => {
                     </div>
                 </div>
 
-                <div className="stt">
-                    <div className="sttcntnt flex flex-col lg:flex-row items-center">
-                        <div className="stinfo lg:w-1/2 text-center lg:text-left">
+                <div className="step">
+                    <div className="stepcontent flex flex-col lg:flex-row items-center">
+                        <div className="stepinfo lg:w-1/2 text-center lg:text-left">
                             <h2>Step 5: Code editor</h2>
                             <p><b>UPLOAD FILE:</b> This option allows you to upload any file from your local device to your editor screen. All users currently present in the same room as you would be able to view it and all changes made to it.</p>
                             <p><b>CONNECTED USERS HERE:</b>  Here, you can see the usernames of all connected users in the room.</p>
@@ -122,10 +122,10 @@ const HelpPage = () => {
                             <p><b>EDITOR:</b>  The code editor has real-time synchronization to handle multiple cursors at the same time. All users present in a room currently can modify the editor’s code.</p>
                             <p><b>CHAT:</b>  This button opens up a chat box where you can communicate with other users in the same room as you.</p>
                         </div>
-                        <div className="stimge lg:w-1/2">
-                            <div className="stimge"><img src={Room} alt="Editor Demo" /></div>
+                        <div className="stepimage lg:w-1/2">
+                            <div className="stepimage"><img src={Room} alt="Editor Demo" /></div>
 
-                            <div className="stimge"><img src={ChatBox} alt="Editor Demo" /></div>
+                            <div className="stepimage"><img src={ChatBox} alt="Editor Demo" /></div>
                         </div>
                     </div>
                 </div>
@@ -141,11 +141,11 @@ const HelpPage = () => {
                                 <label className="text-lg mb-2" htmlFor="name">Name</label>
                                 <input className='w-full text-gray-700 p-2.5 text-lg border-2 border-solid rounded-md outline-none border-stone-300' type="text" id="name" name="name" value={formData.name} onChange={handleChange} required />
                             </div>
-                            <div className="frmgp">
+                            <div className="formgroup">
                                 <label className="text-lg mb-2" htmlFor="email">Email</label>
                                 <input className='w-full text-gray-700 p-2.5 text-lg border-2 border-solid rounded-md outline-none border-stone-300' type="email" id="email" name="email" value={formData.email} onChange={handleChange} required />
                             </div>
-                            <div className="frmgp">
+                            <div className="formgroup">
                                 <label className="text-lg mb-2" htmlFor="message">Message</label>
                                 <textarea className='w-full text-gray-700 p-2.5 text-lg border-2 border-solid rounded-md outline-none border-stone-300' id="message" name="message" value={formData.message} onChange={handleChange} required></textarea>
                             </div>
