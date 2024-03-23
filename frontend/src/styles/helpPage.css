@@ -1,32 +1,37 @@
 /* Change the color of the scrollbar track */
 ::-webkit-scrollbar {
-    width: 6px; /* Width of the scrollbar */
+    width: 6px;
+    /* Width of the scrollbar */
 }
 
 /* Change the color of the scrollbar handle */
 ::-webkit-scrollbar-thumb {
-    background-color: #9fa09f; /* Color of the scrollbar handle */
+    background-color: #9fa09f;
+    /* Color of the scrollbar handle */
     border-radius: 12px;
 }
 
 /* Change the color of the scrollbar track on hover */
 ::-webkit-scrollbar-thumb:hover {
-    background-color: #4f504f; /* Color of the scrollbar handle on hover */
+    background-color: #4f504f;
+    /* Color of the scrollbar handle on hover */
 }
-.xwz{
+
+.xwz {
     background-image: url("https://img.freepik.com/premium-photo/colorful-line-wave-background-geometric-banner-flyer-wallpaper-template_665280-5059.jpg?w=360");
     color: #ffffff;
     background-size: cover;
-    font-family: 'Roboto', sans-serif;
+    font-family: "Roboto", sans-serif;
     /* overflow-y: scroll; */
 }
+
 /* #root{
     overflow-y: scroll;
 } */
 .smpct {
     max-width: 90%;
     margin: 0 auto;
-    
+
     padding: 20px;
     overflow-y: auto;
     max-height: calc(100vh);
@@ -84,7 +89,6 @@
 .frmgp {
     margin-bottom: 20px;
 }
-
 
 textarea {
     resize: vertical;
