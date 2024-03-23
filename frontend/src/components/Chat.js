@@ -4,30 +4,30 @@ import '../styles/Chat.css';
 
 const Chat = ({setIsChatOpen,messages,CHAT_LIMIT,inputText,setInputText,handleKeyPress,handleMessageSend}) => {
   return (
-    <div className="chat-container">
-            <div className="chat-popup">
-              <div className="chat-header">
+    <div className='chat-container'>
+            <div className='chat-popup'>
+              <div className='chat-header'>
                 <h2>Chat</h2>
-                {/* <button className="close-icon" onClick={() => setIsChatOpen(false)}>X</button> */}
-                <DisabledByDefaultIcon className="close-icon mt-1" onClick={() => setIsChatOpen(false)}/>
+                {/* <button className='close-icon' onClick={() => setIsChatOpen(false)}>X</button> */}
+                <DisabledByDefaultIcon className='close-icon mt-1' onClick={() => setIsChatOpen(false)}/>
               </div>
-              <div className="chat-messages">
+              <div className='chat-messages'>
                 {messages.slice(-CHAT_LIMIT).map((message, index) => (
                   <div key={index} className={` ${message.sentByCurrentUser ? 'sent_by_user' : 'chat-message'}`}>
-                    <span className="message-sender">{message.sentByCurrentUser ? 'You' : message.sendname}:</span> {message.text}
+                    <span className='message-sender'>{message.sentByCurrentUser ? 'You' : message.sendname}:</span> {message.text}
                   </div>
                 ))}
               </div>
-              <div className="chat-input">
+              <div className='chat-input'>
                 <input
-                  type="text"
+                  type='text'
                   value={inputText}
                   onChange={(e) => setInputText(e.target.value)}
                   onKeyPress={handleKeyPress}
-                  placeholder="Type your message..."
-                  className="input-field"
+                  placeholder='Type your message...'
+                  className='input-field'
                   />
-                <button onClick={handleMessageSend} className="send-button">Send</button>
+                <button onClick={handleMessageSend} className='send-button'>Send</button>
               </div>
             </div>
           </div>
