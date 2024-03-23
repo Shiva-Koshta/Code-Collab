@@ -224,8 +224,8 @@ const EditorPage = () => {
             </div>
           </div>
           <div className='flex flex-col justify-between h-full'>
-            <FileView 
-              contentChanged={contentChanged} 
+            <FileView
+              contentChanged={contentChanged}
               setContentChanged={setContentChanged}
               fileContent={fileContent}
               setFileContent={setFileContent}
@@ -271,7 +271,7 @@ const EditorPage = () => {
             <button onClick={toggleLeftDiv}>{leftIcon}</button>
           </div>
         </div>
-        <div className={`${isLeftDivOpen ? 'col-span-8' : 'w-full absolute top-0 left-0 '}  overflow-y-auto transition-all duration-500 ease-in-out`} >
+        <div className={`${isLeftDivOpen ? 'col-span-8' : 'w-full absolute top-0 left-0 '}  overflow-y-auto transition-all duration-500 ease-in-out`}>
           <Editor
             handleDownloadFile={handleDownloadFile}
             socketRef={socketRef}
