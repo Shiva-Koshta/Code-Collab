@@ -116,14 +116,12 @@
 
 .chatBtn {
   background: #07aadb;
-  width: 100%;
+  width: 50%;
   margin-left: auto;
-  margin-top: 20px;
-  margin-bottom: 30px;
 }
 .chatBtn:hover {
   background: #0e6e8b;
-  transform: scale(1.1);
+  transform: scale(1.01);
 }
 .close-icon {
   position: absolute;
