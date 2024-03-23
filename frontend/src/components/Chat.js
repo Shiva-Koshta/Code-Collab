@@ -13,7 +13,7 @@ const Chat = ({setIsChatOpen,messages,CHAT_LIMIT,inputText,setInputText,handleKe
               </div>
               <div className='chat-messages'>
                 {messages.slice(-CHAT_LIMIT).map((message, index) => (
-                  <div key={index} className={` ${message.sentByCurrentUser ? 'sent_by_user' : 'chat-message'}`}>
+                  <div key={index} className={` ${message.sentByCurrentUser ? 'sent-by-user' : 'chat-message'}`}>
                     <span className='message-sender'>{message.sentByCurrentUser ? 'You' : message.sendname}:</span> {message.text}
                   </div>
                 ))}

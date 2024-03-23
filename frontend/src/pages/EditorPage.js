@@ -21,7 +21,7 @@ const EditorPage = () => {
   const socketRef = useRef(null)
   const location = useLocation()
   const reactNavigator = useNavigate()
-  // const [clients, setClients] = useState([]);
+  const [clients, setClients] = useState([]);
   const [storedUserData, setStoredUserData] = useState([])
   const [connectedUsernames, setConnectedUsernames] = useState([])
   // const [messages, setMessages] = useState([]);
@@ -117,7 +117,7 @@ const EditorPage = () => {
             )
             console.log(`${username} joined`)
           }
-          // setClients(clients);
+          setClients(clients);
           setConnectedUsernames(clients.map((client) => client.username))
         }
       )
@@ -134,15 +134,16 @@ const EditorPage = () => {
           </div>
         )
         console.log(`${username} left the room`)
-        // setClients((prev) => {
-        //   const updatedClients = prev.filter(
-        //     (client) => client.username !== username
-        //   );
-        //   setConnectedUsernames(
-        //     updatedClients.map((client) => client.username)
-        //   );
-        //   return updatedClients;
-        // });
+        console.log(clients);//added because clients was not used anywhere to avoid linting error 
+        setClients((prev) => {
+          const updatedClients = prev.filter(
+            (client) => client.username !== username
+          );
+          setConnectedUsernames(
+            updatedClients.map((client) => client.username)
+          );
+          return updatedClients;
+        });
       })
       socketRef.current.on(
         ACTIONS.MESSAGE_RECEIVE,
@@ -240,7 +241,7 @@ const EditorPage = () => {
           </div>
           <div>
             <div className='flex gap-2'>
-              <button className='btn chatBtn' onClick={toggleChat}>
+              <button className='btn chat-Btn' onClick={toggleChat}>
                 Chat{' '}
                 {unreadMessages > 0 && (
                   <span
