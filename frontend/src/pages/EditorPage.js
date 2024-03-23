@@ -241,7 +241,7 @@ const EditorPage = () => {
           </div>
           <div>
             <div className='flex gap-2'>
-              <button className='btn chat-Btn' onClick={toggleChat}>
+              <button className='btn chat-btn' onClick={toggleChat}>
                 Chat{' '}
                 {unreadMessages > 0 && (
                   <span
