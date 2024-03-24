@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import '../styles/helpPage.css';
+import { useNavigate } from 'react-router-dom';
 import LoginDemo from "../images/LoginDemo.png"
 import SignUp from "../images/SignUp.png";
 import Password from "../images/Password.png";
@@ -48,21 +49,24 @@ const HelpPage = () => {
 
         } catch (error) {
             console.error('Error:', error);
-            // Show error toast message if an error occurs during form submission
             toast.error('An error occurred while submitting the form');
         } finally {
             setIsSubmitting(false);
         }
     };
-
+    const navigate = useNavigate();
+    const goToLoginPage = () => {
+        navigate('/login');
+    };
     return (
         <>
             <div className="bigger-container">
+                
                 <div className="inner-container">
-                    <h1 className="heading text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-8 text-center">Help</h1>
+                    <h1 className="heading text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-8 text-center"><u>USER MANUAL</u></h1>
                     <div className="step">
                         <div className="stepcontent flex flex-col lg:flex-row items-center">
-                            <div className="stepinfo lg:w-1/2 text-center lg:text-left">
+                            <div className="stepinfo lg:w-1/2 lg:text-left">
                                 <h2>Step 1: Login</h2>
                                 <p>On the login screen, you will see an option to sign in with your Google account.</p>
                                 <p>Click on the "Sign in with Google" button.</p>
@@ -78,9 +82,9 @@ const HelpPage = () => {
                             <div className="stepimage lg:w-1/2">
                                 <img src={SignUp} alt="Authenticate Demo" />
                             </div>
-                            <div className="stepinfo lg:w-1/2 text-center lg:text-left">
+                            <div className="stepinfo lg:w-1/2 lg:text-left">
                                 <h2>Step 2: Authenticate with Google</h2>
-                                <p>You will be redirected to Google's authentication page.</p>
+                                <p>You will be redirected to Google's authentication page. (Please refer to the image attached for your reference)</p>
                                 <p>Enter your Google credentials or use an already saved account.</p>
                             </div>
                         </div>
@@ -88,10 +92,10 @@ const HelpPage = () => {
 
                     <div className="step">
                         <div className="stepcontent flex flex-col lg:flex-row items-center">
-                            <div className="stepinfo lg:w-1/2 text-center lg:text-left">
+                            <div className="stepinfo lg:w-1/2 lg:text-left">
                                 <h2>Step 3: Password verification</h2>
                                 <p>Enter your password and click on ‘Next’ to continue with the sign-in process.</p>
-                                <p>If you don’t remember your password, click on the forgot password option.</p>
+                                <p>If you don’t remember your password, click on the forgot password option and rest follows like the "Forgot password" option in Gmail.</p>
                             </div>
                             <div className="stepimage lg:w-1/2">
                                 <img src={Password} alt="Password Demo" />
@@ -104,7 +108,7 @@ const HelpPage = () => {
                             <div className="stepimage lg:w-1/2">
                                 <img src={RoomCreation} alt="Room Demo" />
                             </div>
-                            <div className="stepinfo lg:w-1/2 text-center lg:text-left">
+                            <div className="stepinfo lg:w-1/2 lg:text-left">
                                 <h2>Step 4: Room creation and Joining</h2>
                                 <p>If you have a room ID available, enter it in the "Room ID” option and click on ‘Join’.</p>
                                 <p>If you want to create a new room, click on the “Create New Room option”.</p>
@@ -115,7 +119,7 @@ const HelpPage = () => {
 
                     <div className="step">
                         <div className="stepcontent flex flex-col lg:flex-row items-center">
-                            <div className="stepinfo lg:w-1/2 text-center lg:text-left">
+                            <div className="stepinfo lg:w-1/2 lg:text-left">
                                 <h2>Step 5: Code editor</h2>
                                 <p><b>UPLOAD FILE:</b> This option allows you to upload any file from your local device to your editor screen. All users currently present in the same room as you would be able to view it and all changes made to it.</p>
                                 <p><b>CONNECTED USERS HERE:</b>  Here, you can see the usernames of all connected users in the room.</p>
@@ -151,8 +155,8 @@ const HelpPage = () => {
                                     <label className="text-lg mb-2" htmlFor="message">Message</label>
                                     <textarea className='w-full text-gray-700 p-2.5 text-lg border-2 border-solid rounded-md outline-none border-stone-300' id="message" name="message" value={formData.message} onChange={handleChange} required></textarea>
                                 </div>
-                                <div className="flex justify-center"> {/* Center the button */}
-                                    <button type="submit" className="relative max-w-xs h-12 bg-blue-600 text-white text-lg border-none rounded-md cursor-pointer outline-none mb-6 hover:bg-blue-700 flex items-center justify-center w-full"> {/* Ensure full width */}
+                                <div className="flex justify-center">
+                                    <button type="submit" className="relative max-w-xs h-12 bg-blue-600 text-white text-lg mr-3 border-none rounded-md cursor-pointer outline-none mb-6 hover:bg-blue-700 flex items-center justify-center w-full">
                                         {isSubmitting ? (
                                             <span className="flex items-center">
                                                 <span className="loading-spinner mr-2"></span>
@@ -162,6 +166,7 @@ const HelpPage = () => {
                                             'Submit'
                                         )}
                                     </button>
+                                    <button onClick={goToLoginPage} className="relative max-w-xs h-12 bg-blue-600 text-white ml-3 text-lg border-none rounded-md cursor-pointer outline-none mb-6 hover:bg-blue-700 flex items-center justify-center w-full">Back to Login</button>
                                 </div>
                             </form>
                         </div>
