@@ -1,12 +1,12 @@
 /* Change the color of the scrollbar track */
 ::-webkit-scrollbar {
-    width: 6px; /* Width of the scrollbar */
+  width: 6px;
 }
 
 /* Change the color of the scrollbar handle */
 ::-webkit-scrollbar-thumb {
-    background-color: #9fa09f; /* Color of the scrollbar handle */
-    border-radius: 12px;
+  background-color: #9fa09f;
+  border-radius: 12px;
 }
 
 /* Change the color of the scrollbar track on hover */
@@ -73,9 +73,10 @@
 }
 
 .frm {
-    display: flex;
-    flex-direction: column;
+  display: flex;
+  flex-direction: column;
 }
+
 
 .formgroup {
     margin-bottom: 20px;
@@ -83,7 +84,7 @@
 
 
 textarea {
-    resize: vertical;
+  resize: vertical;
 }
 
 .btnsub:hover {
@@ -103,4 +104,4 @@ textarea {
     animation: spinner 0.6s linear infinite;
     margin: 20px;
   }
-  
+ 
