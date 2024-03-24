@@ -160,12 +160,47 @@ app.post("/receivecode", (req, res) => {
       }
     })
     .catch((error) => {
-      console.error("Error retrieving code from database:", error);
-      res.status(500).json({ error: "Internal server error" });
-    });
-});
+      console.error('Error retrieving code from database:', error)
+      res.status(500).json({ error: 'Internal server error' })
+    })
+})
+// to handle post request from help page
+app.post('/help', (req, res) => {
+  console.log(req.body)
+  res.status(200).json({ message: 'Form submitted' })
+})
 
-//connect to database
+// check and delete the room data if no user in the room
+app.post('/delete-entry', async (req, res) => {
+  // console.log("hit");
+  const { roomId } = req.body
+
+  try {
+    // Check if the user count for the room is zero
+    const room = await RoomUserCount.findOne({ roomId })
+
+    if (!room) {
+      return res.status(200).json({ message: 'Room not found' })
+    }
+
+    if (room.userCount !== 0) {
+      return res.status(200).json({ message: 'done' })
+    }
+
+    // If user count is zero, delete the entry from RoomCodeMap
+    const deletedRoomCodeMap = await RoomCodeMap.findOneAndDelete({ roomId })
+
+    if (!deletedRoomCodeMap) {
+      return res.status(404).json({ error: 'Room code map entry not found' })
+    }
+
+    return res.json({ message: 'Room code map entry deleted successfully' })
+  } catch (error) {
+    console.error('Error deleting room code map entry:', error)
+    return res.status(500).json({ error: 'Internal server error' })
+  }
+})
+// connect to database
 mongoose
   .connect(process.env.MONGO_URL)
   .then(() => {

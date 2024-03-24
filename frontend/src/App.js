@@ -1,6 +1,5 @@
-import logo from "./logo.svg";
-import "./App.css";
-import Login from "./pages/Login";
+import './App.css'
+import Login from './pages/Login'
 
 import Faq from "./pages/Faq";
 import { Routes, Route, Navigate, Router, BrowserRouter } from "react-router-dom";
@@ -23,10 +22,10 @@ function App() {
   useEffect(() => {
     const getUser = async () => {
       try {
-        const url = `${process.env.REACT_APP_API_URL}/auth/login/success`;
-        const { data } = await axios.get(url, { withCredentials: true });
-        setUser(data.user._json);
-        localStorage.setItem("userData", JSON.stringify(data.user._json));
+        const url = `${process.env.REACT_APP_API_URL}/auth/login/success`
+        const { data } = await axios.get(url, { withCredentials: true })
+        setUser(data.user._json)
+        window.localStorage.setItem('userData', JSON.stringify(data.user._json))
       } catch (err) {
         console.log(err);
       }

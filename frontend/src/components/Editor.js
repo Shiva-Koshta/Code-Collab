@@ -1,20 +1,41 @@
-import React, { useEffect, useRef } from "react";
-import Codemirror from "codemirror";
-import "codemirror/lib/codemirror.css";
-import "codemirror/theme/dracula.css";
-import "codemirror/mode/javascript/javascript";
-import "codemirror/addon/edit/closetag";
-import "codemirror/addon/edit/closebrackets";
-import ACTIONS from "../Actions";
+import React, { useEffect } from 'react'
+import Codemirror from 'codemirror'
+import 'codemirror/lib/codemirror.css'
+import 'codemirror/theme/dracula.css'
+import 'codemirror/mode/javascript/javascript'
+import 'codemirror/addon/edit/closetag'
+import 'codemirror/addon/edit/closebrackets'
+import ACTIONS from '../Actions'
 
-const Editor = ({
-  fileContent,
-  socketRef,
-  roomId,
-  contentChanged,
-  // cursorInfoList,
-}) => {
-  const editorRef = useRef(null);
+const Editor = ({ handleDownloadFile, socketRef, roomId, editorRef, fileContent, setFileContent, contentChanged }) => {
+  // const [fileContent, setFileContent] = useState("")
+  // const [contentChanged, setContentChanged] = useState(false)
+  // useEffect(() => {
+  //   const handleStorageChange = () => {
+  //     setFileContent(window.localStorage.getItem('fileContent'))
+  //     setContentChanged(window.localStorage.getItem('contentChange'))
+  //   }
+  //   window.addEventListener('storage', handleStorageChange)
+  //   return () => {
+  //     window.removeEventListener('storage', handleStorageChange)
+  //   }
+  // }, [])
+  console.log(fileContent)
+  console.log(contentChanged)
+  // useEffect(() => {
+  //   setFileContent(window.localStorage.getItem("fileContent"))
+  //   setContentChanged(window.localStorage.getItem("contentChanged"))
+  // }, [])
+
+//   window.localStorage.setItem('roomid', roomId)
+// const Editor = ({
+//   fileContent,
+//   socketRef,
+//   roomId,
+//   contentChanged,
+//   // cursorInfoList,
+// }) => {
+  // const editorRef = useRef(null);
   useEffect(() => {
     // Create style element
     const style = document.createElement("style");
@@ -46,8 +67,7 @@ const Editor = ({
     if (fileContent) {
       editorRef.current.setValue(fileContent);
     }
-  }, [fileContent, contentChanged]);
-
+  }, [fileContent, contentChanged])
   useEffect(() => {
     //console.log("file added");
     if (fileContent) {
@@ -58,8 +78,7 @@ const Editor = ({
         code,
       });
     }
-  }, [fileContent, contentChanged]);
-
+  }, [fileContent, contentChanged])
   useEffect(() => {
     async function init() {
       editorRef.current = Codemirror.fromTextArea(
@@ -158,8 +177,7 @@ const Editor = ({
           console.error("Error fetching code:", error);
         }
       }
-
-      fetchCode();
+      fetchCode()
     }
   }, [roomId]);
 
@@ -180,7 +198,7 @@ const Editor = ({
       // let cursorMarker = document.getElementById(cursorMarkerId);
       // Create a cursor marker element if not present
       // if (!cursorMarker){
-        const prevCursorMarkers = document.querySelectorAll(`.cursor-marker[title="${user.name}"]`);
+      const prevCursorMarkers = document.querySelectorAll(`.cursor-marker[title="${user.name}"]`);
       prevCursorMarkers.forEach((marker) => marker.remove());
 
       const cursorMarker = document.createElement("div");
@@ -209,7 +227,6 @@ const Editor = ({
   // useEffect(() => {
   //   console.log(newusernameRef.current);
   //   if (socketRef.current && newusernameRef.current !== null) {
-
   //     if (newusernameRef.current === "RITESH PATIL") {
   //       console.log("entered here");
   //       console.log(newusernameRef.current);
@@ -221,8 +238,7 @@ const Editor = ({
   //       });
   //     }
   //   }
-  // }, [newuserRef.current, socketRef.current, newusernameRef.current]);
-
+  // }, [newuserRef.current, socketRef.current, newusernameRef.current])
   // useEffect(() => {
   //   if (socketRef.current) {
   //     console.log("hi");
