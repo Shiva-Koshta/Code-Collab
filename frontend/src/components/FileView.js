@@ -1,3 +1,5 @@
+/* eslint-disable no-undef */
+
 import React, { useState } from 'react'
 import UploadFileIcon from '@mui/icons-material/UploadFile'
 import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined'
@@ -19,11 +21,11 @@ const FileView = ({ fileContent, setFileContent, editorRef }) => {
     setContentChanged(!contentChanged)
     // console.log(contentChanged)
 
-    localStorage.setItem('contentChanged', contentChanged)
+    window.localStorage.setItem('contentChanged', contentChanged)
     reader.onload = (e) => {
       const content = e.target.result
       setFileContent(content)
-      localStorage.setItem('fileContent', JSON.stringify(fileContent))
+      window.localStorage.setItem('fileContent', JSON.stringify(fileContent))
       // console.log(content)
       // fileRef.current = content
     }

@@ -228,33 +228,7 @@ app.post('/delete-entry', async (req, res) => {
     if (room.userCount !== 0) {
       return res.status(200).json({ message: 'done' })
     }
-
-    // If user count is zero, delete the entry from RoomCodeMap
-    const deletedRoomCodeMap = await RoomCodeMap.findOneAndDelete({ roomId })
-
-    if (!deletedRoomCodeMap) {
-      return res.status(404).json({ error: 'Room code map entry not found' })
-    }
-
-    return res.json({ message: 'Room code map entry deleted successfully' })
-  } catch (error) {
-    console.error('Error deleting room code map entry:', error)
-    return res.status(500).json({ error: 'Internal server error' })
-  }
-})
-// connect to database
-mongoose
-  .connect(process.env.MONGO_URL)
-  .then(() => {
-    console.log('connected to database')
-    // server.listen(port, () => console.log(`Listenting on port ${port}...`));
-  })
-  .catch((error) => {
-    console.log(error)
-  })
-
-server.listen(port, () => console.log(`Listenting on port ${port}...`))
-app.post("/help", async(req, res) => {
+    app.post("/help", async(req, res) => {
   try {
     const { name, email, message } = req.body;
     console.log(email);
@@ -282,3 +256,29 @@ app.post("/help", async(req, res) => {
     res.status(500).json({ error: "An error occurred while sending the email" });
 }
 });
+
+    // If user count is zero, delete the entry from RoomCodeMap
+    const deletedRoomCodeMap = await RoomCodeMap.findOneAndDelete({ roomId })
+
+    if (!deletedRoomCodeMap) {
+      return res.status(404).json({ error: 'Room code map entry not found' })
+    }
+
+    return res.json({ message: 'Room code map entry deleted successfully' })
+  } catch (error) {
+    console.error('Error deleting room code map entry:', error)
+    return res.status(500).json({ error: 'Internal server error' })
+  }
+})
+// connect to database
+mongoose
+  .connect(process.env.MONGO_URL)
+  .then(() => {
+    console.log('connected to database')
+    // server.listen(port, () => console.log(`Listenting on port ${port}...`));
+  })
+  .catch((error) => {
+    console.log(error)
+  })
+
+server.listen(port, () => console.log(`Listenting on port ${port}...`))
