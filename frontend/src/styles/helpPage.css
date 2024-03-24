@@ -1,99 +1,99 @@
 /* Change the color of the scrollbar track */
 ::-webkit-scrollbar {
-    width: 6px;
-    /* Width of the scrollbar */
+  width: 6px;
+  /* Width of the scrollbar */
 }
 
 /* Change the color of the scrollbar handle */
 ::-webkit-scrollbar-thumb {
-    background-color: #9fa09f;
-    /* Color of the scrollbar handle */
-    border-radius: 12px;
+  background-color: #9fa09f;
+  /* Color of the scrollbar handle */
+  border-radius: 12px;
 }
 
 /* Change the color of the scrollbar track on hover */
 ::-webkit-scrollbar-thumb:hover {
-    background-color: #4f504f;
-    /* Color of the scrollbar handle on hover */
+  background-color: #4f504f;
+  /* Color of the scrollbar handle on hover */
 }
 
 .xwz {
-    background-image: url("https://img.freepik.com/premium-photo/colorful-line-wave-background-geometric-banner-flyer-wallpaper-template_665280-5059.jpg?w=360");
-    color: #ffffff;
-    background-size: cover;
-    font-family: "Roboto", sans-serif;
-    /* overflow-y: scroll; */
+  background-image: url("https://img.freepik.com/premium-photo/colorful-line-wave-background-geometric-banner-flyer-wallpaper-template_665280-5059.jpg?w=360");
+  color: #ffffff;
+  background-size: cover;
+  font-family: "Roboto", sans-serif;
+  /* overflow-y: scroll; */
 }
 
 /* #root{
     overflow-y: scroll;
 } */
 .smpct {
-    max-width: 90%;
-    margin: 0 auto;
+  max-width: 90%;
+  margin: 0 auto;
 
-    padding: 20px;
-    overflow-y: auto;
-    max-height: calc(100vh);
+  padding: 20px;
+  overflow-y: auto;
+  max-height: calc(100vh);
 }
 
 .hdng {
-    font-size: 36px;
-    font-weight: bold;
-    margin-top: 50px;
-    margin-bottom: 30px;
+  font-size: 36px;
+  font-weight: bold;
+  margin-top: 50px;
+  margin-bottom: 30px;
 }
 
 .stt {
-    margin-bottom: 40px;
+  margin-bottom: 40px;
 }
 
 .sttcntnt {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .stinfo {
-    flex: 1;
+  flex: 1;
 }
 
 .stinfo h2 {
-    font-size: 24px;
-    font-weight: bold;
-    margin-bottom: 10px;
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 10px;
 }
 
 .stinfo p {
-    font-size: 18px;
-    margin-bottom: 10px;
+  font-size: 18px;
+  margin-bottom: 10px;
 }
 
 .stimge {
-    flex: 1;
-    text-align: center;
-    margin: 30px;
+  flex: 1;
+  text-align: center;
+  margin: 30px;
 }
 
 .stimge img {
-    max-width: 100%;
-    border-radius: 5px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  max-width: 100%;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
 }
 
 .frm {
-    display: flex;
-    flex-direction: column;
+  display: flex;
+  flex-direction: column;
 }
 
 .frmgp {
-    margin-bottom: 20px;
+  margin-bottom: 20px;
 }
 
 textarea {
-    resize: vertical;
+  resize: vertical;
 }
 
 .btnsub:hover {
-    background-color: #0056b3;
+  background-color: #0056b3;
 }

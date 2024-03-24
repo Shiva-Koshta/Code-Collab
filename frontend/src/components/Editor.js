@@ -21,8 +21,8 @@ const Editor = ({
 
   // useEffect(() => {
   //   const handleStorageChange = () => {
-  //     setFileContent(localStorage.getItem('fileContent'))
-  //     setContentChanged(localStorage.getItem('contentChange'))
+  //     setFileContent(window.localStorage.getItem('fileContent'))
+  //     setContentChanged(window.localStorage.getItem('contentChange'))
   //   }
 
   //   window.addEventListener('storage', handleStorageChange)
@@ -36,11 +36,11 @@ const Editor = ({
   console.log(contentChanged)
 
   // useEffect(() => {
-  //   setFileContent(localStorage.getItem("fileContent"))
-  //   setContentChanged(localStorage.getItem("contentChanged"))
+  //   setFileContent(window.localStorage.getItem("fileContent"))
+  //   setContentChanged(window.localStorage.getItem("contentChanged"))
   // }, [])
 
-  localStorage.setItem('roomid', roomId)
+  window.localStorage.setItem('roomid', roomId)
   useEffect(() => {
     // console.log("hi");
     if (!editorRef.current) return

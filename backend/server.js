@@ -204,9 +204,9 @@ app.post('/receivecode', (req, res) => {
     })
 })
 // to handle post request from help page
-app.post("/help", (req, res) => {
+app.post('/help', (req, res) => {
   console.log(req.body)
-  res.status(200).json({ message: "Form submitted" })
+  res.status(200).json({ message: 'Form submitted' })
 })
 
 // check and delete the room data if no user in the room
