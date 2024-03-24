@@ -267,7 +267,6 @@ const EditorPage = () => {
         </div>
         <div className={`${isLeftDivOpen ? 'col-span-8' : 'w-full absolute top-0 left-0 '}  overflow-y-auto transition-all duration-500 ease-in-out`}>
           <Editor
-            handleDownloadFile={handleDownloadFile}
             socketRef={socketRef}
             roomId={roomId}
             fileContent={fileContent}

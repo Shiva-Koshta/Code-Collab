@@ -7,7 +7,7 @@ import 'codemirror/addon/edit/closetag'
 import 'codemirror/addon/edit/closebrackets'
 import ACTIONS from '../Actions'
 
-const Editor = ({ handleDownloadFile, socketRef, roomId, editorRef, fileContent, setFileContent, contentChanged }) => {
+const Editor = ({ socketRef, roomId, editorRef, fileContent, setFileContent, contentChanged }) => {
   // const [fileContent, setFileContent] = useState("")
   // const [contentChanged, setContentChanged] = useState(false)
   // useEffect(() => {
@@ -216,7 +216,7 @@ const Editor = ({ handleDownloadFile, socketRef, roomId, editorRef, fileContent,
 
       cursorMarker.style.left = `${
         editorRef.current.charCoords({ line, ch }).left
-      -324}px`;
+      -370}px`;
       cursorMarker.style.top = `${
         editorRef.current.charCoords({ line, ch }).top
       }px`;
