@@ -10,16 +10,18 @@ import { initSocket } from '../socket'
 import '../styles/EditorPage.css'
 import '../styles/Chat.css'
 import logo from '../images/Logo.png'
+import Chat from '../components/Chat'
+import { ChevronLeft, ChevronRight } from '@mui/icons-material'
 
 const EditorPage = () => {
   const editorRef = useRef(null)
   const [fileContent, setFileContent] = useState('')
-
+  const [contentChanged, setContentChanged] = useState(false)
   const { roomId } = useParams()
   const socketRef = useRef(null)
   const location = useLocation()
   const reactNavigator = useNavigate()
-  // const [clients, setClients] = useState([]);
+  const [clients, setClients] = useState([])
   const [storedUserData, setStoredUserData] = useState([])
   const [connectedUsernames, setConnectedUsernames] = useState([])
   // const [messages, setMessages] = useState([]);
@@ -38,6 +40,12 @@ const EditorPage = () => {
   const [unreadMessages, setUnreadMessages] = useState(-1)
   const downloadFileExtension = ''
   const downloadFileName = ''
+  const [isLeftDivOpen, setIsLeftDivOpen] = useState(true)
+  const leftIcon = isLeftDivOpen ? <ChevronLeft /> : <ChevronRight />
+
+  const toggleLeftDiv = () => {
+    setIsLeftDivOpen(prevState => !prevState)
+  }
 
   const handleMessageSend = () => {
     console.log(storedUserData)
@@ -108,7 +116,7 @@ const EditorPage = () => {
             )
             console.log(`${username} joined`)
           }
-          // setClients(clients);
+          setClients(clients)
           setConnectedUsernames(clients.map((client) => client.username))
         }
       )
@@ -125,15 +133,16 @@ const EditorPage = () => {
           </div>
         )
         console.log(`${username} left the room`)
-        // setClients((prev) => {
-        //   const updatedClients = prev.filter(
-        //     (client) => client.username !== username
-        //   );
-        //   setConnectedUsernames(
-        //     updatedClients.map((client) => client.username)
-        //   );
-        //   return updatedClients;
-        // });
+        console.log(clients)// added because clients was not used anywhere to avoid linting error
+        setClients((prev) => {
+          const updatedClients = prev.filter(
+            (client) => client.username !== username
+          )
+          setConnectedUsernames(
+            updatedClients.map((client) => client.username)
+          )
+          return updatedClients
+        })
       })
       socketRef.current.on(
         ACTIONS.MESSAGE_RECEIVE,
@@ -202,21 +211,22 @@ const EditorPage = () => {
     <div className='flex flex-col justify-center'>
       <div className='grid grid-cols-10'>
         <Toaster />
+        {/* {isLeftDivOpen && ( */}
 
         <div
-          className='col-span-2 flex flex-col justify-between h-screen text-white p-4 pb-5'
+          className={`flex flex-col justify-between h-screen text-white p-4 pb-5 relative transition-all duration-500 ease-in-out transform ${isLeftDivOpen ? 'col-span-2 ' : '-translate-x-full'}`}
           style={{ backgroundColor: '#1c1e29' }}
         >
           <div className='logo flex items-center'>
             <img className='h-20' src={logo} alt='logo' />
             <div className='flex flex-col w-full'>
-              <p className='text-4xl md:text-2xl text-center lg:text-3xl xl:text-4xl madimi-one-regular whitespace-nowrap'>
-                Code Collab
-              </p>
+              <p className='text-4xl md:text-2xl text-center lg:text-3xl xl:text-4xl madimi-one-regular whitespace-nowrap'>Code Collab</p>
             </div>
           </div>
           <div className='flex flex-col justify-between h-full'>
             <FileView
+              contentChanged={contentChanged}
+              setContentChanged={setContentChanged}
               fileContent={fileContent}
               setFileContent={setFileContent}
               editorRef={editorRef}
@@ -232,7 +242,7 @@ const EditorPage = () => {
           </div>
           <div>
             <div className='flex gap-2'>
-              <button className='btn chatBtn' onClick={toggleChat}>
+              <button className='btn chat-btn' onClick={toggleChat}>
                 Chat{' '}
                 {unreadMessages > 0 && (
                   <span
@@ -255,10 +265,13 @@ const EditorPage = () => {
             <button className='btn-edit leaveBtn' onClick={leaveRoom}>
               Leave
             </button>
+
+          </div>
+          <div className='absolute right-0 top-1/2 transform -translate-y-1/2 transition duration-500 hover:animate-bounce-left'>
+            <button onClick={toggleLeftDiv}>{leftIcon}</button>
           </div>
         </div>
-
-        <div className='col-span-8 overflow-y-auto'>
+        <div className={`${isLeftDivOpen ? 'col-span-8' : 'w-full absolute top-0 left-0 '}  overflow-y-auto transition-all duration-500 ease-in-out`}>
           <Editor
             handleDownloadFile={handleDownloadFile}
             socketRef={socketRef}
@@ -266,53 +279,25 @@ const EditorPage = () => {
             fileContent={fileContent}
             setFileContent={setFileContent}
             editorRef={editorRef}
+            contentChanged={contentChanged}
           />
+          {!isLeftDivOpen && (
+            <div className='absolute left-0 top-1/2 transform -translate-y-1/2 transition duration-500 hover:animate-bounce-right'>
+              <button className='text-white' onClick={toggleLeftDiv}>{leftIcon}</button>
+            </div>
+          )}
         </div>
 
         {isChatOpen && (
-          <div className='chat-container'>
-            <div className='chat-popup'>
-              <div className='chat-header'>
-                <h2>Chat</h2>
-                <button
-                  className='close-icon'
-                  onClick={() => setIsChatOpen(false)}
-                >
-                  X
-                </button>
-              </div>
-              <div className='chat-messages'>
-                {messages.slice(-CHAT_LIMIT).map((message, index) => (
-                  <div
-                    key={index}
-                    className={` ${
-                      message.sentByCurrentUser
-                        ? 'sent_by_user'
-                        : 'chat-message'
-                    }`}
-                  >
-                    <span className='message-sender'>
-                      {message.sentByCurrentUser ? 'You' : message.sendname}:
-                    </span>{' '}
-                    {message.text}
-                  </div>
-                ))}
-              </div>
-              <div className='chat-input'>
-                <input
-                  type='text'
-                  value={inputText}
-                  onChange={(e) => setInputText(e.target.value)}
-                  onKeyPress={handleKeyPress}
-                  placeholder='Type your message...'
-                  className='input-field'
-                />
-                <button onClick={handleMessageSend} className='send-button'>
-                  Send
-                </button>
-              </div>
-            </div>
-          </div>
+          <Chat
+            setIsChatOpen={setIsChatOpen}
+            messages={messages}
+            CHAT_LIMIT={CHAT_LIMIT}
+            inputText={inputText}
+            setInputText={setInputText}
+            handleKeyPress={handleKeyPress}
+            handleMessageSend={handleMessageSend}
+          />
         )}
       </div>
     </div>
