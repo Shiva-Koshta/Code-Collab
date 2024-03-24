@@ -18,7 +18,7 @@ const RoomCreation = () => {
 
   useEffect(() => {
     // Retrieve user data from local storage
-    const storedUserData = localStorage.getItem('userData')
+    const storedUserData = window.localStorage.getItem('userData')
 
     if (storedUserData) {
       const userData = JSON.parse(storedUserData)
@@ -29,7 +29,7 @@ const RoomCreation = () => {
   }, [])
   useEffect(() => {
     // Retrieve room ID from local storage
-    const storedRoomId = localStorage.getItem('roomid')
+    const storedRoomId = window.localStorage.getItem('roomid')
 
     if (storedRoomId) {
       // Make a request to your backend with the room ID

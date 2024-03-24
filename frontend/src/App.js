@@ -1,4 +1,3 @@
-
 import './App.css'
 import Login from './pages/Login'
 
@@ -27,7 +26,7 @@ function App () {
         const url = `${process.env.REACT_APP_API_URL}/auth/login/success`
         const { data } = await axios.get(url, { withCredentials: true })
         setUser(data.user._json)
-        localStorage.setItem('userData', JSON.stringify(data.user._json))
+        window.localStorage.setItem('userData', JSON.stringify(data.user._json))
       } catch (err) {
         console.log(err)
       }

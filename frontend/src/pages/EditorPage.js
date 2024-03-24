@@ -24,7 +24,7 @@ const EditorPage = () => {
   const [connectedUsernames, setConnectedUsernames] = useState([])
   // const [messages, setMessages] = useState([]);
   const [messages, setMessages] = useState(() => {
-    const storedMessages = localStorage.getItem(`messages_${roomId}`)
+    const storedMessages = window.localStorage.getItem(`messages_${roomId}`)
     return storedMessages ? JSON.parse(storedMessages) : []
   })
   const CHAT_LIMIT = 15 // Global variable for chat limit
@@ -79,7 +79,7 @@ const EditorPage = () => {
         toast.error('Socket connection failed, try again later.')
         reactNavigator('/')
       }
-      const userData = localStorage.getItem('userData')
+      const userData = window.localStorage.getItem('userData')
       if (userData) {
         console.log(JSON.parse(userData).name)
         setStoredUserData(JSON.parse(userData))
@@ -148,7 +148,7 @@ const EditorPage = () => {
             const updatedMessages = [...prevMessages, newMessage].slice(
               -CHAT_LIMIT
             )
-            localStorage.setItem(
+            window.localStorage.setItem(
               `messages_${roomId}`,
               JSON.stringify(updatedMessages)
             )
