@@ -12,8 +12,8 @@ const Editor = ({ handleDownloadFile, socketRef, roomId, editorRef, fileContent,
   // const [contentChanged, setContentChanged] = useState(false)
   // useEffect(() => {
   //   const handleStorageChange = () => {
-  //     setFileContent(localStorage.getItem('fileContent'))
-  //     setContentChanged(localStorage.getItem('contentChange'))
+  //     setFileContent(window.localStorage.getItem('fileContent'))
+  //     setContentChanged(window.localStorage.getItem('contentChange'))
   //   }
   //   window.addEventListener('storage', handleStorageChange)
   //   return () => {
@@ -23,10 +23,11 @@ const Editor = ({ handleDownloadFile, socketRef, roomId, editorRef, fileContent,
   console.log(fileContent)
   console.log(contentChanged)
   // useEffect(() => {
-  //   setFileContent(localStorage.getItem("fileContent"))
-  //   setContentChanged(localStorage.getItem("contentChanged"))
+  //   setFileContent(window.localStorage.getItem("fileContent"))
+  //   setContentChanged(window.localStorage.getItem("contentChanged"))
   // }, [])
-  localStorage.setItem('roomid', roomId)
+
+  window.localStorage.setItem('roomid', roomId)
   useEffect(() => {
     // console.log("hi");
     if (!editorRef.current) return
