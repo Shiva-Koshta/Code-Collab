@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const { v4: uuidv4 } = require('uuid');
+const { isURL } = require('validator');
 
 const Schema = mongoose.Schema;
 
@@ -15,9 +16,10 @@ const roomSchema = new Schema({
     },
     description: {
         type: String,
+        default: ''
     },
     createdBy: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: Schema.Types.ObjectId,
         ref: 'User',
         required: true
     },
@@ -25,8 +27,12 @@ const roomSchema = new Schema({
         type: Date,
         default: Date.now
     },
+    updatedAt: {
+        type: Date,
+        default: Date.now
+    },
     collaborators: [{
-        type: mongoose.Schema.Types.ObjectId,
+        type: Schema.Types.ObjectId,
         ref: 'User'
     }],
     files: [{
@@ -36,13 +42,17 @@ const roomSchema = new Schema({
         },
         url: {
             type: String,
-            required: true
-        }
+            required: true,
+            validate: {
+                validator: (value) => isURL(value),
+                message: 'URL is not valid',
+            },
+        },
     }],
     chatMessages: [{
         sender: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'user',
+            type: Schema.Types.ObjectId,
+            ref: 'User',
             required: true
         },
         message: {
@@ -54,7 +64,8 @@ const roomSchema = new Schema({
             default: Date.now
         }
     }]
+}, {
+    timestamps: true,
 });
 
-const Room = mongoose.model('Room', roomSchema);
-module.exports = Room;
+const Room = mongoose.model('Room', room
