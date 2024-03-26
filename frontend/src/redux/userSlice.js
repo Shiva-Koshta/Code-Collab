@@ -4,30 +4,30 @@ import axios from "axios";
 const userSlice = createSlice({
   name: "user",
   initialState: {
-    user: {
-        name: "",
-        email: "",
-        contact: "",
-        role: ""
-    }
+    user: null,
   },
   reducers: {
-    setUserSlice: (state, action) => {
-      const { name, contact, role, email } = action.payload;
-      state.user.name = name;
-      state.user.role = role;
-      state.user.contact = contact;
-      state.user.email = email;
+    setUser: (state, action) => {
+      const { user } = action.payload;
+      state.user = user;
       // localStorage.setItem("user", JSON.stringify(state.user));
     },
     logout: (state) => {
-        state.user.name = "";
-        state.user.contact = "";
-        state.user.email = "";
-        state.user.role = "";
+      state.user = null;
     },
   },
 });
 
-export const { setUserSlice, logout } = userSlice.actions;
+export const { setUser, logout } = userSlice.actions;
 export default userSlice.reducer;
+
+// separate action creator for fetching user data
+export const fetchUser = () => async (dispatch) => {
+  try {
+    const response = await axios.get("/api/user");
+    dispatch(setUser(response.data));
+  } catch (error) {
+    console.error("Failed to fetch user data", error);
+  }
+};
+
