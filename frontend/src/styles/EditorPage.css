@@ -1,43 +1,73 @@
-.editor-page-grid {
-  /* display: grid;
-    grid-template-rows: 1fr 2fr 1fr;
-    grid-template-columns: 1fr 2fr 1fr;
-    height: 100vh; */
-    display: grid;
-    grid-template-columns: 1fr 6fr; /* Divide the page into four columns */
-    /* height: 100vh; */
-  }
-  
-  .aside {
-    grid-row: 1 / span 3;
-    grid-column: 1 / span 1;
-    background: #1c1e29;
-    padding: 16px;
-    padding-bottom: 20px;
-    color: #fff;
-  }
-  
-  
-  .editor-container {
-   
-    overflow-y: auto; 
-  }
-  
-  .chat-container {
-    /* grid-row: 1 / span 3;
-    grid-column: 4 / span 1;
-    background: #fff; */
+/* General styles */
+body, html {
+  height: 100%;
+  margin: 0;
+}
+
+.container {
+  display: grid;
+  grid-template-columns: 1fr 6fr;
+  grid-template-rows: auto 1fr;
+  height: 100%;
+}
+
+.aside {
+  grid-column: 1 / span 1;
+  grid-row: 1 / span 3;
+  background: #1c1e29;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+}
+
+.asideInner {
+  flex: 1;
+  border-bottom: 2px solid #2b824c;
+  padding: 16px;
+  margin-bottom: 10px;
+}
+
+.logo {
+  border-bottom: 1px solid #424242;
+  padding-bottom: 10px;
+}
+
+.logoImage {
+  height: 60px;
+}
+
+.CodeMirror {
+  grid-column: 2 / span 1;
+  grid-row: 2 / span 1;
+  min-height: calc(100vh - 60px); /* Subtract the height of the header */
+  font-size: 20px;
+  line-height: 1.6;
+  padding-top: 20px;
+}
+
+/* Chat container styles */
+.chat-container {
   background: #fff;
-  height: 100vh; /* Make the chat container fill the entire height of the viewport */
+  height: 100%; /* Fill the remaining height of the container */
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  /* padding: 20px; */
-  /* max-width: 100%;  */
   box-sizing: border-box;
-  /* overflow-y: auto; */
+  padding: 20px;
 }
 
+.messages {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.message-input {
+  border-top: 1px solid #ccc;
+  padding-top: 10px;
+  display: flex;
+}
+
+/* Button styles */
 .btn-edit {
   border: none;
   padding: 10px;
@@ -48,6 +78,7 @@
   width: 100%;
   transition: all 0.3s ease-in-out;
 }
+
 .leaveBtn {
   background: #ee0c0c;
   width: 100%;
@@ -65,51 +96,15 @@
   width: 100%;
   margin-left: auto;
 }
+
 .copyBtn:hover {
   background: #2b824c;
   transform: scale(1.1);
 }
 
-.aside {
-  background: #1c1e29;
-  padding: 16px;
-  color: #fff;
-  display: flex;
-  height: 100vh;
-  flex-direction: column;
-}
-.asideInner {
-  flex: 1;
-  border-bottom: 2px solid #2b824c;
-  margin-bottom: 10px;
-}
-
+/* User list styles */
 .Users {
   margin-bottom: 20px;
   border-top: 2px solid #2b824c;
 }
-.UserList{
-    font-size: 1rem; 
-    color: #080808;
-    font-weight: 700; 
-    padding: 5px 10px; 
-    background-color: #2b824c; 
-    border-radius: 5px; 
-    margin-bottom: 5px; 
-}
 
-.logo {
-  border-bottom: 1px solid #424242;
-  padding-bottom: 10px;
-}
-
-.logoImage {
-  height: 60px;
-}
-
-.CodeMirror {
-  min-height: calc(100vh);
-  font-size: 20px;
-  line-height: 1.6;
-  padding-top: 20px;
-}
