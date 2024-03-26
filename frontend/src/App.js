@@ -1,27 +1,18 @@
-import logo from "./logo.svg";
-import "./App.css";
+import React, { useEffect, useState } from "react";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Login from "./pages/Login";
-
 import Faq from "./pages/Faq";
-import { Routes, Route, Navigate, Router, BrowserRouter } from "react-router-dom";
-
-import { useEffect, useState } from "react";
-import axios from "axios";
-import { useNavigate } from "react-router-dom";
 import Room_Creation from "./pages/Room_Creation";
 import EditorPage from "./pages/EditorPage";
 import About from './pages/About';
+import axios from "axios";
+import setAuthToken from "./utils/setAuthToken";
 
-// import './App.css';
-// import Home from './pages/Room_Join';
-// import { BrowserRouter, Routes, Route } from 'react-router-dom';
-// import EditorPage from './pages/EditorPage';
-// import { Toaster } from 'react-hot-toast';
 function App() {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    const getUser = async () => {
+    const checkUser = async () => {
       try {
         const url = `${process.env.REACT_APP_API_URL}/auth/login/success`;
         const { data } = await axios.get(url, { withCredentials: true });
@@ -31,12 +22,18 @@ function App() {
         console.log(err);
       }
     };
-    getUser();
+
+    if (localStorage.getItem("userData")) {
+      const userData = JSON.parse(localStorage.getItem("userData"));
+      setUser(userData);
+      setAuthToken(userData.token);
+    }
+
+    checkUser();
   }, []);
 
   return (
     <BrowserRouter>
-
       <Routes>
         <Route
           exact
@@ -46,22 +43,20 @@ function App() {
         <Route
           exact
           path="/login"
-          element={user ? <Room_Creation /> : <Login />}
+          element={user ? <Navigate to="/" /> : <Login />}
         />
 
         <Route path="/faq" element={<Faq />} />
         <Route
           path="/editor/:roomId"
-          element={<EditorPage />}
+          element={user ? <EditorPage /> : <Navigate to="/login" />}
         />
         <Route
           path="/about-us"
           element={<About/>}
         />
-
       </Routes>
     </BrowserRouter>
-
   );
 }
 
