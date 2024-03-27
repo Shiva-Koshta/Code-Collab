@@ -182,6 +182,11 @@ const EditorPage = () => {
               <p className="text-4xl md:text-2xl text-center lg:text-3xl xl:text-4xl madimi-one-regular whitespace-nowrap">Code Collab</p>
             </div>
           </div>
+                   
+          {/* FileExplorer component */}
+          <FileExplorer />
+          {/* End of FileExplorer component */}
+
           <div className="flex flex-col justify-between h-full">
             <FileView fileContent={fileContent} setFileContent={setFileContent} editorRef={editorRef}/>
             <div className="Users">
