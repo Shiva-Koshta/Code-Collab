@@ -6,7 +6,7 @@ import toast, { Toaster } from 'react-hot-toast'
 import Editor from '../components/Editor'
 import FileView from '../components/FileView'
 import { initSocket } from '../socket'
-
+import FileExplorer from '../components/FileExplorer';
 import '../styles/EditorPage.css'
 import '../styles/Chat.css'
 import logo from '../images/Logo.png'
@@ -223,6 +223,9 @@ const EditorPage = () => {
               <p className='text-4xl md:text-2xl text-center lg:text-3xl xl:text-4xl madimi-one-regular whitespace-nowrap'>Code Collab</p>
             </div>
           </div>
+
+          <FileExplorer />
+
           <div className='flex flex-col justify-between h-full'>
             <FileView
               contentChanged={contentChanged}
