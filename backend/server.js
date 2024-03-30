@@ -15,15 +15,7 @@ const RoomUserCount = require('./models/RoomUserCount')
 const app = express()
 const server = http.createServer(app)
 const port = process.env.PORT || 8080
-const nodemailer = require('nodemailer');
 
-let transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-        user: 'codecollabhelp@gmail.com', 
-        pass: 'dogk zdwu jdws dxpp' 
-    }
-});
 app.use(
   cors({
     origin: 'http://localhost:3000',
@@ -242,34 +234,6 @@ app.post('/delete-entry', async (req, res) => {
     console.error('Error deleting room code map entry:', error)
     return res.status(500).json({ error: 'Internal server error' })
   }
-})
-app.post("/help", async(req, res) => {
-  try {
-    const { name, email, message } = req.body
-    console.log(email)
-    let mailOptions = {
-        from: 'codecollabhelp@gmail.com', 
-        to: 'codecollabhelp@gmail.com', 
-        subject: 'Help for Code Collab',
-        text: `Name: ${name}\nEmail: ${email}\nMessage: ${message}`
-    }
-
-    let info = await transporter.sendMail(mailOptions)
-    let mailOptions1 = {
-      from: 'codecollabhelp@gmail.com', 
-      to: email, 
-      subject: 'Message recieved: Code Collab',
-      text: `We have recieved your messgae: ${message}.\nAnd we will be getting back to you soon. Have a Good Day`
-  }
-
-    let info1 = await transporter.sendMail(mailOptions1)
-    console.log("Email sent: " + info.response)
-    console.log("Email sent: " + info1.response)
-    res.status(200).json({ message: "Form submitted" })
-} catch (error) {
-    console.error('Error:', error)
-    res.status(500).json({ error: "An error occurred while sending the email" })
-}
 })
 // connect to database
 mongoose
