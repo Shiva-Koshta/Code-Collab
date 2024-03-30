@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 import Codemirror from 'codemirror'
 import 'codemirror/lib/codemirror.css'
 import 'codemirror/theme/dracula.css'
@@ -7,34 +7,21 @@ import 'codemirror/addon/edit/closetag'
 import 'codemirror/addon/edit/closebrackets'
 import ACTIONS from '../Actions'
 
-const Editor = ({
-  handleDownloadFile,
-  socketRef,
-  roomId,
-  editorRef,
-  fileContent,
-  setFileContent
-}) => {
+const Editor = ({ handleDownloadFile, socketRef, roomId, editorRef, fileContent, setFileContent, contentChanged }) => {
   // const [fileContent, setFileContent] = useState("")
-  const [contentChanged] = useState(false)
   // const [contentChanged, setContentChanged] = useState(false)
-
   // useEffect(() => {
   //   const handleStorageChange = () => {
   //     setFileContent(window.localStorage.getItem('fileContent'))
   //     setContentChanged(window.localStorage.getItem('contentChange'))
   //   }
-
   //   window.addEventListener('storage', handleStorageChange)
-
   //   return () => {
   //     window.removeEventListener('storage', handleStorageChange)
   //   }
   // }, [])
-
   console.log(fileContent)
   console.log(contentChanged)
-
   // useEffect(() => {
   //   setFileContent(window.localStorage.getItem("fileContent"))
   //   setContentChanged(window.localStorage.getItem("contentChanged"))
@@ -51,7 +38,6 @@ const Editor = ({
       editorRef.current.setValue(fileContent)
     }
   }, [fileContent, contentChanged])
-
   useEffect(() => {
     // console.log("file added");
     if (fileContent) {
@@ -63,7 +49,6 @@ const Editor = ({
       })
     }
   }, [fileContent, contentChanged])
-
   useEffect(() => {
     async function init () {
       editorRef.current = Codemirror.fromTextArea(
@@ -134,14 +119,12 @@ const Editor = ({
           console.error('Error fetching code:', error)
         }
       }
-
       fetchCode()
     }
   }, [roomId])
   // useEffect(() => {
   //   console.log(newusernameRef.current)
   //   if (socketRef.current && newusernameRef.current !== null) {
-
   //     if (newusernameRef.current === "RITESH PATIL") {
   //       console.log("entered here")
   //       console.log(newusernameRef.current)
@@ -154,7 +137,6 @@ const Editor = ({
   //     }
   //   }
   // }, [newuserRef.current, socketRef.current, newusernameRef.current])
-
   // useEffect(() => {
   //   if (socketRef.current) {
   //     console.log("hi")
@@ -165,7 +147,6 @@ const Editor = ({
   //     });
   //   }
   // }, [socketRef.current]);
-
   return <textarea id='realEditor' />
 }
 
