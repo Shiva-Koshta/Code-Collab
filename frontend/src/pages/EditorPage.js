@@ -99,7 +99,7 @@ const EditorPage = () => {
       }
       socketRef.current.on(
         ACTIONS.JOINED,
-        ({ clients, username, socketId }) => {
+        ({ clients, username, picture, socketId }) => {
           if (socketId !== socketRef.current.id) {
             toast.success(
               <div style={{ display: 'flex', alignItems: 'center' }}>

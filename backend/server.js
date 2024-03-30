@@ -10,6 +10,7 @@ const middleware = require('./middleware')
 const RoomCodeMap = require('./models/RoomCodeMap')
 const RoomUserCount = require('./models/RoomUserCount')
 const ACTIONS = require('../frontend/src/Actions')
+const { log } = require('console')
 
 const app = express()
 const server = http.createServer(app)
@@ -38,23 +39,9 @@ function getAllConnectedClients (roomId) {
 io.on('connection', (socket) => {
   console.log('Socket connected', socket.id)
 
-  socket.on(ACTIONS.JOIN, ({ roomId, username, picture }) => {
-    userSocketMap[socket.id] = {username, picture};
-    console.log(userSocketMap[socket.id]);
-    socket.join(roomId);
-    const clients = getAllConnectedClients(roomId);
-    clients.forEach(({ socketId }) => {
-      io.to(socketId).emit(ACTIONS.JOINED, {
-        clients,
-        username,
-        picture,
-        socketId: socket.id,
-      });
-    });
-  });
-  socket.on(ACTIONS.JOIN, async ({ roomId, username }) => {
+  socket.on(ACTIONS.JOIN, async ({ roomId, username, picture }) => {
     // Add the user to the socket map
-    userSocketMap[socket.id] = username
+    userSocketMap[socket.id] = {username, picture}
 
     // Join the room
     socket.join(roomId)
@@ -72,12 +59,12 @@ io.on('connection', (socket) => {
 
       // Get all connected clients for the room
       const clients = getAllConnectedClients(roomId)
-
       // Emit the JOINED event to all clients in the room
       clients.forEach(({ socketId }) => {
         io.to(socketId).emit(ACTIONS.JOINED, {
           clients,
           username,
+          picture,
           socketId: socket.id,
           userCount: updatedRoom.userCount // Pass the updated user count to clients
         })
