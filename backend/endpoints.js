@@ -5,6 +5,32 @@ const RoomUserCount = require('./models/RoomUserCount')
 const authRoute = require('./routes/auth')
 
 router.use('/auth', authRoute)
+
+
+
+// Endpoint to get the number of users in a room
+router.post('/rooms/numUsersInRoom', async (req, res) => {
+  try {
+    const { roomId } = req.body;
+
+    // Fetch the room from the database
+    const room = await RoomUserCount.findOne({ roomId });
+
+    if (!room) {
+      return res.status(404).json({ error: 'Room not found' });
+    }
+
+    // Return the number of users in the room
+    res.json({ numUsers: room.userCount });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+
+
+
 // Endpoint to handle receiving code
 router.post('/receivecode', async (req, res) => {
   const { roomId } = req.body
