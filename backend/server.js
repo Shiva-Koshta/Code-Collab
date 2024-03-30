@@ -50,8 +50,6 @@ function getAllConnectedClients (roomId) {
         username: userSocketMap[socketId].username,
         picture: userSocketMap[socketId].picture
         //consolelog(username)
-      };
-        username: userSocketMap[socketId]
       }
     }
   )
@@ -141,12 +139,6 @@ io.on('connection', (socket) => {
     delete userSocketMap[socket.id];
     socket.leave();
   });
-        username: userSocketMap[socket.id]
-      })
-    })
-    delete userSocketMap[socket.id]
-    socket.leave()
-  })
 
   socket.on('disconnecting', () => {
     // Iterate through each room the socket is connected to
