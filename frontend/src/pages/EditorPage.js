@@ -93,12 +93,13 @@ const EditorPage = () => {
         setStoredUserData(JSON.parse(userData))
         socketRef.current.emit(ACTIONS.JOIN, {
           roomId,
-          username: JSON.parse(userData).name
-        })
+          username: JSON.parse(userData).name,
+          picture: JSON.parse(userData).picture,
+        });
       }
       socketRef.current.on(
         ACTIONS.JOINED,
-        ({ clients, username, socketId }) => {
+        ({ clients, username, picture, socketId }) => {
           if (socketId !== socketRef.current.id) {
             toast.success(
               <div style={{ display: 'flex', alignItems: 'center' }}>
