@@ -5,6 +5,8 @@ import UploadFileIcon from '@mui/icons-material/UploadFile'
 import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined'
 import { IconButton } from '@mui/material'
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined'
+import toast from 'react-hot-toast'
+const allowedExtensions = require('../FileExtensions').default
 
 const FileView = ({ fileContent, setFileContent, editorRef, contentChanged, setContentChanged }) => {
   // const [contentChanged, setContentChanged] = useState(false);
@@ -12,9 +14,18 @@ const FileView = ({ fileContent, setFileContent, editorRef, contentChanged, setC
   const [downloadFileExtension, setFileExtension] = useState('')
   const [downloadFileName, setFileName] = useState('')
   const handleFileChange = (event) => {
-    console.log('reached')
+    // console.log('reached')
     // console.log(event)
     const file = event.target.files[0]
+
+    if (!file) return
+    const fileExtension = file.name.split('.').pop();
+    if (!allowedExtensions.includes('.' + fileExtension)) {
+      // console.log('Invalid file type');
+      toast.error('Invalid file type');
+      return;
+    }
+
     const reader = new FileReader()
     setContentChanged(!contentChanged)
     // console.log(contentChanged)
@@ -24,6 +35,7 @@ const FileView = ({ fileContent, setFileContent, editorRef, contentChanged, setC
       const content = e.target.result
       setFileContent(content)
       window.localStorage.setItem('fileContent', JSON.stringify(fileContent))
+      toast.success('File uploaded')
       // console.log(content)
       // fileRef.current = content
     }
