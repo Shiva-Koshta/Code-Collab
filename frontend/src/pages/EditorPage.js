@@ -12,6 +12,9 @@ import '../styles/Chat.css'
 import logo from '../images/Logo.png'
 import Chat from '../components/Chat'
 import { ChevronLeft, ChevronRight } from '@mui/icons-material'
+import { ToastContainer, toast as reactToastify } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 
 const EditorPage = () => {
   const editorRef = useRef(null)
@@ -76,13 +79,40 @@ const EditorPage = () => {
     })
   }
 
+
+
+
+  useEffect(() => {
+    const lastMessage = messages[messages.length - 1]
+    if (lastMessage && !isChatOpen) {
+      
+      reactToastify.info(
+        `${lastMessage.sendname} : ${lastMessage.text}`, {
+        position: "bottom-right",
+        autoClose: 2000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "dark",
+        style: {
+          backgroundColor: "#1c1e29", // Change this to your desired color
+      },
+        });
+        // reactToastify.info(`${lastMessage.sendname} : ${lastMessage.text}`)
+      
+
+    }
+  }, [messages])
+
   useEffect(() => {
     const init = async () => {
       socketRef.current = await initSocket()
       socketRef.current.on('connect_error', (err) => handleErrors(err))
       socketRef.current.on('connect_failed', (err) => handleErrors(err))
 
-      function handleErrors (e) {
+      function handleErrors(e) {
         console.log('socket error', e)
         toast.error('Socket connection failed, try again later.')
         reactNavigator('/')
@@ -181,7 +211,7 @@ const EditorPage = () => {
     return <Navigate to='/' />
   }
 
-  async function copyRoomId () {
+  async function copyRoomId() {
     try {
       await navigator.clipboard.writeText(roomId)
       toast.success('Room ID has been copied to your clipboard')
@@ -211,7 +241,8 @@ const EditorPage = () => {
   return (
     <div className='flex flex-col justify-center'>
       <div className='grid grid-cols-10'>
-        <Toaster />
+      {<Toaster position="top-center" reverseOrder={false}/>}
+      
         {/* {isLeftDivOpen && ( */}
 
         <div
@@ -292,16 +323,30 @@ const EditorPage = () => {
           )}
         </div>
 
+<ToastContainer 
+position="bottom-right"
+autoClose={2000}
+hideProgressBar={true}
+closeOnClick
+pauseOnFocusLoss
+draggable
+pauseOnHover
+theme="dark"
+/>
+
+
         {isChatOpen && (
-          <Chat
-            setIsChatOpen={setIsChatOpen}
-            messages={messages}
-            CHAT_LIMIT={CHAT_LIMIT}
-            inputText={inputText}
-            setInputText={setInputText}
-            handleKeyPress={handleKeyPress}
-            handleMessageSend={handleMessageSend}
-          />
+          <div>
+            <Chat
+              setIsChatOpen={setIsChatOpen}
+              messages={messages}
+              CHAT_LIMIT={CHAT_LIMIT}
+              inputText={inputText}
+              setInputText={setInputText}
+              handleKeyPress={handleKeyPress}
+              handleMessageSend={handleMessageSend}
+            />
+          </div>
         )}
       </div>
     </div>
