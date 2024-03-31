@@ -85,8 +85,9 @@ const EditorPage = () => {
   useEffect(() => {
     const lastMessage = messages[messages.length - 1]
     if (lastMessage && !isChatOpen) {
-      // toast.success(`${lastMessage.sendname} : ${lastMessage.text}`);
-      reactToastify.info(`${lastMessage.sendname} : ${lastMessage.text}`, {
+      
+      reactToastify.info(
+        `${lastMessage.sendname} : ${lastMessage.text}`, {
         position: "bottom-right",
         autoClose: 2000,
         hideProgressBar: true,
@@ -94,8 +95,12 @@ const EditorPage = () => {
         pauseOnHover: true,
         draggable: true,
         progress: undefined,
-        theme: "light",
+        theme: "dark",
+        style: {
+          backgroundColor: "#1c1e29", // Change this to your desired color
+      },
         });
+        // reactToastify.info(`${lastMessage.sendname} : ${lastMessage.text}`)
       
 
     }
@@ -317,19 +322,18 @@ const EditorPage = () => {
           )}
         </div>
 
-<ToastContainer
+<ToastContainer 
 position="bottom-right"
 autoClose={2000}
 hideProgressBar={true}
-newestOnTop
 closeOnClick
-rtl={false}
 pauseOnFocusLoss
 draggable
 pauseOnHover
-theme="light"
-
+theme="dark"
 />
+
+
         {isChatOpen && (
           <div>
             <Chat
