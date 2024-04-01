@@ -52,16 +52,8 @@ router.post("/receivecode", async (req, res) => {
   }
 });
 
-// Endpoint to handle help request
-// router.post("/help", (req, res) => {
-//   console.log("hi", req.body);
-//   res.status(200).json({ message: "Form submitted" });
-// });
-
-// Endpoint to handle deleting room entry
 router.post("/delete-entry", async (req, res) => {
   const { roomId } = req.body;
-  //   console.log("hi", roomId);
 
   try {
     const room = await RoomUserCount.findOne({ roomId });
@@ -112,6 +104,74 @@ router.post("/help", async (req, res) => {
     res
       .status(500)
       .json({ error: "An error occurred while sending the email" });
+  }
+});
+router.post("/initialize", async (req, res) => {
+  // console.log("hey");
+  const { roomId, username } = req.body;
+
+  try {
+    // Check if the room exists
+    const existingRoom = await RoomUserCount.findOne({ roomId });
+
+    if (!existingRoom) {
+      // If the room doesn't exist, create a new room document
+      const newRoom = new RoomUserCount({
+        roomId,
+        userCount: 0, // Initial user count is 1
+        hostname: username, // Set the hostname to the username of the current user
+        users: [{ username, role: "editor" }], // Add the current user as the host with role 'editor'
+      });
+
+      // Save the new room document
+      await newRoom.save();
+
+      // Respond with success message
+      return res.status(200).json({ message: "Room initialized successfully" });
+    }
+
+    // If the room already exists
+    // Check if the user is already present in the room
+    const existingUser = existingRoom.users.find(
+      (user) => user.username === username
+    );
+    if (!existingUser) {
+      // If the user is not already present, add the user to the room as an editor
+      existingRoom.users.push({ username, role: "editor" });
+      await existingRoom.save();
+    }
+
+    // Respond with success message
+    return res.status(200).json({ message: "Room initialized successfully" });
+  } catch (error) {
+    console.error("Error initializing room:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+});
+router.post("/getdetails", async (req, res) => {
+  console.log("hi");
+  const { roomId } = req.body; // Assuming roomId is sent as a query parameter
+
+  try {
+    // Fetch room details including user list and hostname
+    const roomDetails = await RoomUserCount.findOne({ roomId });
+
+    if (!roomDetails) {
+      return res.status(404).json({ error: "Room not found" });
+    }
+
+    // Extract usernames and roles from the room details
+    const userRoles = roomDetails.users.map((user) => ({
+      name: user.username,
+      role: user.role,
+    }));
+    const host = roomDetails.hostname;
+
+    // Respond with user details and hostname
+    return res.status(200).json({ users: userRoles, host });
+  } catch (error) {
+    console.error("Error fetching room details:", error);
+    return res.status(500).json({ error: "Internal server error" });
   }
 });
 
