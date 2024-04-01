@@ -106,6 +106,23 @@ const Editor = ({ handleDownloadFile, socketRef, roomId, editorRef, fileContent,
     }
     init()
   }, [])
+ 
+  useEffect(() => {
+    editorRef.current.on("cursorActivity", (instance) => {
+      const cursor = instance.getCursor();
+      const userData = JSON.parse(localStorage.getItem("userData"));
+      const cursorData = {
+        cursor: { line: cursor.line, ch: cursor.ch },
+        user: {email: userData.email, name: userData.name },
+        tab: null,
+      }
+      console.log(cursorData);
+      socketRef.current.emit(ACTIONS.CURSOR_CHANGE, {
+        roomId,
+        cursorData,
+      })
+    })
+  },[editorRef])
   useEffect(() => {
     if (socketRef.current) {
       socketRef.current.on(ACTIONS.CODE_CHANGE, ({ code }) => {
@@ -113,6 +130,10 @@ const Editor = ({ handleDownloadFile, socketRef, roomId, editorRef, fileContent,
         if (code !== null) {
           editorRef.current.setValue(code)
         }
+      })
+      socketRef.current.on(ACTIONS.CURSOR_CHANGE, ({cursorData}) => {
+        console.log("cursorData retrieved from user: "+cursorData.user.name)
+        console.log(cursorData)
       })
     }
   }, [socketRef.current])
@@ -144,6 +165,7 @@ const Editor = ({ handleDownloadFile, socketRef, roomId, editorRef, fileContent,
       fetchCode()
     }
   }, [roomId])
+
   // useEffect(() => {
   //   console.log(newusernameRef.current)
   //   if (socketRef.current && newusernameRef.current !== null) {
