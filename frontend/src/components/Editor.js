@@ -28,6 +28,30 @@ const Editor = ({ handleDownloadFile, socketRef, roomId, editorRef, fileContent,
   // }, [])
 
   window.localStorage.setItem('roomid', roomId)
+
+  useEffect(() => {
+    // Create style element
+    const style = document.createElement("style");
+    style.textContent = `
+      @keyframes blinkCursor {
+        0%, 100% {
+          opacity: 1;
+        }
+        100% {
+          opacity: 0;
+        }
+      }
+    `;
+
+    // Append style to document head
+    document.head.appendChild(style);
+
+    // Clean up function to remove style element when component unmounts
+    return () => {
+      document.head.removeChild(style);
+    };
+  }, []);
+
   useEffect(() => {
     // console.log("hi");
     if (!editorRef.current) return
@@ -147,6 +171,57 @@ const Editor = ({ handleDownloadFile, socketRef, roomId, editorRef, fileContent,
   //     });
   //   }
   // }, [socketRef.current]);
+  const getRandomColor = () => {
+    const letters = "0123456789ABCDEF";
+    let color = "#";
+    for (let i = 0; i < 6; i++) {
+      color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+  };
+  // Function to render cursors
+  const renderCursors = (cursorInfoList) => {
+    if (cursorInfoList) {
+      const { cursor,tab, user } = cursorInfoList;
+      const { ch, line } = cursor;
+      // const cursorMarkerId = `cursor-marker-${user.email}`;
+      // let cursorMarker = document.getElementById(cursorMarkerId);
+      // Create a cursor marker element if not present
+      // if (!cursorMarker){
+        const prevCursorMarkers = document.querySelectorAll(`.cursor-marker[title="${user.name}"]`);
+      prevCursorMarkers.forEach((marker) => marker.remove());
+
+      const cursorMarker = document.createElement("div");
+      cursorMarker.className = "cursor-marker";
+      cursorMarker.style.position = "absolute";
+      cursorMarker.classList.add("h-8", "w-px");
+
+      cursorMarker.style.backgroundColor = getRandomColor(); // Assign a random color
+      cursorMarker.title = user.name;
+
+      // Append cursor marker to CodeMirror editor container
+      editorRef.current.getWrapperElement().appendChild(cursorMarker);
+      cursorMarker.style.animation = "blinkCursor 1s infinite";
+      // }
+
+      cursorMarker.style.left = `${
+        editorRef.current.charCoords({ line, ch }).left
+      -324}px`;
+      cursorMarker.style.top = `${
+        editorRef.current.charCoords({ line, ch }).top
+      }px`;
+      // console.log(editorRef.current.charCoords({ line, ch }).top);
+      // Define CSS keyframes for blinking effect
+    }
+  };
+  // Clean up cursor markers when component unmounts
+  useEffect(() => {
+    return () => {
+      document
+        .querySelectorAll(".cursor-marker")
+        .forEach((node) => node.remove());
+    };
+  }, []);
   return <textarea id='realEditor' />
 }
 
