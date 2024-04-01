@@ -7,7 +7,7 @@ import Editor from '../components/Editor'
 import FileView from '../components/FileView'
 import { initSocket } from '../socket'
 import FileExplorer from '../components/FileExplorer';
-import UploadFilesFolders from '../components/UploadFilesFolders';
+import UplaodFilesFolders from '../components/UploadFilesFolders';
 import '../styles/EditorPage.css'
 import '../styles/Chat.css'
 import logo from '../images/Logo.png'
@@ -15,6 +15,7 @@ import Chat from '../components/Chat'
 import { ChevronLeft, ChevronRight } from '@mui/icons-material'
 import { ToastContainer, toast as reactToastify } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import UploadFilesFolders from '../components/UploadFilesFolders'
 
 
 const EditorPage = () => {
