@@ -20,8 +20,6 @@ const Editor = ({ handleDownloadFile, socketRef, roomId, editorRef, fileContent,
   //     window.removeEventListener('storage', handleStorageChange)
   //   }
   // }, [])
-  console.log(fileContent)
-  console.log(contentChanged)
   // useEffect(() => {
   //   setFileContent(window.localStorage.getItem("fileContent"))
   //   setContentChanged(window.localStorage.getItem("contentChanged"))
