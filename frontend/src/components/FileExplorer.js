@@ -16,67 +16,6 @@ const initialFolder = {
 };
 
 const FileExplorer = () => {
-  const [folders, setFolders] = useState([initialFolder]);
-
-  const createFolder = (parentFolder) => {
-    const newFolderName = prompt('Enter folder name:');
-    if (newFolderName) {
-      const newFolder = { name: newFolderName, type: 'folder', children: [], isOpen: true };
-      parentFolder.children.push(newFolder);
-      setFolders([...folders]);
-    }
-  };
-
-  const createFile = (parentFolder) => {
-    const newFileName = prompt('Enter file name:');
-    if (newFileName) {
-      const newFile = { name: newFileName, type: 'file' };
-      parentFolder.children.push(newFile);
-      setFolders([...folders]);
-    }
-  };
-
-  const renameFolder = (folder) => {
-    const newName = prompt('Enter new folder name:', folder.name);
-    if (newName) {
-      folder.name = newName;
-      setFolders([...folders]);
-    }
-  };
-
-  const renameFile = (file) => {
-    const newName = prompt('Enter new file name:', file.name);
-    if (newName) {
-      file.name = newName;
-      setFolders([...folders]);
-    }
-  };
-
-  const toggleFolder = (folder) => {
-    folder.isOpen = !folder.isOpen;
-    setFolders([...folders]);
-  };
-
-  const deleteFolder = (folder, parentFolder) => {
-    if (folder !== initialFolder) { // Check if folder is not the root folder
-      const index = parentFolder.children.indexOf(folder);
-      if (index !== -1) {
-        parentFolder.children.splice(index, 1);
-        setFolders([...folders]);
-      }
-    } else {
-      alert("Cannot delete root folder.");
-    }
-  };
-
-  const deleteFile = (file, parentFolder) => {
-    const index = parentFolder.children.indexOf(file);
-    if (index !== -1) {
-      parentFolder.children.splice(index, 1);
-      setFolders([...folders]);
-    }
-  };
-
   const renderFolder = (folder, depth = 0, parentFolder = null) => {
     const FolderIconComponent = folder.isOpen ? FolderOpenIcon : FolderIcon;
 
