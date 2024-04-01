@@ -6,12 +6,17 @@ import toast, { Toaster } from 'react-hot-toast'
 import Editor from '../components/Editor'
 import FileView from '../components/FileView'
 import { initSocket } from '../socket'
-import FileExplorer from '../components/FileExplorer';
 import '../styles/EditorPage.css'
 import '../styles/Chat.css'
 import logo from '../images/Logo.png'
 import Chat from '../components/Chat'
 import { ChevronLeft, ChevronRight } from '@mui/icons-material'
+import { ToastContainer, toast as reactToastify } from 'react-toastify';
+import ChatIcon from '@mui/icons-material/Chat';
+import 'react-toastify/dist/ReactToastify.css';
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
+
 
 const EditorPage = () => {
   const editorRef = useRef(null)
@@ -35,6 +40,7 @@ const EditorPage = () => {
 
   // const fileRef=useRef(null);
   // const [isOpen, setIsOpen] = useState(true);
+  const [isConnectedComponentOpen, setIsConnectedComponentOpen] = useState(false)
   const [isChatOpen, setIsChatOpen] = useState(false) // State to control chat window
 
   const [unreadMessages, setUnreadMessages] = useState(-1)
@@ -75,6 +81,33 @@ const EditorPage = () => {
       roomId
     })
   }
+  const handleToggle = () => {
+    setIsConnectedComponentOpen(!isConnectedComponentOpen)
+  }
+
+  useEffect(() => {
+    const lastMessage = messages[messages.length - 1]
+    if (lastMessage && !isChatOpen) {
+      
+      reactToastify.info(
+        `${lastMessage.sendname} : ${lastMessage.text}`, {
+        position: "bottom-right",
+        autoClose: 2000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "dark",
+        style: {
+          backgroundColor: "#1c1e29", // Change this to your desired color
+      },
+        });
+        // reactToastify.info(`${lastMessage.sendname} : ${lastMessage.text}`)
+      
+
+    }
+  }, [messages])
 
   useEffect(() => {
     const init = async () => {
@@ -82,7 +115,7 @@ const EditorPage = () => {
       socketRef.current.on('connect_error', (err) => handleErrors(err))
       socketRef.current.on('connect_failed', (err) => handleErrors(err))
 
-      function handleErrors (e) {
+      function handleErrors(e) {
         console.log('socket error', e)
         toast.error('Socket connection failed, try again later.')
         reactNavigator('/')
@@ -181,7 +214,7 @@ const EditorPage = () => {
     return <Navigate to='/' />
   }
 
-  async function copyRoomId () {
+  async function copyRoomId() {
     try {
       await navigator.clipboard.writeText(roomId)
       toast.success('Room ID has been copied to your clipboard')
@@ -211,11 +244,12 @@ const EditorPage = () => {
   return (
     <div className='flex flex-col justify-center'>
       <div className='grid grid-cols-10'>
-        <Toaster />
+      {<Toaster position="top-center" reverseOrder={false}/>}
+      
         {/* {isLeftDivOpen && ( */}
 
         <div
-          className={`flex flex-col justify-between h-screen text-white p-4 pb-5 relative transition-all duration-500 ease-in-out transform ${isLeftDivOpen ? 'col-span-2 ' : '-translate-x-full'}`}
+          className={`flex flex-col justify-between h-screen text-white px-4 relative transition-all duration-500 ease-in-out transform ${isLeftDivOpen ? 'col-span-2 ' : '-translate-x-full'}`}
           style={{ backgroundColor: '#1c1e29' }}
         >
           <div className='logo flex items-center'>
@@ -224,27 +258,26 @@ const EditorPage = () => {
               <p className='text-4xl md:text-2xl text-center lg:text-3xl xl:text-4xl madimi-one-regular whitespace-nowrap'>Code Collab</p>
             </div>
           </div>
-
-          <FileExplorer />
-
-          <div className='flex flex-col justify-between h-full'>
-            <FileView
-              contentChanged={contentChanged}
-              setContentChanged={setContentChanged}
-              fileContent={fileContent}
-              setFileContent={setFileContent}
-              editorRef={editorRef}
-            />
-            <div className='Users'>
-              <h3 className='my-3 font-bold text-lg'>Connected Users here</h3>
-              {connectedUsernames.map((username) => (
+          <FileView
+            contentChanged={contentChanged}
+            setContentChanged={setContentChanged}
+            fileContent={fileContent}
+            setFileContent={setFileContent}
+            editorRef={editorRef}
+          />
+          <div className='Users z-10'>
+              <div className='flex justify-between items-center' onClick={handleToggle}>
+                <p className='my-3 font-bold text-lg'>Connected Users here</p>
+                {isConnectedComponentOpen && <ArrowDropUpIcon />}
+                {!isConnectedComponentOpen && <ArrowDropDownIcon />}
+              </div>
+              {isConnectedComponentOpen && connectedUsernames.map((username) => (
                 <div className='UserList' key={username}>
                   {username}
                 </div>
               ))}
             </div>
-          </div>
-          <div>
+          <div className='p-4'>
             <div className='flex gap-2'>
               <button className='btn chat-btn' onClick={toggleChat}>
                 Chat{' '}
@@ -292,16 +325,30 @@ const EditorPage = () => {
           )}
         </div>
 
+<ToastContainer 
+position="bottom-right"
+autoClose={2000}
+hideProgressBar={true}
+closeOnClick
+pauseOnFocusLoss
+draggable
+pauseOnHover
+theme="dark"
+/>
+
+
         {isChatOpen && (
-          <Chat
-            setIsChatOpen={setIsChatOpen}
-            messages={messages}
-            CHAT_LIMIT={CHAT_LIMIT}
-            inputText={inputText}
-            setInputText={setInputText}
-            handleKeyPress={handleKeyPress}
-            handleMessageSend={handleMessageSend}
-          />
+          <div>
+            <Chat
+              setIsChatOpen={setIsChatOpen}
+              messages={messages}
+              CHAT_LIMIT={CHAT_LIMIT}
+              inputText={inputText}
+              setInputText={setInputText}
+              handleKeyPress={handleKeyPress}
+              handleMessageSend={handleMessageSend}
+            />
+          </div>
         )}
       </div>
     </div>
