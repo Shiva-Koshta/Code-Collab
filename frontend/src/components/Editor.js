@@ -29,7 +29,7 @@ const Editor = ({ handleDownloadFile, socketRef, roomId, editorRef, fileContent,
 
   useEffect(() => {
     // Create style element
-    const style = document.createElement("style");
+    const style = document.createElement("style")
     style.textContent = `
       @keyframes blinkCursor {
         0%, 100% {
@@ -42,13 +42,13 @@ const Editor = ({ handleDownloadFile, socketRef, roomId, editorRef, fileContent,
     `;
 
     // Append style to document head
-    document.head.appendChild(style);
+    document.head.appendChild(style)
 
     // Clean up function to remove style element when component unmounts
     return () => {
-      document.head.removeChild(style);
+      document.head.removeChild(style)
     };
-  }, []);
+  }, [])
 
   useEffect(() => {
     // console.log("hi");
@@ -134,7 +134,7 @@ const Editor = ({ handleDownloadFile, socketRef, roomId, editorRef, fileContent,
       socketRef.current.on(ACTIONS.CURSOR_CHANGE, ({cursorData}) => {
         console.log("cursorData retrieved from user: "+cursorData.user.name)
         console.log(cursorData)
-        renderCursors(cursorData);
+        renderCursors(cursorData)
       })
     }
   }, [socketRef.current])
@@ -193,41 +193,48 @@ const Editor = ({ handleDownloadFile, socketRef, roomId, editorRef, fileContent,
   //   }
   // }, [socketRef.current]);
   const getRandomColor = () => {
-    const letters = "0123456789ABCDEF";
-    let color = "#";
+    const letters = "0123456789ABCDEF"
+    let color = "#"
     for (let i = 0; i < 6; i++) {
-      color += letters[Math.floor(Math.random() * 16)];
+      color += letters[Math.floor(Math.random() * 16)]
     }
-    return color;
+    return color
   };
   // Function to render cursors
   const renderCursors = (cursorInfoList) => {
     if (cursorInfoList) {
-      const { cursor,tab, user } = cursorInfoList;
-      const { ch, line } = cursor;
+      const { cursor,tab, user } = cursorInfoList
+      const { ch, line } = cursor
       // const cursorMarkerId = `cursor-marker-${user.email}`;
       // let cursorMarker = document.getElementById(cursorMarkerId);
       // Create a cursor marker element if not present
       // if (!cursorMarker){
-        const prevCursorMarkers = document.querySelectorAll(`.cursor-marker[title="${user.name}"]`);
-      prevCursorMarkers.forEach((marker) => marker.remove());
+      // Get the total width of the screen
+      const totalScreenWidth = window.innerWidth
+      const sidebarWidth = (2 / 10) * totalScreenWidth
+      const cursorPosition = editorRef.current.charCoords({ line, ch })
+      const leftPosition = cursorPosition.left - sidebarWidth
 
-      const cursorMarker = document.createElement("div");
-      cursorMarker.className = "cursor-marker";
-      cursorMarker.style.position = "absolute";
-      cursorMarker.classList.add("h-8", "w-px");
+      const prevCursorMarkers = document.querySelectorAll(`.cursor-marker[title="${user.name}"]`)
+      prevCursorMarkers.forEach((marker) => marker.remove())
 
-      cursorMarker.style.backgroundColor = getRandomColor(); // Assign a random color
-      cursorMarker.title = user.name;
+      const cursorMarker = document.createElement("div")
+      cursorMarker.className = "cursor-marker"
+      cursorMarker.style.position = "absolute"
+      cursorMarker.classList.add("h-8", "w-px")
+
+      cursorMarker.style.backgroundColor = getRandomColor() // Assign a random color
+      cursorMarker.title = user.name
 
       // Append cursor marker to CodeMirror editor container
-      editorRef.current.getWrapperElement().appendChild(cursorMarker);
-      cursorMarker.style.animation = "blinkCursor 1s infinite";
+      editorRef.current.getWrapperElement().appendChild(cursorMarker)
+      cursorMarker.style.animation = "blinkCursor 1s infinite"
       // }
 
-      cursorMarker.style.left = `${
-        editorRef.current.charCoords({ line, ch }).left
-      -324}px`;
+      // cursorMarker.style.left = `${
+      //   editorRef.current.charCoords({ line, ch }).left
+      // -324}px`;
+      cursorMarker.style.left = `${leftPosition}px`
       cursorMarker.style.top = `${
         editorRef.current.charCoords({ line, ch }).top
       }px`;
@@ -240,7 +247,7 @@ const Editor = ({ handleDownloadFile, socketRef, roomId, editorRef, fileContent,
     return () => {
       document
         .querySelectorAll(".cursor-marker")
-        .forEach((node) => node.remove());
+        .forEach((node) => node.remove())
     };
   }, []);
   return <textarea id='realEditor' />
