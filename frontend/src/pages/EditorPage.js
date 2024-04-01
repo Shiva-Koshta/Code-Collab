@@ -7,6 +7,7 @@ import Editor from '../components/Editor'
 import FileView from '../components/FileView'
 import { initSocket } from '../socket'
 import FileExplorer from '../components/FileExplorer';
+import UplaodFilesFolders from '../components/UploadFilesFolders';
 import '../styles/EditorPage.css'
 import '../styles/Chat.css'
 import logo from '../images/Logo.png'
@@ -14,6 +15,7 @@ import Chat from '../components/Chat'
 import { ChevronLeft, ChevronRight } from '@mui/icons-material'
 import { ToastContainer, toast as reactToastify } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import UploadFilesFolders from '../components/UploadFilesFolders'
 
 
 const EditorPage = () => {
@@ -85,7 +87,7 @@ const EditorPage = () => {
   useEffect(() => {
     const lastMessage = messages[messages.length - 1]
     if (lastMessage && !isChatOpen) {
-      
+
       reactToastify.info(
         `${lastMessage.sendname} : ${lastMessage.text}`, {
         position: "bottom-right",
@@ -98,10 +100,10 @@ const EditorPage = () => {
         theme: "dark",
         style: {
           backgroundColor: "#1c1e29", // Change this to your desired color
-      },
-        });
-        // reactToastify.info(`${lastMessage.sendname} : ${lastMessage.text}`)
-      
+        },
+      });
+      // reactToastify.info(`${lastMessage.sendname} : ${lastMessage.text}`)
+
 
     }
   }, [messages])
@@ -241,8 +243,8 @@ const EditorPage = () => {
   return (
     <div className='flex flex-col justify-center'>
       <div className='grid grid-cols-10'>
-      {<Toaster position="top-center" reverseOrder={false}/>}
-      
+        {<Toaster position="top-center" reverseOrder={false} />}
+
         {/* {isLeftDivOpen && ( */}
 
         <div
@@ -255,7 +257,7 @@ const EditorPage = () => {
               <p className='text-4xl md:text-2xl text-center lg:text-3xl xl:text-4xl madimi-one-regular whitespace-nowrap'>Code Collab</p>
             </div>
           </div>
-
+          <UploadFilesFolders />
           <FileExplorer />
 
           <div className='flex flex-col justify-between h-full'>
@@ -323,16 +325,16 @@ const EditorPage = () => {
           )}
         </div>
 
-<ToastContainer 
-position="bottom-right"
-autoClose={2000}
-hideProgressBar={true}
-closeOnClick
-pauseOnFocusLoss
-draggable
-pauseOnHover
-theme="dark"
-/>
+        <ToastContainer
+          position="bottom-right"
+          autoClose={2000}
+          hideProgressBar={true}
+          closeOnClick
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="dark"
+        />
 
 
         {isChatOpen && (
