@@ -134,6 +134,7 @@ const Editor = ({ handleDownloadFile, socketRef, roomId, editorRef, fileContent,
       socketRef.current.on(ACTIONS.CURSOR_CHANGE, ({cursorData}) => {
         console.log("cursorData retrieved from user: "+cursorData.user.name)
         console.log(cursorData)
+        renderCursors(cursorData);
       })
     }
   }, [socketRef.current])
