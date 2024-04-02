@@ -6,7 +6,8 @@ const ACTIONS = {
   SYNC_CODE: 'sync-code',
   LEAVE: 'leave',
   MESSAGE_SEND: 'MESSAGE_SEND',
-  MESSAGE_RECEIVE: 'MESSAGE_RECEIVE'
+  MESSAGE_RECEIVE: 'MESSAGE_RECEIVE',
+  CURSOR_CHANGE: 'cursor-change'
 }
 
 module.exports = ACTIONS
