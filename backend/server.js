@@ -116,7 +116,7 @@ io.on("connection", (socket) => {
         { $inc: { userCount: -1 } }, // Decrement userCount by 1
         { new: true } // Return the updated document
       );
-      4;
+      
 
       if (updatedRoom && updatedRoom.userCount === 0) {
         // If user count becomes 0, delete the entry from the code map model
