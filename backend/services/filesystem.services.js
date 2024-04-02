@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const FileNodeSchema = require('../models/FileNode')
 
 const FileNode = mongoose.model('FileNode', FileNodeSchema);
 
@@ -10,8 +11,8 @@ async function uploadFile(name, content, parentId, roomId) {
 }
 
 // Function to create a directory
-async function createDirectory(name, parentId, roomId) {
-    const directoryNode = new FileNode({ name, type: 'directory', parent: parentId, roomId });
+async function createDirectory(name, parentId, roomId, type='directory') {
+    const directoryNode = new FileNode({ name, type: type, parent: parentId, roomId });
     await directoryNode.save();
     return directoryNode;
 }
@@ -28,31 +29,30 @@ async function fetchFile(nodeId) {
 // Add a function to create a root directory for a room
 async function createRootDirectory(roomId) {
     // Check if the root directory already exists for the room
-    const existingRootDirectory = await FileNode.findOne({ name: 'Root', type: 'directory', parent: null, roomId });
+    const existingRootDirectory = await FileNode.findOne({ name: 'Root', type: 'root', parent: null, roomId });
     if (existingRootDirectory) {
         // Root directory already exists, no need to create again
         return existingRootDirectory;
     }
 
     // Create a new root directory node
-    const rootDirectory = await createDirectory('Root', null, roomId);
-
+    const rootDirectory = await createDirectory('Root', null, roomId, 'root');
     return rootDirectory;
 }
 
 // get tree structure for the file system of a room
 async function generateTree(roomId) {
     // Find the root directory node
-    const rootDirectory = await FileNode.findOne({ name: 'Root', type: 'directory', parent: null, roomId });
+    const rootDirectory = await FileNode.findOne({type: 'root', parent: null, roomId });
     if (!rootDirectory) {
         throw new Error('Root directory not found.');
     }
 
-    // Initialize the tree with the root directory and its ObjectId
-    const tree = { [rootDirectory.name]: { _id: rootDirectory._id } };
+    // Initialize the tree with the root directory
+    const tree = { name: rootDirectory.name, type: rootDirectory.type, _id: rootDirectory._id };
 
     // Stack to keep track of nodes to process
-    const stack = [{ node: rootDirectory, parentPath: tree[rootDirectory.name] }];
+    const stack = [{ node: rootDirectory, parentPath: tree }];
 
     // Iterate through the stack until it's empty
     while (stack.length > 0) {
@@ -62,19 +62,19 @@ async function generateTree(roomId) {
         // Find all child nodes of the current node
         const childNodes = await FileNode.find({ parent: node._id, roomId });
 
+        // Initialize an array to store children nodes
+        parentPath.children = [];
+
         // Iterate over each child node
         for (const childNode of childNodes) {
-            // If the child node is a directory
-            if (childNode.type === 'directory') {
-                // Add the directory to the parent's tree with its ObjectId
-                parentPath[childNode.name] = { _id: childNode._id };
-                // Push the directory node to the stack for further processing
-                stack.push({ node: childNode, parentPath: parentPath[childNode.name] });
-            } else {
-                // If the child node is a file, add it directly to the parent's tree with its ObjectId
-                parentPath[childNode.name] = { _id: childNode._id };
-                // Or you can set it to the file's metadata
-            }
+            // Create a new node object for the child node
+            const newNode = { name: childNode.name, type: childNode.type, _id: childNode._id };
+
+            // Push the new node to the parent's children array
+            parentPath.children.push(newNode);
+
+            // Push the child node to the stack for further processing
+            stack.push({ node: childNode, parentPath: newNode });
         }
     }
 

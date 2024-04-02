@@ -5,6 +5,7 @@ const passportStrategy = require('./passport')
 const http = require('http')
 const mongoose = require('mongoose')
 const { Server } = require('socket.io')
+const filesysrouter = require("./routes/filesystem.routes");
 const endpoints = require('./endpoints')
 const middleware = require('./middleware')
 const RoomCodeMap = require('./models/RoomCodeMap')
@@ -18,6 +19,7 @@ const io = new Server(server)
 const port = process.env.PORT || 8080
 
 app.use(middleware)
+app.use('/filesystem', filesysrouter);
 app.use(endpoints)
 const userSocketMap = {}
 
