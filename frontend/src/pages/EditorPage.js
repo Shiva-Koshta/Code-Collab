@@ -304,7 +304,7 @@ const EditorPage = () => {
             </button>
 
           </div>
-          <div className='absolute right-0 top-1/2 transform -translate-y-1/2 transition duration-500 hover:animate-bounce-left'>
+          <div className='absolute right-0 top-1/2 transform transition duration-500 hover:animate-bounce-left'>
             <button onClick={toggleLeftDiv}>{leftIcon}</button>
           </div>
         </div>
@@ -319,7 +319,7 @@ const EditorPage = () => {
             contentChanged={contentChanged}
           />
           {!isLeftDivOpen && (
-            <div className='absolute left-0 top-1/2 transform -translate-y-1/2 transition duration-500 hover:animate-bounce-right'>
+            <div className='absolute left-0 top-1/2 transform transition duration-500 hover:animate-bounce-right'>
               <button className='text-white' onClick={toggleLeftDiv}>{leftIcon}</button>
             </div>
           )}
