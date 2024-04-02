@@ -88,7 +88,11 @@ io.on("connection", (socket) => {
       });
 
     // Emit the code change to other sockets in the room
-    socket.in(roomId).emit(ACTIONS.CODE_CHANGE, { code });
+
+    socket.in(roomId).emit(ACTIONS.CODE_CHANGE, { code })
+  })
+  socket.on(ACTIONS.CURSOR_CHANGE, ({ roomId, cursorData }) => {
+    socket.in(roomId).emit(ACTIONS.CURSOR_CHANGE, { cursorData });
   });
   socket.on(ACTIONS.SYNC_CODE, ({ socketId, code }) => {
     // console.log("yes code syncing");

@@ -1,4 +1,5 @@
 const ACTIONS = {
+
   JOIN: "join",
   JOINED: "joined",
   DISCONNECTED: "disconnected",
@@ -8,6 +9,8 @@ const ACTIONS = {
   MESSAGE_SEND: "MESSAGE_SEND",
   MESSAGE_RECEIVE: "MESSAGE_RECEIVE",
   ROLE_CHANGE: "ROLE_CHANGE",
-};
+  CURSOR_CHANGE: 'cursor-change'
+}
+
 
 module.exports = ACTIONS;
