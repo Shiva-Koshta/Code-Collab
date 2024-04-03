@@ -3,6 +3,7 @@ import { render } from '@testing-library/react';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import HelpPage from '../pages/HelpPage'; // Assuming this is your HelpPage component
 
+
 describe('Routing', () => {
   it('renders HelpPage component when /help URL is called', () => {
     const { getByText } = render(
@@ -18,3 +19,4 @@ describe('Routing', () => {
     expect(helpPageElement).toBeInTheDocument();
   });
 });
+
