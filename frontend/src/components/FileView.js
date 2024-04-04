@@ -1,7 +1,6 @@
 /* eslint-disable no-undef */
 import React, { useEffect, useRef, useState } from 'react'
 import UploadFileIcon from '@mui/icons-material/UploadFile'
-import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined'
 import { IconButton, sliderClasses } from '@mui/material'
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined'
 import FolderIcon from '@mui/icons-material/Folder'
@@ -13,7 +12,7 @@ import DeleteIcon from '@mui/icons-material/Delete'
 import TextFileIcon from '@mui/icons-material/Description'
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown'
 import ArrowRightIcon from '@mui/icons-material/ArrowRight'
-import { FolderCopy } from '@mui/icons-material'
+import DriveFolderUploadIcon from '@mui/icons-material/DriveFolderUpload';
 
 const FileView = ({ fileContent, setFileContent, editorRef, contentChanged, setContentChanged }) => {
   const [isDownloadTrue, setIsDownloadTrue] = useState(false)
@@ -269,10 +268,10 @@ const FileView = ({ fileContent, setFileContent, editorRef, contentChanged, setC
                   onChange={handleFileChange}
                 />
                 <label htmlFor='fileInput'>
-                  <IconButton component='span'>
-                    <UploadFileIcon className='text-white' />
-                  </IconButton>
+                  <UploadFileIcon className='text-white' />
                 </label>
+                <button className='' title="Upload Folder"><DriveFolderUploadIcon /></button>
+                <div className='absolute bottom-0 hidden hover:bg-gray-100 hover:rounded hover:p-2 hover:block hover:z-10 hover:border hover:border-gray-300'>Upload Folder</div>
                 <button className='renameFolderIcon update-buttons ' onClick={() => renameFolder(selectedFileFolder)} title="Rename Folder"><CreateIcon /></button>
                 <div className='absolute bottom-0 hidden hover:bg-gray-100 hover:rounded hover:p-2 hover:block hover:z-10 hover:border hover:border-gray-300 hover:top-7'>Rename Folder</div>
               </div>
@@ -290,10 +289,10 @@ const FileView = ({ fileContent, setFileContent, editorRef, contentChanged, setC
                   onChange={handleFileChange}
                 />
                 <label htmlFor='fileInput'>
-                  <IconButton component='span'>
-                    <UploadFileIcon className='text-white' />
-                  </IconButton>
+                  <UploadFileIcon className='text-white' />
                 </label>
+                <button className='' title="Upload Folder"><DriveFolderUploadIcon /></button>
+                <div className='absolute bottom-0 hidden hover:bg-gray-100 hover:rounded hover:p-2 hover:block hover:z-10 hover:border hover:border-gray-300'>Upload Folder</div>
                 <button className='renameFolderIcon update-buttons ' onClick={() => renameFolder(selectedFileFolder)} title="Rename Folder"><CreateIcon /></button>
                 <div className='absolute bottom-0 hidden hover:bg-gray-100 hover:rounded hover:p-2 hover:block hover:z-10 hover:border hover:border-gray-300 hover:top-7'>Rename Folder</div>
                 <button className='deleteFolderIcon update-buttons ' onClick={() => deleteFolder(selectedFileFolder, selectedFileFolderParent)} title="Delete Folder"><DeleteIcon /></button>
