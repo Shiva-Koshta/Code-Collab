@@ -12,7 +12,8 @@ createfile = async(req, res) => {
                 type: file.type,
                 parent: file.parentId,
             }
-        }     
+        } 
+        console.log(responseJSON);    
         res.status(200).json(responseJSON);
     } catch (error) {
         console.log(error)

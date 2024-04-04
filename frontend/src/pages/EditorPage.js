@@ -21,6 +21,7 @@ import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
 const EditorPage = () => {
   const editorRef = useRef(null)
   const [fileContent, setFileContent] = useState('')
+  const [fileId, setFileId] = useState('') // get this from fileview.js, whichever file is opened. 
   const [contentChanged, setContentChanged] = useState(false)
   const { roomId } = useParams()
   const socketRef = useRef(null)
@@ -313,6 +314,7 @@ const EditorPage = () => {
             handleDownloadFile={handleDownloadFile}
             socketRef={socketRef}
             roomId={roomId}
+            fileId={fileId}
             fileContent={fileContent}
             setFileContent={setFileContent}
             editorRef={editorRef}
