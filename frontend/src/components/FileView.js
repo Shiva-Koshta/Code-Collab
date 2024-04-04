@@ -1,5 +1,6 @@
 /* eslint-disable no-undef */
 import React, { useEffect, useRef, useState } from 'react'
+import { useParams } from 'react-router-dom'
 import UploadFileIcon from '@mui/icons-material/UploadFile'
 import { IconButton, sliderClasses } from '@mui/material'
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined'
@@ -13,21 +14,23 @@ import TextFileIcon from '@mui/icons-material/Description'
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown'
 import ArrowRightIcon from '@mui/icons-material/ArrowRight'
 import DriveFolderUploadIcon from '@mui/icons-material/DriveFolderUpload';
+import axios from 'axios'
 
 const FileView = ({ fileContent, setFileContent, editorRef, contentChanged, setContentChanged }) => {
+  const { roomId } = useParams()
   const [isDownloadTrue, setIsDownloadTrue] = useState(false)
   const [downloadFileExtension, setFileExtension] = useState('')
   const [downloadFileName, setFileName] = useState('')
   const parentRef = useRef(null);
   const [parentWidth, setParentWidth] = useState(0);
   const [folders, setFolders] = useState([{
-    id: '0',
+    _id: '0',
     name: 'Root',
     type: 'root',
     children: [],
   }])
   const [selectedFileFolder, setSelectedFileFolder] = useState({
-    id: '0',
+    _id: '0',
     name: 'Root',
     type: 'root',
     children: [],
@@ -37,11 +40,21 @@ const FileView = ({ fileContent, setFileContent, editorRef, contentChanged, setC
   const [isFolderOpen, setIsFolderOpen] = useState({'0' : false})
   const [isSmallScreen, setIsSmallScreen] = useState(false);
 
-  useEffect(() => {
-    const root = folders.filter((folder) => {
-      return folder.id === '0'
-    })
-    setSelectedFileFolder(root)
+  useEffect(() => {    
+    (async () => {
+      try{
+        const response = await axios.post(`${process.env.REACT_APP_API_URL}/filesystem/generatetree`, {
+          roomId: roomId
+        });
+        const root = response.data.tree;
+        setSelectedFileFolder(root);
+        setFolders([root]);
+        return root._id;
+      } catch (error) {
+        console.log(error)
+      }
+    })();
+
     function handleResize() {
       setIsSmallScreen(window.innerWidth < 1290); // Adjust the threshold as needed
     }
@@ -116,12 +129,12 @@ const FileView = ({ fileContent, setFileContent, editorRef, contentChanged, setC
   const toggleFolder = (folder, flag = false) => {
     if(flag && folder.type !== 'file') {
       let folderOpen = isFolderOpen
-      folderOpen[folder.id] = true
+      folderOpen[folder._id] = true
       setIsFolderOpen(folderOpen)
       setFolders([...folders])
     } else if(!flag && folder.type !== 'file') {
       let folderOpen = isFolderOpen
-      folderOpen[folder.id] = !isFolderOpen[folder.id]
+      folderOpen[folder._id] = !isFolderOpen[folder._id]
       setIsFolderOpen(folderOpen)
       setFolders([...folders])
     }
@@ -151,10 +164,23 @@ const FileView = ({ fileContent, setFileContent, editorRef, contentChanged, setC
     toggleFolder(parentFolder, true)
     const newFileName = prompt('Enter file name:')
     if (newFileName) {
-      const newFile = { id:generateId(), name: newFileName, type: 'file' }
-      parentFolder.children.push(newFile)
-      console.log("pushed")
-      setFolders([...folders])
+      (async () => {
+        try {
+          const response = await axios.post(`${process.env.REACT_APP_API_URL}/filesystem/createfile`, {
+            name: newFileName,
+            parentId: parentFolder._id,
+            roomId: roomId,
+          });
+          const newFile = { _id:response.data.file._id, name: response.data.file.name, type: response.data.file.type }
+          parentFolder.children.push(newFile)
+          console.log("pushed")
+          setFolders([...folders])
+          
+        } catch (error) {
+          console.log(error);
+        }
+      })();
+
     }
   }
 
@@ -168,9 +194,20 @@ const FileView = ({ fileContent, setFileContent, editorRef, contentChanged, setC
     toggleFolder(parentFolder, true)
     const newFolderName = prompt('Enter folder name:')
     if (newFolderName) {
-      const newFolder = { id: generateId(), name: newFolderName, type: 'folder', children: []}
-      parentFolder.children.push(newFolder)
-      setFolders([...folders])
+      (async () => {
+        try {
+          const response = await axios.post(`${process.env.REACT_APP_API_URL}/filesystem/createdirectory`, {
+            name: newFolderName,
+            parentId: parentFolder._id,
+            roomId: roomId,
+          });
+          const newFolder = { _id: response.data.directory._id, name: response.data.directory.name, type: response.data.directory.type, children: []}
+          parentFolder.children.push(newFolder);
+          setFolders([...folders]);
+        } catch (error) {
+          console.log(error);
+        }
+      })();
     }
   }
 
@@ -178,7 +215,7 @@ const FileView = ({ fileContent, setFileContent, editorRef, contentChanged, setC
     // Iterate through each node in the tree
     for (const node of nodes) {
       // Check if the current node's ID matches the target ID
-      if (node.id === id) {
+      if (node._id === id) {
         // Return the node if found
         return node;
       }
@@ -201,7 +238,7 @@ const FileView = ({ fileContent, setFileContent, editorRef, contentChanged, setC
         key={folder.name} 
         className='flex flex-col mb-1 h-fit'
         style={{ marginLeft: `${depth === 0 ? 0 : 10}px`, maxWidth: `${depth === 0 ? `${parentWidth}px` : `${parentWidth - depth * 10}px`}` }}>
-        <div className={`flex items-center p-px  overflow-hidden ${(selectedFileFolder && selectedFileFolder.id === folder.id) ? 'Selected-file-folder' : ''} rounded-md`}>
+        <div className={`flex items-center p-px  overflow-hidden ${(selectedFileFolder && selectedFileFolder._id === folder._id) ? 'Selected-file-folder' : ''} rounded-md`}>
           <div className='grow flex relative overflow-hidden'>
             {folder.type === 'root' && (
               <div onClick={() => {
@@ -210,13 +247,13 @@ const FileView = ({ fileContent, setFileContent, editorRef, contentChanged, setC
                 }} 
                 style={{ maxWidth: `${depth === 0 ? '328px' : `${328 - depth}px`}` }}
                 className="cursor-pointer mr-2 grow flex overflow-hidden">
-                {isFolderOpen[folder.id] ? <ArrowDropDownIcon /> : <ArrowRightIcon />}
-                {isFolderOpen[folder.id] ? <FolderIcon className='mr-2' style={{ fontSize: 20 }}/> : <FolderOpenIcon className='mr-2' style={{ fontSize: 20 }}/>}
+                {isFolderOpen[folder._id] ? <ArrowDropDownIcon /> : <ArrowRightIcon />}
+                {isFolderOpen[folder._id] ? <FolderIcon className='mr-2' style={{ fontSize: 20 }}/> : <FolderOpenIcon className='mr-2' style={{ fontSize: 20 }}/>}
                 
                 <div className='truncate'>{folder.name}</div>
               </div>
             )}
-            {folder.type === 'folder' && (
+            {folder.type === 'directory' && (
               <div onClick={() => {
                   toggleFolder(folder)
                   setSelectedFileFolder(folder)
@@ -224,8 +261,8 @@ const FileView = ({ fileContent, setFileContent, editorRef, contentChanged, setC
                 }} 
                 style={{ maxWidth: `${depth === 0 ? '328px' : `${328 - depth}px`}` }}
                 className="cursor-pointer mr-2 grow flex overflow-hidden">
-                {isFolderOpen[folder.id] ? <ArrowDropDownIcon /> : <ArrowRightIcon />}
-                {isFolderOpen[folder.id] ? <FolderIcon className='mr-2' style={{ fontSize: 20 }}/> : <FolderOpenIcon className='mr-2' style={{ fontSize: 20 }}/>}
+                {isFolderOpen[folder._id] ? <ArrowDropDownIcon /> : <ArrowRightIcon />}
+                {isFolderOpen[folder._id] ? <FolderIcon className='mr-2' style={{ fontSize: 20 }}/> : <FolderOpenIcon className='mr-2' style={{ fontSize: 20 }}/>}
                 <div className='truncate'>{folder.name}</div>
               </div>
             )}
@@ -244,7 +281,7 @@ const FileView = ({ fileContent, setFileContent, editorRef, contentChanged, setC
             )}
           </div>
         </div>
-        {isFolderOpen[folder.id] && folder.children.map(child => renderFolder(child, depth + 1, folder))}
+        {isFolderOpen[folder._id] && folder.children.map(child => renderFolder(child, depth + 1, folder))}
       </div>
     )
   }
@@ -276,7 +313,7 @@ const FileView = ({ fileContent, setFileContent, editorRef, contentChanged, setC
                 <div className='absolute bottom-0 hidden hover:bg-gray-100 hover:rounded hover:p-2 hover:block hover:z-10 hover:border hover:border-gray-300 hover:top-7'>Rename Folder</div>
               </div>
             )}
-            {selectedFileFolder.type === 'folder' && (
+            {selectedFileFolder.type === 'directory' && (
               <div className='flex items-center relative'>
                 <button className='addFolderIcon update-buttons ' onClick={() => createFolder(selectedFileFolder)} title="Add Folder"><CreateNewFolderIcon /></button>
                 <div className='absolute bottom-0 hidden hover:bg-gray-100 hover:rounded hover:p-2 hover:block hover:z-10 hover:border hover:border-gray-300 hover:top-7'>Add Folder</div>

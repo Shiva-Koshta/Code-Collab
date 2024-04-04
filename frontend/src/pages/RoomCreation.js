@@ -3,6 +3,7 @@ import { v4 as uuidV4 } from 'uuid'
 import toast, { Toaster } from 'react-hot-toast'
 import { useNavigate } from 'react-router-dom'
 import '../index'
+import axios from 'axios'
 
 const RoomCreation = () => {
   const navigate = useNavigate()
@@ -62,7 +63,28 @@ const RoomCreation = () => {
     e.preventDefault()
     const id = uuidV4()
     setRoomId(id)
-    toast.success('Created a new room')
+
+    // creating the root directory
+    const apiurl = `${process.env.REACT_APP_API_URL}/filesystem/createrootdirectory`;
+    const requestBody = {
+      roomId: id
+    };
+    const postData = async () => {
+      try {
+        const response = await axios.post(apiurl, requestBody);
+        console.log('Response:', response.data);
+        // the create room button should lead directly to the editor page and not after explicitly clicking the join button
+        navigate(`/editor/${id}`, {
+          state: {
+            userName
+          }
+        });
+      } catch (error) {
+        console.error('Error:', error);
+      }
+    };
+    postData();
+
   }
 
   // this function is used to join a room
