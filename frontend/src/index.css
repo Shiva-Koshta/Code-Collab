@@ -130,6 +130,19 @@ code {
   font-style: italic;
 }
 
+.el-messiri-regular {
+  font-family: "El Messiri", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: normal;
+  font-style: normal;
+}
+.el-messiri-bold {
+  font-family: "El Messiri", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: bold;
+  font-style: normal;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

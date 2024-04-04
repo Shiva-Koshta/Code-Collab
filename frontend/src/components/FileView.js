@@ -305,7 +305,7 @@ const FileView = ({ fileContent, setFileContent, editorRef, contentChanged, setC
                   onChange={handleFileChange}
                 />
                 <label htmlFor='fileInput'>
-                  <UploadFileIcon className='text-white' />
+                  <UploadFileIcon className='text-white cursor-pointer' />
                 </label>
                 <button className='' title="Upload Folder"><DriveFolderUploadIcon /></button>
                 <div className='absolute bottom-0 hidden hover:bg-gray-100 hover:rounded hover:p-2 hover:block hover:z-10 hover:border hover:border-gray-300'>Upload Folder</div>
