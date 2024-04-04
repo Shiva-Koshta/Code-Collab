@@ -11,6 +11,7 @@ const RoomCreation = () => {
   const [roomId, setRoomId] = useState('')
   const [userName, setUserName] = useState('')
   const [userimage, setUserimage] = useState('')
+  const [roomUsersCount, setRoomUsersCount] = useState(0)
 
   // this function is used to logout the user
   const logout = () => {
@@ -89,11 +90,31 @@ const RoomCreation = () => {
 
   // this function is used to join a room
   const joinRoom = () => {
-    if (!roomId || !userName) {
+    
+    if (!roomId || !userName ) {
       toast.error('ROOM ID & username is required')
       return
     }
-
+    const apiurl = `${process.env.REACT_APP_API_URL}/rooms/numUsersInRoom`;
+    const id = uuidV4();
+    let timerInterval;
+    const requestBody = {
+      roomId: id
+    };
+    const postData = async () => {
+      try {
+        const response = await axios.post(apiurl, requestBody);
+        if (response.data.numUsers > 10) {
+          toast.error('Cannot join room. Room is full.');
+          return;
+        }
+      setRoomUsersCount(response.data.numUsers);
+      } catch (error) {
+        console.error(error);
+        toast.error('Error checking room users count');
+        return;
+      }
+    };
     // this will navigate to the editor page
     // axios.post("http://localhost:8080/createroom", { "roomId" : roomId})
     navigate(`/editor/${roomId}`, {
@@ -217,5 +238,4 @@ const RoomCreation = () => {
     </div>
   )
 }
-
 export default RoomCreation
