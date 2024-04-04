@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1712139618793" clover="3.2.0">
-  <project timestamp="1712139618794" name="All files">
-    <metrics statements="78" coveredstatements="31" conditionals="12" coveredconditionals="0" methods="8" coveredmethods="1" elements="98" coveredelements="32" complexity="0" loc="78" ncloc="78" packages="3" files="4" classes="4"/>
+<coverage generated="1712255000081" clover="3.2.0">
+  <project timestamp="1712255000081" name="All files">
+    <metrics statements="78" coveredstatements="34" conditionals="12" coveredconditionals="0" methods="8" coveredmethods="1" elements="98" coveredelements="35" complexity="0" loc="78" ncloc="78" packages="3" files="4" classes="4"/>
     <package name="backend">
-      <metrics statements="54" coveredstatements="14" conditionals="10" coveredconditionals="0" methods="4" coveredmethods="1"/>
+      <metrics statements="54" coveredstatements="17" conditionals="10" coveredconditionals="0" methods="4" coveredmethods="1"/>
       <file name="endpoints.js" path="C:\Users\Anisha\OneDrive\Desktop\test\Code-Collab\backend\endpoints.js">
-        <metrics statements="54" coveredstatements="14" conditionals="10" coveredconditionals="0" methods="4" coveredmethods="1"/>
+        <metrics statements="54" coveredstatements="17" conditionals="10" coveredconditionals="0" methods="4" coveredmethods="1"/>
         <line num="1" count="1" type="stmt"/>
         <line num="2" count="1" type="stmt"/>
         <line num="3" count="1" type="stmt"/>
@@ -24,7 +24,7 @@
         <line num="33" count="0" type="stmt"/>
         <line num="34" count="0" type="stmt"/>
         <line num="39" count="1" type="stmt"/>
-        <line num="40" count="2" type="stmt"/>
+        <line num="40" count="0" type="stmt"/>
         <line num="42" count="0" type="stmt"/>
         <line num="43" count="0" type="stmt"/>
         <line num="44" count="0" type="cond" truecount="0" falsecount="2"/>
@@ -47,8 +47,8 @@
         <line num="83" count="0" type="stmt"/>
         <line num="84" count="0" type="stmt"/>
         <line num="87" count="1" type="stmt"/>
-        <line num="88" count="0" type="stmt"/>
-        <line num="89" count="0" type="stmt"/>
+        <line num="88" count="2" type="stmt"/>
+        <line num="89" count="2" type="stmt"/>
         <line num="90" count="0" type="stmt"/>
         <line num="91" count="0" type="stmt"/>
         <line num="98" count="0" type="stmt"/>
@@ -57,8 +57,8 @@
         <line num="107" count="0" type="stmt"/>
         <line num="108" count="0" type="stmt"/>
         <line num="109" count="0" type="stmt"/>
-        <line num="111" count="0" type="stmt"/>
-        <line num="112" count="0" type="stmt"/>
+        <line num="111" count="2" type="stmt"/>
+        <line num="112" count="2" type="stmt"/>
         <line num="118" count="1" type="stmt"/>
       </file>
     </package>
