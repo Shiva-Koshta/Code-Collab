@@ -8,7 +8,7 @@ const About = () => {
   const navigate = useNavigate()
   return (
     <div
-      className='about-us-container flex flex-col gap-32 h-screen min-h-screen p-5 w-screen bg-cover'
+      className='about-us-container flex flex-col gap-32 h-screen min-h-screen p-5 w-screen bg-cover overflow-y-scroll'
       style={{
         backgroundColor: '#1c1e29'
       }}

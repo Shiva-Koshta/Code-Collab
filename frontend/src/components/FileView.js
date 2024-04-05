@@ -38,7 +38,6 @@ const FileView = ({ fileContent, setFileContent, editorRef, contentChanged, setC
     children: [],
   });
   const [selectedFileFolderParent, setSelectedFileFolderParent] = useState({});
-  const [latestId, setLatestId] = useState(0);
   const [isFolderOpen, setIsFolderOpen] = useState({'0' : false})
   const [isSmallScreen, setIsSmallScreen] = useState(false);
 
@@ -185,12 +184,6 @@ const FileView = ({ fileContent, setFileContent, editorRef, contentChanged, setC
     }
   }
 
-  const generateId = () => {
-    const currId = latestId
-    setLatestId(latestId + 1)
-    return currId + 1
-  };
-
   const createFolder = (parentFolder) => {
     toggleFolder(parentFolder, true)
     const newFolderName = prompt('Enter folder name:')
@@ -310,6 +303,8 @@ const FileView = ({ fileContent, setFileContent, editorRef, contentChanged, setC
                     <UploadFileIcon className='text-white' />
                   </IconButton>
                 </label>
+                <button className='' title="Upload Folder"><DriveFolderUploadIcon /></button>
+                <div className='absolute bottom-0 hidden hover:bg-gray-100 hover:rounded hover:p-2 hover:block hover:z-10 hover:border hover:border-gray-300'>Upload Folder</div>
                 <button className='renameFolderIcon update-buttons ' onClick={() => renameFolder(selectedFileFolder)} title="Rename Folder"><CreateIcon /></button>
                 <div className='absolute bottom-0 hidden hover:bg-gray-100 hover:rounded hover:p-2 hover:block hover:z-10 hover:border hover:border-gray-300 hover:top-7'>Rename Folder</div>
               </div>
