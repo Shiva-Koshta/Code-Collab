@@ -17,7 +17,7 @@
 .about-us-container {
     display: flex;
     overflow-x: hidden;
-    margin-top: -30px;
+    /* padding-top: -30px; */
   }
   
   .text-container-container {
