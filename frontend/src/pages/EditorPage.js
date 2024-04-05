@@ -16,6 +16,8 @@ import ChatIcon from '@mui/icons-material/Chat';
 import 'react-toastify/dist/ReactToastify.css';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
+import MoreVertSharpIcon from '@mui/icons-material/MoreVertSharp';
+import { MenuItem, Menu, IconButton } from '@mui/material';
 
 
 const EditorPage = () => {
@@ -48,11 +50,44 @@ const EditorPage = () => {
   const downloadFileName = ''
   const [isLeftDivOpen, setIsLeftDivOpen] = useState(true)
   const leftIcon = isLeftDivOpen ? <ChevronLeft /> : <ChevronRight />
+  const [anchorEl,setAnchorEl] = useState(null)
 
   const toggleLeftDiv = () => {
     setIsLeftDivOpen(prevState => !prevState)
   }
 
+  const handleUserMenuOpen = (e) => {
+    setAnchorEl(e.currentTarget)
+  }
+
+  const handleUserMenuClose = () => {
+    setAnchorEl(null)
+  }
+
+  const handleChangeRole = (username) => {
+    const user = connectedUserRoles.find(user => user.name === username)
+    if(!user)
+    {
+      console.error(`User with id ${username} not found.`)
+      return
+    }
+
+    const newRole = user.role === 'viewer' ? 'editor' : 'viewer'
+    
+    setConnectedUserRoles(prevRoles => prevRoles.map(prevUser => {
+      if(prevUser.name === username)
+      {
+        return {...prevUser, role:newRole}
+      }
+      return prevUser
+    }))
+
+    socketRef.current.emit(ACTIONS.ROLE_CHANGE, {
+      roomId,
+      username,
+      newRole,
+    })
+  }
   const handleMessageSend = () => {
     console.log(storedUserData)
     if (inputText.trim() !== '') {
@@ -199,6 +234,26 @@ const EditorPage = () => {
           })
         }
       )
+      socketRef.current.on(ACTIONS.ROLE_CHANGE, ({ username, newRole }) => {
+        setConnectedUserRoles(prevRoles => prevRoles.map(prevUser => {
+          if (prevUser.name === username) {
+            return { ...prevUser, role: newRole }
+          }
+          return prevUser
+        }))
+
+        if (username === storedUserData.name && newRole=='viewer') { 
+          const editor = editorRef.current.getCodeMirror()
+          editor.setOption('readOnly', true)
+        }
+        if (username === storedUserData.name && newRole === 'editor') {
+          const editor = editorRef.current.getCodeMirror()
+          editor.setOption('readOnly', false)
+        }
+      })
+      socketRef.current.on(ACTIONS.HOST_CHANGE, ({username}) => {
+          setHost(username)
+      })
     }
 
     init()
@@ -272,8 +327,27 @@ const EditorPage = () => {
                 {!isConnectedComponentOpen && <ArrowDropDownIcon />}
               </div>
               {isConnectedComponentOpen && connectedUsernames.map((username) => (
-                <div className='UserList' key={username}>
-                  {username}
+                <div className='UserList flex justify-between items-center' key={username}>
+                  <span>
+                    {username}
+                  </span>
+                  { username !== host && 
+                  (<IconButton onClick={handleUserMenuOpen}>
+                    <MoreVertSharpIcon className='text-black'/>
+                  </IconButton>
+                  )} 
+                  <Menu
+                  anchorEl={anchorEl}
+                  open={Boolean(anchorEl)}
+                  onClose={handleUserMenuClose}
+                  >
+                    <MenuItem>{"user.role"}</MenuItem>
+                    {storedUserData.name === host  && (
+                      <MenuItem onClick={() => handleChangeRole(username)}>
+                        Change Role
+                      </MenuItem>
+                    )}
+                  </Menu>
                 </div>
               ))}
             </div>
