@@ -18,17 +18,17 @@ const Faq = () => {
   return (
     <div>
       {/* Blue banner with "FAQ" */}
-      <div className='flex justify-start gap-5' style={{ backgroundColor: '#136163', padding: '10px', color: 'white', fontSize: '24px', fontWeight: 'bold', textAlign: 'left', fontFamily: 'Arial, sans-serif', boxShadow: '0px 0px 10px 0px rgba(255, 255, 255, 0.3)' }}>
+      <div className='flex justify-start gap-5' style={{ backgroundColor: '#1c1e29', padding: '10px', color: 'white', fontSize: '24px', fontWeight: 'bold', textAlign: 'left', fontFamily: 'Arial, sans-serif', boxShadow: '0px 0px 10px 0px rgba(255, 255, 255, 0.3)' }}>
         <HomeOutlinedIcon
           className='text-slate-300 cursor-pointer ml-8'
           fontSize='large'
           onClick={() => navigate('/')}
         />
-        <p className='ml-8 text-3xl madimi-one-regular'>FAQ</p>
+        <p className='ml-8  text-red-300 font-bold text-5xl madimi-one-regular'>FAQ</p>
       </div>
 
       {/* FAQ content */}
-      <div style={{ backgroundColor: '#140314', minHeight: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+      <div style={{ backgroundColor: '#1c1e29', minHeight: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
         <div style={{ width: '80%', fontFamily: 'Helvetica, sans-serif' }}>
           {faqData.map((category, index) => (
             <div
@@ -44,8 +44,8 @@ const Faq = () => {
               <div
                 onClick={() => handleCategoryToggle(index)}
                 style={{
-                  backgroundColor: openCategory === index ? '#136163' : 'black',
-                  color: openCategory === index ? 'white' : '#136163',
+                  backgroundColor: openCategory === index ? '#1c1e29' : 'black',
+                  color: openCategory === index ? '#FCA5A5' : '#FCA5A5',
                   padding: '10px',
                   cursor: 'pointer',
                   fontSize: '18px',
