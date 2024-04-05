@@ -18,6 +18,7 @@
     display: flex;
     overflow-x: hidden;
     /* padding-top: -30px; */
+    /* margin-bottom: 80px; */
   }
   
   .text-container-container {
@@ -28,6 +29,8 @@
     max-width: 60%;
     padding: 20px; 
     margin-left: 5%;
+    margin-bottom: 80px;
+    /*  */
   }
   
   .Logo-container {
@@ -40,12 +43,14 @@
   
   .Logo {
     max-width: 100%;
+    margin-bottom: 80px;
   }
   
   .max-h-100 {
     max-width: 700px;
     margin-left: 170%;
     padding-left: 50%;
+    margin-bottom: 90px;
   }
   
   @media (max-width: 768px) {
