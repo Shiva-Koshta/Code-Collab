@@ -13,6 +13,7 @@ import DeleteIcon from '@mui/icons-material/Delete'
 import TextFileIcon from '@mui/icons-material/Description'
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown'
 import ArrowRightIcon from '@mui/icons-material/ArrowRight'
+import { FolderCopy } from '@mui/icons-material'
 import DriveFolderUploadIcon from '@mui/icons-material/DriveFolderUpload';
 import axios from 'axios'
 
@@ -36,7 +37,6 @@ const FileView = ({ fileContent, setFileContent, editorRef, contentChanged, setC
     children: [],
   });
   const [selectedFileFolderParent, setSelectedFileFolderParent] = useState({});
-  const [latestId, setLatestId] = useState(0);
   const [isFolderOpen, setIsFolderOpen] = useState({'0' : false})
   const [isSmallScreen, setIsSmallScreen] = useState(false);
 
@@ -183,12 +183,6 @@ const FileView = ({ fileContent, setFileContent, editorRef, contentChanged, setC
 
     }
   }
-
-  const generateId = () => {
-    const currId = latestId
-    setLatestId(latestId + 1)
-    return currId + 1
-  };
 
   const createFolder = (parentFolder) => {
     toggleFolder(parentFolder, true)
