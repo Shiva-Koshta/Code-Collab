@@ -260,6 +260,7 @@ const EditorPage = () => {
               <p className='text-4xl md:text-2xl text-center lg:text-3xl xl:text-4xl madimi-one-regular whitespace-nowrap'>Code Collab</p>
             </div>
           </div>
+          {/* <UploadFilesFolders />           */}
           <FileView
             contentChanged={contentChanged}
             setContentChanged={setContentChanged}

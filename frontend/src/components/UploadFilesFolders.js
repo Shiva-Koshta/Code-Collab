@@ -8,6 +8,7 @@ const FileTreeNode = ({ file }) => (
         )}
     </li>
 );
+
 const FolderNode = ({ folder }) => (
     <details>
         <summary>{folder.name}</summary>
@@ -18,7 +19,9 @@ const FolderNode = ({ folder }) => (
         </ul>
     </details>
 );
+
 const FileNode = ({ file }) => <li>{file.path}</li>;
+
 const FolderUploader = () => {
     const [files, setFiles] = useState([]);
     const handleUpload = (event) => {
