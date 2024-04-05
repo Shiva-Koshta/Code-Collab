@@ -65,6 +65,7 @@ const Faq = () => {
         >
           <div style={{ width: "80%", fontFamily: "Helvetica, sans-serif" }}>
             {faqData.map((category, index) => (
+
               <div
                 key={index}
                 style={{
@@ -74,6 +75,7 @@ const Faq = () => {
                   transition:
                     "background-color 0.3s, color 0.3s, box-shadow 0.3s", // Add smooth transitions
                   boxShadow: "0px 0px 10px 0px rgba(255, 255, 255, 0.5)", // Add box shadow
+
                 }}
               >
                 <div
@@ -149,4 +151,4 @@ const Faq = () => {
   );
 };
 
-export default Faq;
+export default Faq
