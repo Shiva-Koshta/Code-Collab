@@ -60,7 +60,7 @@ const Faq = () => {
             backgroundColor: "#1c1e29",
             minHeight: "100vh",
             // marginTop: "50px"
-            paddingTop: "100px"
+            paddingTop: "60px"
           }}
         >
           <div style={{ width: "80%", fontFamily: "Helvetica, sans-serif" }}>
