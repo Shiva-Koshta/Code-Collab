@@ -28,8 +28,10 @@ const EditorPage = () => {
   const reactNavigator = useNavigate()
   const [clients, setClients] = useState([])
   const [storedUserData, setStoredUserData] = useState([])
-  const [connectedUsernames, setConnectedUsernames] = useState([])
+  // const [connectedUsernames, setConnectedUsernames] = useState([])
+  const [connectedUsers, setConnectedUsers] = useState([])
   // const [messages, setMessages] = useState([]);
+
   const [messages, setMessages] = useState(() => {
     const storedMessages = window.localStorage.getItem(`messages_${roomId}`)
     return storedMessages ? JSON.parse(storedMessages) : []
@@ -76,6 +78,7 @@ const EditorPage = () => {
       setUnreadMessages((prevCount) => prevCount + 1)
     }
   }, [messages, isChatOpen])
+
   const leaveRoom = () => {
     reactNavigator('/', {
       roomId
@@ -88,7 +91,7 @@ const EditorPage = () => {
   useEffect(() => {
     const lastMessage = messages[messages.length - 1]
     if (lastMessage && !isChatOpen) {
-      
+
       reactToastify.info(
         `${lastMessage.sendname} : ${lastMessage.text}`, {
         position: "bottom-right",
@@ -101,10 +104,10 @@ const EditorPage = () => {
         theme: "dark",
         style: {
           backgroundColor: "#1c1e29", // Change this to your desired color
-      },
-        });
-        // reactToastify.info(`${lastMessage.sendname} : ${lastMessage.text}`)
-      
+        },
+      });
+      // reactToastify.info(`${lastMessage.sendname} : ${lastMessage.text}`)
+
 
     }
   }, [messages])
@@ -151,7 +154,9 @@ const EditorPage = () => {
             console.log(`${username} joined`)
           }
           setClients(clients)
-          setConnectedUsernames(clients.map((client) => client.username))
+          const updatedUsers = clients.map(client => ({ username: client.username, profileImage: client.picture }));
+          setConnectedUsers(updatedUsers);
+          // setConnectedUsernames(clients.map((client) => client.username))
         }
       )
 
@@ -172,9 +177,11 @@ const EditorPage = () => {
           const updatedClients = prev.filter(
             (client) => client.username !== username
           )
-          setConnectedUsernames(
-            updatedClients.map((client) => client.username)
-          )
+          const updatedUsers = updatedClients.map(client => ({ username: client.username, profileImage: client.picture }));
+          setConnectedUsers(updatedUsers);
+          // setConnectedUsernames(
+          //   updatedClients.map((client) => client.username)
+          // )
           return updatedClients
         })
       })
@@ -244,8 +251,8 @@ const EditorPage = () => {
   return (
     <div className='flex flex-col justify-center'>
       <div className='grid grid-cols-10'>
-      {<Toaster position="top-center" reverseOrder={false}/>}
-      
+        {<Toaster position="top-center" reverseOrder={false} />}
+
         {/* {isLeftDivOpen && ( */}
 
         <div
@@ -266,17 +273,24 @@ const EditorPage = () => {
             editorRef={editorRef}
           />
           <div className='Users z-10'>
-              <div className='flex justify-between items-center' onClick={handleToggle}>
-                <p className='my-3 font-bold text-lg'>Connected Users here</p>
-                {isConnectedComponentOpen && <ArrowDropUpIcon />}
-                {!isConnectedComponentOpen && <ArrowDropDownIcon />}
-              </div>
-              {isConnectedComponentOpen && connectedUsernames.map((username) => (
-                <div className='UserList' key={username}>
-                  {username}
-                </div>
-              ))}
+            <div className='flex justify-between items-center' onClick={handleToggle}>
+              <p className='my-3 font-bold text-lg'>Connected Users here</p>
+              {isConnectedComponentOpen && <ArrowDropUpIcon />}
+              {!isConnectedComponentOpen && <ArrowDropDownIcon />}
             </div>
+            <div className='UserListContainer'>
+              <div className='UserListContainer'>
+                {isConnectedComponentOpen && connectedUsers.map((user) => (
+                  <div className='UserListItem' key={user.username}>
+                    <img src={user.profileImage} alt={user.username} className='img' />
+                    <div className='username'>{user.username.split(' ')[0]}</div>
+                  </div>
+                ))}
+              </div>
+
+            </div>
+
+          </div>
           <div className='p-4'>
             <div className='flex gap-2'>
               <button className='btn chat-btn' onClick={toggleChat}>
@@ -325,16 +339,16 @@ const EditorPage = () => {
           )}
         </div>
 
-<ToastContainer 
-position="bottom-right"
-autoClose={2000}
-hideProgressBar={true}
-closeOnClick
-pauseOnFocusLoss
-draggable
-pauseOnHover
-theme="dark"
-/>
+        <ToastContainer
+          position="bottom-right"
+          autoClose={2000}
+          hideProgressBar={true}
+          closeOnClick
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="dark"
+        />
 
 
         {isChatOpen && (

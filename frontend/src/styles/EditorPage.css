@@ -88,7 +88,7 @@
   margin-bottom: 4px;
   border-top: 2px solid #424242;
 }
-.UserList{
+/* .UserList{
     font-size: 1rem; 
     color: #080808;
     font-weight: 700;
@@ -96,6 +96,53 @@
     background-color: #4ef990; 
     border-radius: 5px; 
     margin-bottom: 5px; 
+} */
+
+.UserListContainer {
+  display: flex;
+  flex-wrap: wrap; /* Allow items to wrap to the next line */
+  align-items: center;
+  justify-content: flex-start; /* Align items to the start of the flex container */
+}
+
+.UserListItem {
+  text-align: center;
+  margin-right: 10px; /* Add spacing between user items */
+  margin-bottom: 10px; /* Add spacing between lines */
+  position: relative; /* Add relative positioning for absolute positioning of username */
+   /* Ensure items don't shrink and maintain their initial size */
+}
+.UserListItem img {
+  width: 50px; /* Adjust the width of the profile pictures */
+  height: 50px; /* Adjust the height of the profile pictures */
+  border-radius: 50%; /* Make the profile pictures circular */
+  transition: filter 0.3s ease; /* Add transition effect for filter property */
+}
+.UserListItem:hover img {
+  filter: blur(4px); /* Apply blur effect on hover */
+}
+
+.UserListItem .username {
+  font-size: 0.8rem; /* Adjust the font size of the usernames */
+  color: #ffffff;
+  font-weight: 700;
+  position: absolute;
+  top:30%; /* Adjust the position of the username */
+  left: 50%;
+  transform: translateX(-50%);
+  visibility: hidden; /* Hide the username by default */
+  max-width: 120%; /* Ensure username does not exceed the width of the image */
+  opacity: 0; /* Hide the username by default */
+  transition: opacity 0.3s ease, visibility 0.3s ease; /* Add transition effect */
+  white-space: nowrap; /* Prevent the username from wrapping */
+  overflow: hidden; /* Hide overflow text */
+  text-overflow: ellipsis; /* Display ellipsis (...) for overflow text */
+}
+
+
+.UserListItem:hover .username {
+  visibility: visible; /* Show the username on hover */
+  opacity: 1; /* Show the username on hover */
 }
 
 .logo {
