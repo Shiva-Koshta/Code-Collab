@@ -76,11 +76,12 @@ io.on('connection', (socket) => {
       console.error('Error updating user count:', error)
     }
   })
-  socket.on(ACTIONS.CODE_CHANGE, ({ roomId, fileId, code }) => {
-    //Save the updated data in filnode model using file name or ID. Will be updated further by Darshan since he is better aware of all the dependencies this change might have.
-    FileNodeSchema.findOneAndUpdate(
-      { fileId },
-      { content: code}
+  socket.on(ACTIONS.CODE_CHANGE, ({ roomId, code }) => {
+    // Save or update the code in the database
+    RoomCodeMap.findOneAndUpdate(
+      { roomId },
+      { code },
+      { new: true, upsert: true }
     )
       .then((updatedMap) => {
         // console.log("Code updated in database:");

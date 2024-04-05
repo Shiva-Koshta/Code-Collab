@@ -7,7 +7,7 @@ import 'codemirror/addon/edit/closetag'
 import 'codemirror/addon/edit/closebrackets'
 import ACTIONS from '../Actions'
 
-const Editor = ({ handleDownloadFile, socketRef, roomId, editorRef, fileContent, fileId, setFileContent, contentChanged }) => {
+const Editor = ({ handleDownloadFile, socketRef, roomId, editorRef, fileContent, setFileContent, contentChanged }) => {
   // const [fileContent, setFileContent] = useState("")
   // const [contentChanged, setContentChanged] = useState(false)
   // useEffect(() => {
@@ -99,7 +99,6 @@ const Editor = ({ handleDownloadFile, socketRef, roomId, editorRef, fileContent,
         const code = instance.getValue()
         if (origin !== 'setValue') {
           socketRef.current.emit(ACTIONS.CODE_CHANGE, {
-            fileId,
             roomId,
             code
           })
