@@ -6,6 +6,7 @@ import toast, { Toaster } from 'react-hot-toast'
 import Editor from '../components/Editor'
 import FileView from '../components/FileView'
 import { initSocket } from '../socket'
+import UplaodFilesFolders from '../components/UploadFilesFolders';
 import '../styles/EditorPage.css'
 import '../styles/Chat.css'
 import logo from '../images/Logo.png'
