@@ -146,10 +146,17 @@ io.on('connection', (socket) => {
   })
 
   socket.on(ACTIONS.ROLE_CHANGE, ({roomId, username, newRole}) => {
-    
-    io.to(roomId).emit(ACTIONS.ROLE_CHANGE, {
+    RoomUserCount.findOneAndUpdate(
+      { roomId, 'users.username': username },
+      { $set: { 'users.$.role': newRole } },
+      { new: true }
+    )
+    .then(() => {io.to(roomId).emit(ACTIONS.ROLE_CHANGE, {
       username,
       newRole
+    })})
+    .catch((error) => {
+      console.error("Error in changing role",error)
     })
   })
 })
