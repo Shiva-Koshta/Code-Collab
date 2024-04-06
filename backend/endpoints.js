@@ -4,12 +4,14 @@ const RoomCodeMap = require("./models/RoomCodeMap");
 const RoomUserCount = require("./models/RoomUserCount");
 const authRoute = require("./routes/auth");
 const nodemailer = require("nodemailer");
+//initialise env file
+require("dotenv").config();
 
 let transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
-    user: "codecollabhelp@gmail.com",
-    pass: "dogk zdwu jdws dxpp",
+    user: process.env.MAILER_EMAIL_ID,
+    pass: process.env.MAILER_PASSWORD,
   },
 });
 
@@ -19,7 +21,9 @@ router.use("/auth", authRoute);
 router.post("/rooms/numUsersInRoom", async (req, res) => {
   try {
     const { roomId } = req.body;
-
+    if (!roomId) {
+      return res.status(400).json({ error: "Room ID is required" });
+    }
     // Fetch the room from the database
     const room = await RoomUserCount.findOne({ roomId });
 
@@ -38,6 +42,9 @@ router.post("/rooms/numUsersInRoom", async (req, res) => {
 // Endpoint to handle receiving code
 router.post("/receivecode", async (req, res) => {
   const { roomId } = req.body;
+  if(!roomId){
+    return res.status(400).json({ error: "Room ID is required" });
+  }
 
   try {
     const roomMap = await RoomCodeMap.findOne({ roomId });
@@ -62,7 +69,9 @@ router.post("/receivecode", async (req, res) => {
 router.post("/delete-entry", async (req, res) => {
   const { roomId } = req.body;
   //   console.log("hi", roomId);
-
+  if (!roomId) {
+    return res.status(400).json({ error: "Room ID is required" });
+  }
   try {
     const room = await RoomUserCount.findOne({ roomId });
     if (!room) {
@@ -87,6 +96,9 @@ router.post("/delete-entry", async (req, res) => {
 router.post("/help", async (req, res) => {
   try {
     const { name, email, message } = req.body;
+    if(!name || !email || !message){
+      return res.status(400).json({ error: "Name, Email and Message are required" });
+    }
     console.log(email);
     let mailOptions = {
       from: "codecollabhelp@gmail.com",
