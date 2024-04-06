@@ -6,6 +6,7 @@ import toast, { Toaster } from 'react-hot-toast'
 import Editor from '../components/Editor'
 import FileView from '../components/FileView'
 import { initSocket } from '../socket'
+import UplaodFilesFolders from '../components/UploadFilesFolders';
 import '../styles/EditorPage.css'
 import '../styles/Chat.css'
 import logo from '../images/Logo.png'
@@ -16,6 +17,7 @@ import ChatIcon from '@mui/icons-material/Chat';
 import 'react-toastify/dist/ReactToastify.css';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
+import UploadFilesFolders from '../components/UploadFilesFolders'
 
 
 const EditorPage = () => {
@@ -265,6 +267,7 @@ const EditorPage = () => {
               <p className='text-4xl md:text-2xl text-center lg:text-3xl xl:text-4xl madimi-one-regular whitespace-nowrap'>Code Collab</p>
             </div>
           </div>
+          {/* <UploadFilesFolders />           */}
           <FileView
             contentChanged={contentChanged}
             setContentChanged={setContentChanged}
@@ -318,7 +321,7 @@ const EditorPage = () => {
             </button>
 
           </div>
-          <div className='absolute right-0 top-1/2 transform -translate-y-1/2 transition duration-500 hover:animate-bounce-left'>
+          <div className='absolute right-0 top-1/2 transform transition duration-500 hover:animate-bounce-left'>
             <button onClick={toggleLeftDiv}>{leftIcon}</button>
           </div>
         </div>
@@ -333,7 +336,7 @@ const EditorPage = () => {
             contentChanged={contentChanged}
           />
           {!isLeftDivOpen && (
-            <div className='absolute left-0 top-1/2 transform -translate-y-1/2 transition duration-500 hover:animate-bounce-right'>
+            <div className='absolute left-0 top-1/2 transform transition duration-500 hover:animate-bounce-right'>
               <button className='text-white' onClick={toggleLeftDiv}>{leftIcon}</button>
             </div>
           )}
