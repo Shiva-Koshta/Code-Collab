@@ -87,6 +87,26 @@ const EditorPage = () => {
       username,
       newRole,
     })
+
+    fetch('/http://localhost:8080/changerole', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        roomId: roomId,
+        name: username, 
+        role: newRole
+      })
+    })
+    .then(response => {
+      if (!response.ok) {
+        console.error('Failed to change role')
+      }
+    })
+    .catch(error => {
+      console.error('Error changing role:', error)
+    })
   }
   const handleMessageSend = () => {
     console.log(storedUserData)
@@ -252,7 +272,7 @@ const EditorPage = () => {
         }
       })
       socketRef.current.on(ACTIONS.HOST_CHANGE, ({username}) => {
-          setHost(username)
+        setHost(username)
       })
     }
 
