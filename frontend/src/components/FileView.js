@@ -37,12 +37,12 @@ const FileView = ({ fileContent, setFileContent, editorRef, contentChanged, setC
     children: [],
   });
   const [selectedFileFolderParent, setSelectedFileFolderParent] = useState({});
-  const [isFolderOpen, setIsFolderOpen] = useState({'0' : false})
+  const [isFolderOpen, setIsFolderOpen] = useState({ '0': false })
   const [isSmallScreen, setIsSmallScreen] = useState(false);
 
-  useEffect(() => {    
+  useEffect(() => {
     (async () => {
-      try{
+      try {
         const response = await axios.post(`${process.env.REACT_APP_API_URL}/filesystem/generatetree`, {
           roomId: roomId
         });
@@ -72,7 +72,6 @@ const FileView = ({ fileContent, setFileContent, editorRef, contentChanged, setC
 
 
   // useEffect(() => {
-    
   // }, []);
 
   const handleFileChange = (event) => {
@@ -127,12 +126,12 @@ const FileView = ({ fileContent, setFileContent, editorRef, contentChanged, setC
   }
 
   const toggleFolder = (folder, flag = false) => {
-    if(flag && folder.type !== 'file') {
+    if (flag && folder.type !== 'file') {
       let folderOpen = isFolderOpen
       folderOpen[folder._id] = true
       setIsFolderOpen(folderOpen)
       setFolders([...folders])
-    } else if(!flag && folder.type !== 'file') {
+    } else if (!flag && folder.type !== 'file') {
       let folderOpen = isFolderOpen
       folderOpen[folder._id] = !isFolderOpen[folder._id]
       setIsFolderOpen(folderOpen)
@@ -171,11 +170,11 @@ const FileView = ({ fileContent, setFileContent, editorRef, contentChanged, setC
             parentId: parentFolder._id,
             roomId: roomId,
           });
-          const newFile = { _id:response.data.file._id, name: response.data.file.name, type: response.data.file.type }
+          const newFile = { _id: response.data.file._id, name: response.data.file.name, type: response.data.file.type }
           parentFolder.children.push(newFile)
           console.log("pushed")
           setFolders([...folders])
-          
+
         } catch (error) {
           console.log(error);
         }
@@ -195,7 +194,7 @@ const FileView = ({ fileContent, setFileContent, editorRef, contentChanged, setC
             parentId: parentFolder._id,
             roomId: roomId,
           });
-          const newFolder = { _id: response.data.directory._id, name: response.data.directory.name, type: response.data.directory.type, children: []}
+          const newFolder = { _id: response.data.directory._id, name: response.data.directory.name, type: response.data.directory.type, children: [] }
           parentFolder.children.push(newFolder);
           setFolders([...folders]);
         } catch (error) {
@@ -228,40 +227,40 @@ const FileView = ({ fileContent, setFileContent, editorRef, contentChanged, setC
 
   const renderFolder = (folder, depth = 0, parentFolder = null) => {
     return (
-      <div 
-        key={folder.name} 
+      <div
+        key={folder.name}
         className='flex flex-col mb-1 h-fit'
         style={{ marginLeft: `${depth === 0 ? 0 : 10}px`, maxWidth: `${depth === 0 ? `${parentWidth}px` : `${parentWidth - depth * 10}px`}` }}>
         <div className={`flex items-center p-px  overflow-hidden ${(selectedFileFolder && selectedFileFolder._id === folder._id) ? 'Selected-file-folder' : ''} rounded-md`}>
           <div className='grow flex relative overflow-hidden'>
             {folder.type === 'root' && (
               <div onClick={() => {
-                  toggleFolder(folder)
-                  setSelectedFileFolder(folder)
-                }} 
+                toggleFolder(folder)
+                setSelectedFileFolder(folder)
+              }}
                 style={{ maxWidth: `${depth === 0 ? '328px' : `${328 - depth}px`}` }}
                 className="cursor-pointer mr-2 grow flex overflow-hidden">
                 {isFolderOpen[folder._id] ? <ArrowDropDownIcon /> : <ArrowRightIcon />}
-                {isFolderOpen[folder._id] ? <FolderIcon className='mr-2' style={{ fontSize: 20 }}/> : <FolderOpenIcon className='mr-2' style={{ fontSize: 20 }}/>}
-                
+                {isFolderOpen[folder._id] ? <FolderIcon className='mr-2' style={{ fontSize: 20 }} /> : <FolderOpenIcon className='mr-2' style={{ fontSize: 20 }} />}
+
                 <div className='truncate'>{folder.name}</div>
               </div>
             )}
             {folder.type === 'directory' && (
               <div onClick={() => {
-                  toggleFolder(folder)
-                  setSelectedFileFolder(folder)
-                  setSelectedFileFolderParent(parentFolder)
-                }} 
+                toggleFolder(folder)
+                setSelectedFileFolder(folder)
+                setSelectedFileFolderParent(parentFolder)
+              }}
                 style={{ maxWidth: `${depth === 0 ? '328px' : `${328 - depth}px`}` }}
                 className="cursor-pointer mr-2 grow flex overflow-hidden">
                 {isFolderOpen[folder._id] ? <ArrowDropDownIcon /> : <ArrowRightIcon />}
-                {isFolderOpen[folder._id] ? <FolderIcon className='mr-2' style={{ fontSize: 20 }}/> : <FolderOpenIcon className='mr-2' style={{ fontSize: 20 }}/>}
+                {isFolderOpen[folder._id] ? <FolderIcon className='mr-2' style={{ fontSize: 20 }} /> : <FolderOpenIcon className='mr-2' style={{ fontSize: 20 }} />}
                 <div className='truncate'>{folder.name}</div>
               </div>
             )}
             {folder.type === 'file' && (
-              <div 
+              <div
                 style={{ maxWidth: `${depth === 0 ? '328px' : `${328 - depth}px`}` }}
                 className
                 ='grow cursor-pointer mr-2 flex overflow-hidden'
@@ -269,7 +268,7 @@ const FileView = ({ fileContent, setFileContent, editorRef, contentChanged, setC
                   setSelectedFileFolder(folder)
                   setSelectedFileFolderParent(parentFolder)
                 }}>
-                <TextFileIcon className='mr-2 pb-0.5' style={{ fontSize: 20 }}/>
+                <TextFileIcon className='mr-2 pb-0.5' style={{ fontSize: 20 }} />
                 <div className='truncate'>{folder.name}</div>
               </div>
             )}
@@ -279,7 +278,43 @@ const FileView = ({ fileContent, setFileContent, editorRef, contentChanged, setC
       </div>
     )
   }
+  const [files, setFiles] = useState([]);
+  const handleUpload = async (event) => {
+    const items = event.target.files;
+    const entries = await Promise.all(Array.from(items).map(async (item) => {
+      const path = item.webkitRelativePath || item.name;
+      const isDirectory = item.isDirectory || false;
+      let content = null;
+      if (!isDirectory) {
+        content = await readFileAsync(item);
+      }
+      return { path, isDirectory, content };
+    }));
+    sendDataToServer(entries);
+    setFiles(entries);
+  };
+  const readFileAsync = (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        resolve(event.target.result);
+      };
+      reader.onerror = (error) => {
+        reject(error);
+      };
+      reader.readAsText(file);
+    });
+  };
 
+  const sendDataToServer = async (data) => {
+    try {
+      console.log('Data to be sent to the server:', data);
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}`, data);
+      console.log('Server response:', response.data);
+    } catch (error) {
+      console.error('Error sending data to server:', error);
+    }
+  };
   return (
     <div className='flex flex-col justify-between h-full'>
       <div className='flex justify-between mx-1 relative h-fit grow'>
@@ -301,7 +336,18 @@ const FileView = ({ fileContent, setFileContent, editorRef, contentChanged, setC
                 <label htmlFor='fileInput'>
                   <UploadFileIcon className='text-white cursor-pointer' />
                 </label>
-                <button className='' title="Upload Folder"><DriveFolderUploadIcon /></button>
+                <input
+                  type='file'
+                  id='folderInput'
+                  directory=""
+                  webkitdirectory=""
+                  style={{ display: 'none' }}
+                  onChange={handleUpload}
+                />
+                <label htmlFor='folderInput'>
+                  <DriveFolderUploadIcon className='text-white cursor-pointer' />
+                </label>
+                {/* <button className='' title="Upload Folder"><DriveFolderUploadIcon /></button> */}
                 <div className='absolute bottom-0 hidden hover:bg-gray-100 hover:rounded hover:p-2 hover:block hover:z-10 hover:border hover:border-gray-300'>Upload Folder</div>
                 <button className='renameFolderIcon update-buttons ' onClick={() => renameFolder(selectedFileFolder)} title="Rename Folder"><CreateIcon /></button>
                 <div className='absolute bottom-0 hidden hover:bg-gray-100 hover:rounded hover:p-2 hover:block hover:z-10 hover:border hover:border-gray-300 hover:top-7'>Rename Folder</div>
@@ -322,7 +368,18 @@ const FileView = ({ fileContent, setFileContent, editorRef, contentChanged, setC
                 <label htmlFor='fileInput'>
                   <UploadFileIcon className='text-white' />
                 </label>
-                <button className='' title="Upload Folder"><DriveFolderUploadIcon /></button>
+                <input
+                  type='file'
+                  id='folderInput'
+                  directory=""
+                  webkitdirectory=""
+                  style={{ display: 'none' }}
+                  onChange={handleUpload}
+                />
+                <label htmlFor='folderInput'>
+                  <DriveFolderUploadIcon className='text-white cursor-pointer' />
+                </label>
+                {/* <button className='' title="Upload Folder"><DriveFolderUploadIcon /></button> */}
                 <div className='absolute bottom-0 hidden hover:bg-gray-100 hover:rounded hover:p-2 hover:block hover:z-10 hover:border hover:border-gray-300'>Upload Folder</div>
                 <button className='renameFolderIcon update-buttons ' onClick={() => renameFolder(selectedFileFolder)} title="Rename Folder"><CreateIcon /></button>
                 <div className='absolute bottom-0 hidden hover:bg-gray-100 hover:rounded hover:p-2 hover:block hover:z-10 hover:border hover:border-gray-300 hover:top-7'>Rename Folder</div>
