@@ -144,6 +144,14 @@ io.on('connection', (socket) => {
       sendname
     })
   })
+
+  socket.on(ACTIONS.ROLE_CHANGE, ({roomId, username, newRole}) => {
+    
+    io.to(roomId).emit(ACTIONS.ROLE_CHANGE, {
+      username,
+      newRole
+    })
+  })
 })
 
 // Connect to MongoDB
