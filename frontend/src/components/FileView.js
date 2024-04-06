@@ -140,25 +140,55 @@ const FileView = ({ fileContent, setFileContent, editorRef, contentChanged, setC
     }
   }
 
-  const deleteFolder = (folder, parentFolder) => {
-    console.log(folder, parentFolder)
-    if (folder.type !== 'root') { // Check if folder is not the root folder
-      const index = parentFolder.children.indexOf(folder)
-      if (index !== -1) {
-        parentFolder.children.splice(index, 1)
-        setFolders([...folders])
-      }
+  // const deleteFolder = (folder, parentFolder) => {
+  //   console.log(folder, parentFolder)
+  //   if (folder.type !== 'root') { // Check if folder is not the root folder
+  //     const index = parentFolder.children.indexOf(folder)
+  //     if (index !== -1) {
+  //       parentFolder.children.splice(index, 1)
+  //       setFolders([...folders])
+  //     }
+  //   }
+  // }
+  async function deleteFolder(folderId) {
+    try {
+        // Make a DELETE request to the backend endpoint to delete the folder
+        const response = await axios.delete(`${process.env.REACT_APP_API_URL}/filesystem/deletefile`, {
+          data: {
+              nodeId: folderId,
+              fileType: 'folder' // Indicate that this is a folder deletion
+          }
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Error deleting folder:', error.message);
+        throw new Error('Failed to delete folder.');
     }
-  }
+}
 
-  const deleteFile = (file, parentFolder) => {
-    const index = parentFolder.children.indexOf(file)
-    console.log(parentFolder)
-    if (index !== -1) {
-      parentFolder.children.splice(index, 1)
-      setFolders([...folders])
+  // const deleteFile = (file, parentFolder) => {
+  //   const index = parentFolder.children.indexOf(file)
+  //   console.log(parentFolder)
+  //   if (index !== -1) {
+  //     parentFolder.children.splice(index, 1)
+  //     setFolders([...folders])
+  //   }
+  // }
+  async function deleteFile(fileId) {
+    try {
+        // Make a DELETE request to the backend endpoint to delete the file
+        const response = await axios.delete(`${process.env.REACT_APP_API_URL}/filesystem/deletefile`, {
+            data: {
+                nodeId: fileId,
+                fileType: 'file' // Indicate that this is a file deletion
+            }
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Error deleting file:', error.message);
+        throw new Error('Failed to delete file.');
     }
-  }
+}
 
   const createFile = (parentFolder) => {
     toggleFolder(parentFolder, true)

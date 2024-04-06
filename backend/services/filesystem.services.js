@@ -26,6 +26,40 @@ async function fetchFile(nodeId) {
     return fileNode.content;
 }
 
+// Function to delete a file
+async function deleteFile(nodeId) {
+    try {
+        const fileNode = await FileNode.findById(nodeId);
+        // Check if the file node exists
+        if (!fileNode) {
+            throw new Error('File node not found.');
+        }
+        // Delete the file node
+        await fileNode.remove();
+        return { success: true, message: 'File deleted successfully.' };
+    } catch (error) {
+        console.error('Error deleting file:', error.message);
+        return { success: false, message: 'Failed to delete file.' };
+    }
+}
+
+// Function to delete a directory
+async function deleteDirectory(nodeId) {
+    try {
+        const fileNode = await FileNode.findById(nodeId);
+        // Check if the file node exists
+        if (!fileNode) {
+            throw new Error('File node not found.');
+        }
+        // Delete the file node
+        await fileNode.remove();
+        return { success: true, message: 'File deleted successfully.' };
+    } catch (error) {
+        console.error('Error deleting file:', error.message);
+        return { success: false, message: 'Failed to delete file.' };
+    }
+}
+
 // Add a function to create a root directory for a room
 async function createRootDirectory(roomId) {
     // Check if the root directory already exists for the room
@@ -88,4 +122,6 @@ module.exports = {
     fetchFile,
     createRootDirectory,
     generateTree,
+    deleteFile,
+    deleteDirectory
 }

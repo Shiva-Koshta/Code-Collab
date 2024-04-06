@@ -88,6 +88,23 @@ fetchfile = async(req, res) => {
         console.log(error)
     }
 }
+deletefile = async(req, res) => {
+    try {
+        const result = await filesys.deleteFile(req.body.nodeId);
+        res.status(200).json({ success: true, message: 'File deleted successfully.' });
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+}
+deletedirectory = async(req, res) => {
+    try {
+        dir = await filesys.deleteDirectory(req.body.nodeId);  
+        res.status(200).json({ success: true, message: 'Directory deleted successfully.' });
+    } catch (error) {
+        console.log(error)
+    }
+}
+
 generatetree = async(req, res) => {
     try {
         tree = await filesys.generateTree(req.body.roomId); 
@@ -109,4 +126,6 @@ module.exports = {
     createrootdirectory,
     generatetree,
     fetchfile,
+    deletefile,
+    deletedirectory
 }
