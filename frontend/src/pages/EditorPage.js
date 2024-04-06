@@ -16,7 +16,6 @@ import ChatIcon from '@mui/icons-material/Chat';
 import 'react-toastify/dist/ReactToastify.css';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
-import UploadFilesFolders from '../components/UploadFilesFolders';
 
 
 const EditorPage = () => {
@@ -259,7 +258,6 @@ const EditorPage = () => {
               <p className='text-4xl md:text-2xl text-center lg:text-3xl xl:text-4xl madimi-one-regular whitespace-nowrap'>Code Collab</p>
             </div>
           </div>
-          <UploadFilesFolders />          
           <FileView
             contentChanged={contentChanged}
             setContentChanged={setContentChanged}
@@ -268,17 +266,17 @@ const EditorPage = () => {
             editorRef={editorRef}
           />
           <div className='Users z-10'>
-            <div className='flex justify-between items-center' onClick={handleToggle}>
-              <p className='my-3 font-bold text-lg'>Connected Users here</p>
-              {isConnectedComponentOpen && <ArrowDropUpIcon />}
-              {!isConnectedComponentOpen && <ArrowDropDownIcon />}
-            </div>
-            {isConnectedComponentOpen && connectedUsernames.map((username) => (
-              <div className='UserList' key={username}>
-                {username}
+              <div className='flex justify-between items-center' onClick={handleToggle}>
+                <p className='my-3 font-bold text-lg'>Connected Users here</p>
+                {isConnectedComponentOpen && <ArrowDropUpIcon />}
+                {!isConnectedComponentOpen && <ArrowDropDownIcon />}
               </div>
-            ))}
-          </div>
+              {isConnectedComponentOpen && connectedUsernames.map((username) => (
+                <div className='UserList' key={username}>
+                  {username}
+                </div>
+              ))}
+            </div>
           <div className='p-4'>
             <div className='flex gap-2'>
               <button className='btn chat-btn' onClick={toggleChat}>
@@ -306,7 +304,7 @@ const EditorPage = () => {
             </button>
 
           </div>
-          <div className='absolute right-0 top-1/2 transform -translate-y-1/2 transition duration-500 hover:animate-bounce-left'>
+          <div className='absolute right-0 top-1/2 transform transition duration-500 hover:animate-bounce-left'>
             <button onClick={toggleLeftDiv}>{leftIcon}</button>
           </div>
         </div>
@@ -321,7 +319,7 @@ const EditorPage = () => {
             contentChanged={contentChanged}
           />
           {!isLeftDivOpen && (
-            <div className='absolute left-0 top-1/2 transform -translate-y-1/2 transition duration-500 hover:animate-bounce-right'>
+            <div className='absolute left-0 top-1/2 transform transition duration-500 hover:animate-bounce-right'>
               <button className='text-white' onClick={toggleLeftDiv}>{leftIcon}</button>
             </div>
           )}
