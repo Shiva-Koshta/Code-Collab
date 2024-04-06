@@ -16,8 +16,6 @@ import ArrowRightIcon from '@mui/icons-material/ArrowRight'
 import { FolderCopy } from '@mui/icons-material'
 import DriveFolderUploadIcon from '@mui/icons-material/DriveFolderUpload';
 import axios from 'axios'
-import { toast, ToastContainer } from 'react-toastify'
-import 'react-toastify/dist/ReactToastify.css'
 
 const FileView = ({ fileContent, setFileContent, editorRef, contentChanged, setContentChanged }) => {
   const { roomId } = useParams()
@@ -269,16 +267,6 @@ const FileView = ({ fileContent, setFileContent, editorRef, contentChanged, setC
                 onClick={() => {
                   setSelectedFileFolder(folder)
                   setSelectedFileFolderParent(parentFolder)
-                  // console.log('Node ID:', folder._id);
-                  toast(`Node ID of the file is: ${folder._id}`, {
-                    position: "top-right",
-                    autoClose: 1000,
-                    hideProgressBar: false,
-                    closeOnClick: true,
-                    pauseOnHover: true,
-                    draggable: true,
-                    progress: undefined,
-                  });
                 }}>
                 <TextFileIcon className='mr-2 pb-0.5' style={{ fontSize: 20 }} />
                 <div className='truncate'>{folder.name}</div>
