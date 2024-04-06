@@ -1,0 +1,54 @@
+[
+  {
+    "category": "General Questions",
+    "questions": [
+      {
+        "question": "What is Code Collab?",
+        "answer": "CodeCollab is a collaborative code editing platform that empowers developers to work together in real-time, sharing ideas and code to create remarkable solutions"
+      },
+      {
+        "question": "What are the main features of Code Collab?",
+        "answer": "The main features of codecollab include role based access for users(Viewer, Host and Developer), room creation, real time code and cursor sharing and chat functionality for better communication."
+      }
+    ]
+  },
+  {
+    "category": "Users",
+    "questions": [
+      {
+        "question": "What kind of role- based access does Code Collab offer?",
+        "answer": "The team has prepared a Github Wiki as well as Design document for the project. If this is a user finding his way through the website, please refer to Home-> Help page"
+      },
+      {
+        "question": "What kind of support and documentation does Code Collab provide?",
+        "answer": "The team has prepared a Github Wiki as well as Design document for the project. If this is a user finding his way through the website, please refer to Home-> Help page"
+      }
+    ]
+  },
+  {
+    "category": "Project",
+    "questions": [
+      {
+        "question": "Can multiple developers work on the same project simultaneously?",
+        "answer": "Yes, upto 10 developers can work in a single room."
+      },
+      {
+        "question": "How will we know who else is working right now?",
+        "answer": "You can see the active users at left side bottom of the page and also, you can see where a user is by hovering over the cursor."
+      }
+    ]
+  },
+  {
+    "category": "Code",
+    "questions": [
+      {
+        "question": "Can I upload an image?",
+        "answer": "No, you cannot upload .pdf, .ppt, .png and .jpg extension files"
+      },
+      {
+        "question": "Can I work on an existing project in my local system?",
+        "answer": "Yes, you can upload a file or folder from your local directory and work on it with your team."
+      }
+    ]
+  }
+]
