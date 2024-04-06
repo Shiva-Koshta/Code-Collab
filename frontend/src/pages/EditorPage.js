@@ -312,13 +312,20 @@ const EditorPage = () => {
           </div>
           <div className="p-4">
             <div className="flex gap-2">
-              <button className="btn chat-btn" onClick={toggleChat}>
+              <button
+                className="btn chat-btn"
+                onClick={toggleChat}
+                style={{ position: "relative" }}
+              >
                 Chat{" "}
                 {unreadMessages > 0 && (
                   <span
                     className="unread-messages"
                     style={{
-                      color: "red",
+                      position: "absolute",
+                      top: "-5px", 
+                      right: "-5px", 
+                      color: "black",
                       borderRadius: "50%",
                       width: "30px",
                       height: "30px",
