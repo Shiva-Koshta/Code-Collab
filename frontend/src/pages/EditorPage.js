@@ -207,6 +207,7 @@ const EditorPage = () => {
           }
           setClients(clients)
           setConnectedUsernames(clients.map((client) => client.username))
+          setConnectedUserRoles(prevRoles => [...prevRoles, { id: socketId, name:username, role: 'editor' }])
         }
       )
 
@@ -232,6 +233,7 @@ const EditorPage = () => {
           )
           return updatedClients
         })
+        setConnectedUserRoles(prevRoles => prevRoles.filter(user => user.username !== username))
       })
       socketRef.current.on(
         ACTIONS.MESSAGE_RECEIVE,
