@@ -72,7 +72,6 @@ const FileView = ({ fileContent, setFileContent, editorRef, contentChanged, setC
 
 
   // useEffect(() => {
-
   // }, []);
 
   const handleFileChange = (event) => {
