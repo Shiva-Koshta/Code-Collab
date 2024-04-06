@@ -293,22 +293,31 @@ const EditorPage = () => {
           </div>
           <div className='p-4'>
             <div className='flex gap-2'>
-              <button className='btn chat-btn' onClick={toggleChat}>
-                Chat{' '}
-                {unreadMessages > 0 && (
-                  <span
-                    className='unread-messages'
-                    style={{
-                      color: 'red',
-                      borderRadius: '50%',
-                      border: 'black',
-                      background: 'white'
-                    }}
-                  >
-                    {unreadMessages}
-                  </span>
-                )}
-              </button>
+            <button className='btn chat-btn' onClick={toggleChat}>
+  Chat{' '}
+  {unreadMessages > 0 && (
+    <span
+      className='unread-messages'
+      style={{
+        color: 'red',
+        borderRadius: '50%',
+        width: '30px',
+        height: '30px', 
+        display: 'inline-flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        textAlign: 'center',
+        fontSize: '14px',
+        fontWeight: 'bold',
+        border: '2px solid black',
+        background: 'white'
+      }}
+    >
+      {unreadMessages}
+    </span>
+  )}
+</button>
+
               <button className='btn-edit copyBtn' onClick={copyRoomId}>
                 Copy ROOM ID
               </button>
