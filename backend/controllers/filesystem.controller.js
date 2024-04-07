@@ -90,6 +90,9 @@ fetchfile = async(req, res) => {
 }
 deletefile = async(req, res) => {
     try {
+        console.log("\n\n\n\n\n\n")
+        console.log(req.body.nodeId);
+        console.log("\n\n\n\n\n\n")
         const result = await filesys.deleteFile(req.body.nodeId);
         res.status(200).json({ success: true, message: 'File deleted successfully.' });
     } catch (error) {
@@ -104,7 +107,28 @@ deletedirectory = async(req, res) => {
         console.log(error)
     }
 }
-
+renamefile = async(req, res) => {
+    try {
+        file = await filesys.renameFile(req.body.nodeId, req.body.name)
+        responseJSON = {
+            message: 'Renamed file',
+        }     
+        res.status(200).json(responseJSON);
+    } catch (error) {
+        console.log(error)
+    }
+}
+renamedirectory = async(req, res) => {
+    try {
+        dir = await filesys.renameDirectory(req.body.nodeId, req.body.name)
+        responseJSON = {
+            message: 'Rename directory',
+        }     
+        res.status(200).json(responseJSON);
+    } catch (error) {
+        console.log(error)
+    }
+}
 generatetree = async(req, res) => {
     try {
         tree = await filesys.generateTree(req.body.roomId); 
@@ -127,5 +151,7 @@ module.exports = {
     generatetree,
     fetchfile,
     deletefile,
-    deletedirectory
+    deletedirectory,
+    renamefile,
+    renamedirectory
 }

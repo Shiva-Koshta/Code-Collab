@@ -26,8 +26,8 @@ const userSocketMap = {}
 function getAllConnectedClients (roomId) {
   return Array.from(io.sockets.adapter.rooms.get(roomId) || []).map(
     (socketId) => {
-      console.log("userSocketMap:")
-      console.log(userSocketMap)
+      // console.log("userSocketMap:")
+      // console.log(userSocketMap)
       return {
         socketId,
         username: userSocketMap[socketId].username,
@@ -39,7 +39,7 @@ function getAllConnectedClients (roomId) {
 }
 // Define socket.io logic
 io.on('connection', (socket) => {
-  console.log('Socket connected', socket.id)
+  // console.log('Socket connected', socket.id)
 
   socket.on(ACTIONS.JOIN, async ({ roomId, username, picture }) => {
     // Add the user to the socket map
@@ -132,12 +132,12 @@ io.on('connection', (socket) => {
 
   socket.on(ACTIONS.JOIN, ({ roomId }) => {
     socket.join(roomId)
-    console.log(`User joined room ${roomId}`)
+    // console.log(`User joined room ${roomId}`)
   })
 
   socket.on(ACTIONS.MESSAGE_SEND, ({ roomId, message, sender, sendname }) => {
-    console.log(sender)
-    console.log(sendname)
+    // console.log(sender)
+    // console.log(sendname)
     io.to(roomId).emit(ACTIONS.MESSAGE_RECEIVE, {
       text: message.text,
       sender,

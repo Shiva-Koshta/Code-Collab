@@ -29,13 +29,11 @@ async function fetchFile(nodeId) {
 // Function to delete a file
 async function deleteFile(nodeId) {
     try {
-        const fileNode = await FileNode.findById(nodeId);
+        const deletedNode = await FileNode.findOneAndDelete({ _id: nodeId });
         // Check if the file node exists
-        if (!fileNode) {
+        if (!deletedNode) {
             throw new Error('File node not found.');
         }
-        // Delete the file node
-        await fileNode.remove();
         return { success: true, message: 'File deleted successfully.' };
     } catch (error) {
         console.error('Error deleting file:', error.message);
@@ -46,13 +44,12 @@ async function deleteFile(nodeId) {
 // Function to delete a directory
 async function deleteDirectory(nodeId) {
     try {
-        const fileNode = await FileNode.findById(nodeId);
+        const deletedNode = await FileNode.findOneAndDelete({ _id: nodeId });
+        console.log(deletedNode)
         // Check if the file node exists
-        if (!fileNode) {
+        if (!deletedNode) {
             throw new Error('File node not found.');
         }
-        // Delete the file node
-        await fileNode.remove();
         return { success: true, message: 'File deleted successfully.' };
     } catch (error) {
         console.error('Error deleting file:', error.message);
@@ -116,6 +113,48 @@ async function generateTree(roomId) {
     return tree;
 }
 
+async function renameFile(nodeId, newName) {
+    try {
+        // Find the file node by ID and update its name
+        const updatedNode = await FileNode.findByIdAndUpdate(
+            nodeId,
+            { name: newName },
+            { new: true } // Return the updated document
+        );
+
+        // Check if the file node exists
+        if (!updatedNode) {
+            throw new Error('File node not found.');
+        }
+        return { success: true, message: 'File renamed successfully.', updatedNode };
+
+    } catch (error) {
+        console.error('Error renaming file:', error.message);
+        return { success: false, message: 'Failed to rename file.' };
+    }
+}
+
+async function renameDirectory(nodeId, newName) {
+    try {
+        // Find the Directory node by ID and update its name
+        const updatedNode = await FileNode.findByIdAndUpdate(
+            nodeId,
+            { name: newName },
+            { new: true } // Return the updated document
+        );
+
+        // Check if the Directory node exists
+        if (!updatedNode) {
+            throw new Error('Directory node not found.');
+        }
+        return { success: true, message: 'Directory renamed successfully.', updatedNode };
+        
+    } catch (error) {
+        console.error('Error renaming Directory:', error.message);
+        return { success: false, message: 'Failed to rename file.' };
+    }
+}
+
 module.exports = {
     uploadFile,
     createDirectory,
@@ -123,5 +162,7 @@ module.exports = {
     createRootDirectory,
     generateTree,
     deleteFile,
-    deleteDirectory
+    deleteDirectory,
+    renameFile,
+    renameDirectory
 }

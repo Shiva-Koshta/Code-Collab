@@ -9,5 +9,7 @@ router.post('/generatetree', filesystem.generatetree);
 router.post('/fetchfile', filesystem.fetchfile);
 router.delete('/deletefile', filesystem.deletefile);
 router.delete('/deletedirectory', filesystem.deletedirectory);
+router.put('/renamefile', filesystem.renamefile);
+router.put('/renamedirectory', filesystem.renamedirectory);
 
 module.exports = router;

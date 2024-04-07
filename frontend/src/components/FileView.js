@@ -112,17 +112,42 @@ const FileView = ({ fileContent, setFileContent, editorRef, contentChanged, setC
   const renameFolder = (folder) => {
     const newName = prompt('Enter new folder name:', folder.name)
     if (newName) {
-      folder.name = newName
-      setFolders([...folders])
-      setSelectedFileFolder(folder)
+      (async () => {
+        try {
+          const response = await axios.put(`${process.env.REACT_APP_API_URL}/filesystem/renamedirectory`, {
+            name: newName,
+            nodeId: folder._id
+          });
+          console.log("renamed directory")
+          folder.name = newName
+          setFolders([...folders])
+          setSelectedFileFolder(folder)
+          window.location.reload();
+        } catch(error) {
+          console.log("error in renaming directory",error)
+        }
+      })();
     }
   }
 
   const renameFile = (file) => {
     const newName = prompt('Enter new file name:', file.name)
     if (newName) {
-      file.name = newName
-      setFolders([...folders])
+      (async () => {
+        try {
+          console.log(file);
+          const response = await axios.put(`${process.env.REACT_APP_API_URL}/filesystem/renamefile`, {
+            name: newName,
+            nodeId: file._id
+          });
+          console.log("renamed file")
+          file.name = response.name
+          setFolders([...folders])
+          window.location.reload();
+        } catch(error) {
+          console.log("error in renaming file",error)
+        }
+      })();
     }
   }
 
@@ -153,12 +178,13 @@ const FileView = ({ fileContent, setFileContent, editorRef, contentChanged, setC
   async function deleteFolder(folderId) {
     try {
         // Make a DELETE request to the backend endpoint to delete the folder
-        const response = await axios.delete(`${process.env.REACT_APP_API_URL}/filesystem/deletefile`, {
+        const response = await axios.delete(`${process.env.REACT_APP_API_URL}/filesystem/deletedirectory`, {
           data: {
-              nodeId: folderId,
-              fileType: 'folder' // Indicate that this is a folder deletion
+            nodeId: folderId,
+            fileType: 'folder' // Indicate that this is a folder deletion
           }
         });
+        // window.location.reload();
         return response.data;
     } catch (error) {
         console.error('Error deleting folder:', error.message);
@@ -183,6 +209,7 @@ const FileView = ({ fileContent, setFileContent, editorRef, contentChanged, setC
                 fileType: 'file' // Indicate that this is a file deletion
             }
         });
+        window.location.reload();
         return response.data;
     } catch (error) {
         console.error('Error deleting file:', error.message);
@@ -205,7 +232,7 @@ const FileView = ({ fileContent, setFileContent, editorRef, contentChanged, setC
           parentFolder.children.push(newFile)
           console.log("pushed")
           setFolders([...folders])
-          
+          window.location.reload();
         } catch (error) {
           console.log(error);
         }
@@ -228,6 +255,7 @@ const FileView = ({ fileContent, setFileContent, editorRef, contentChanged, setC
           const newFolder = { _id: response.data.directory._id, name: response.data.directory.name, type: response.data.directory.type, children: []}
           parentFolder.children.push(newFolder);
           setFolders([...folders]);
+          window.location.reload();
         } catch (error) {
           console.log(error);
         }
@@ -367,9 +395,9 @@ const FileView = ({ fileContent, setFileContent, editorRef, contentChanged, setC
             {selectedFileFolder.type === 'file' && (
               <div className='flex items-center relative'>
                 <button className='renameFileIcon update-buttons ' onClick={() => renameFile(selectedFileFolder)} title="Rename File"><CreateIcon /></button>
-                <div className='absolute bottom-0 hidden hover:bg-gray-100 hover:rounded hover:p-2 hover:block hover:z-10 hover:border hover:border-gray-300 hover:top-7'>Add Folder</div>
+                <div className='absolute bottom-0 hidden hover:bg-gray-100 hover:rounded hover:p-2 hover:block hover:z-10 hover:border hover:border-gray-300 hover:top-7'>rename File</div>
                 <button className='deleteFileIcon update-buttons ' onClick={() => deleteFile(selectedFileFolder, selectedFileFolderParent)} title="Delete File"><DeleteIcon /></button>
-                <div className='absolute bottom-0 hidden hover:bg-gray-100 hover:rounded hover:p-2 hover:block hover:z-10 hover:border hover:border-gray-300 hover:top-7'>Delete Folder</div>
+                <div className='absolute bottom-0 hidden hover:bg-gray-100 hover:rounded hover:p-2 hover:block hover:z-10 hover:border hover:border-gray-300 hover:top-7'>Delete Fi</div>
               </div>
             )}
           </div>
