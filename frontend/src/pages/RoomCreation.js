@@ -184,10 +184,12 @@ const RoomCreation = () => {
               onKeyUp={handleInputEnter}
             />
             <input
-              type="text"
-              className="p-2.5 rounder-md mb-3.5 text-base font-bold placeholder-gray-500 text-gray-700"
-              style={{ backgroundColor: "#eee" }}
-              placeholder="USERNAME"
+              type='text'
+              className='p-2.5 rounder-md mb-3.5 text-base font-bold placeholder-gray-500 text-gray-700'
+              style={{ backgroundColor: '#eee' }}
+              disabled
+              placeholder='USERNAME'
+
               onChange={(e) => setUserName(e.target.value)}
               value={userName}
               onKeyUp={handleInputEnter}
