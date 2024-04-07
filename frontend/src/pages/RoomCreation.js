@@ -163,7 +163,7 @@ const RoomCreation = () => {
             {userName && (
               <p className=''>
                 Hello,{' '}
-                <span className=' text-2xl madimi-one-regular'>{userName}</span>{' '}
+                <span className=' text-2xl el-messiri-bold'>{userName}</span>{' '}
               </p>
             )}{' '}
           </h2>
