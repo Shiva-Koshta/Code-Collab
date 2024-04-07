@@ -11,7 +11,7 @@ const RoomCreation = () => {
   const [roomId, setRoomId] = useState('')
   const [userName, setUserName] = useState('')
   const [userimage, setUserimage] = useState('')
-  const [roomUsersCount, setRoomUsersCount] = useState(0)
+  //const [roomUsersCount, setRoomUsersCount] = useState(0)
 
   // this function is used to logout the user
   const logout = () => {
@@ -96,19 +96,19 @@ const RoomCreation = () => {
       return
     }
     const apiurl = `${process.env.REACT_APP_API_URL}/rooms/numUsersInRoom`;
-    const id = uuidV4();
+    //const id = uuidV4();
     let timerInterval;
     const requestBody = {
-      roomId: id
+      roomId: roomId
     };
     const postData = async () => {
       try {
         const response = await axios.post(apiurl, requestBody);
-        if (response.data.numUsers > 10) {
+        if (response.data.numUsers > 1) {
           toast.error('Cannot join room. Room is full.');
           return;
         }
-      setRoomUsersCount(response.data.numUsers);
+      //setRoomUsersCount(response.data.numUsers);
       } catch (error) {
         console.error(error);
         toast.error('Error checking room users count');
