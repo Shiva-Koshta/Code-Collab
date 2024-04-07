@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect,useRef } from 'react'
 import Codemirror from 'codemirror'
 import 'codemirror/lib/codemirror.css'
 import 'codemirror/theme/dracula.css'
@@ -24,7 +24,9 @@ const Editor = ({ handleDownloadFile, socketRef, roomId, editorRef, fileContent,
   //   setFileContent(window.localStorage.getItem("fileContent"))
   //   setContentChanged(window.localStorage.getItem("contentChanged"))
   // }, [])
-
+  const prevCursor = useRef({ line: 0, ch: 0 })
+  const currentUser = localStorage.getItem('userData')
+  
   window.localStorage.setItem('roomid', roomId)
 
   useEffect(() => {
@@ -99,7 +101,8 @@ const Editor = ({ handleDownloadFile, socketRef, roomId, editorRef, fileContent,
         if (origin !== 'setValue') {
           socketRef.current.emit(ACTIONS.CODE_CHANGE, {
             roomId,
-            code
+            code,
+            username: currentUser
           })
         }
       })
@@ -110,6 +113,13 @@ const Editor = ({ handleDownloadFile, socketRef, roomId, editorRef, fileContent,
   useEffect(() => {
     editorRef.current.on("cursorActivity", (instance) => {
       const cursor = instance.getCursor();
+      if (cursor.line !== prevCursor.current.line || cursor.ch !== prevCursor.current.ch){
+        if (currentUser){console.log("!")
+        console.log(prevCursor.current.line)
+        console.log(prevCursor.current.ch)
+        console.log(cursor.line)
+        console.log(cursor.ch)
+        console.log("!")
       const userData = JSON.parse(localStorage.getItem("userData"));
       const cursorData = {
         cursor: { line: cursor.line, ch: cursor.ch },
@@ -117,10 +127,12 @@ const Editor = ({ handleDownloadFile, socketRef, roomId, editorRef, fileContent,
         tab: null,
       }
       console.log(cursorData);
+      prevCursor.current = cursor
       socketRef.current.emit(ACTIONS.CURSOR_CHANGE, {
         roomId,
         cursorData,
       })
+    }}
     })
   },[editorRef])
   useEffect(() => {
