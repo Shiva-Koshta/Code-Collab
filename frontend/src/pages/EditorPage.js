@@ -37,7 +37,7 @@ const EditorPage = () => {
   const [connectedUsernames, setConnectedUsernames] = useState([]);
   const [storedUserData, setStoredUserData] = useState([]);
   const [host, setHost] = useState("");
-  const [connectedUserroles, setConnectedUserroles] = useState([]);
+  const [connectedUserRoles, setConnectedUserRoles] = useState([]);
   const connectedUsernamesRef = useRef([]);
   // const [connectedUsernames, setConnectedUsernames] = useState([])
   const [connectedUsers, setConnectedUsers] = useState([]);
@@ -77,29 +77,29 @@ const EditorPage = () => {
     setAnchorEl(null)
   }
 
-  // const handleChangeRole = (username) => {
-  //   const user = connectedUserRoles.find(user => user.name === username)
-  //   if(!user)
-  //   {
-  //     console.error(`User with id ${username} not found.`)
-  //     return
-  //   }
+  const handleChangeRole = (username) => {
+    const user = connectedUserRoles.find(user => user.name === username)
+    if(!user)
+    {
+      console.error(`User with id ${username} not found.`)
+      return
+    }
 
-  //   const newRole = user.role === 'viewer' ? 'editor' : 'viewer'
+    const newRole = user.role === 'viewer' ? 'editor' : 'viewer'
     
-  //   setConnectedUserRoles(prevRoles => prevRoles.map(prevUser => {
-  //     if(prevUser.name === username)
-  //     {
-  //       return {...prevUser, role:newRole}
-  //     }
-  //     return prevUser
-  //   }))
+    setConnectedUserRoles(prevRoles => prevRoles.map(prevUser => {
+      if(prevUser.name === username)
+      {
+        return {...prevUser, role:newRole}
+      }
+      return prevUser
+    }))
 
-  //   socketRef.current.emit(ACTIONS.ROLE_CHANGE, {
-  //     roomId,
-  //     username,
-  //     newRole,
-  //   })
+    socketRef.current.emit(ACTIONS.ROLE_CHANGE, {
+      roomId,
+      username,
+      newRole,
+    })
 
   //   // fetch('/http://localhost:8080/changerole', {
   //   //   method: 'POST',
@@ -120,7 +120,7 @@ const EditorPage = () => {
   //   // .catch(error => {
   //   //   console.error('Error changing role:', error)
   //   // })
-  // }
+  }
   const handleMessageSend = () => {
     console.log(storedUserData);
     if (inputText.trim() !== "") {
@@ -226,7 +226,7 @@ const EditorPage = () => {
           }));
           setConnectedUsers(updatedUsers);
           setConnectedUsernames(clients.map((client) => client.username));
-          // setConnectedUserRoles(prevRoles => [...prevRoles, { id: socketId, name:username, role: 'editor' }])
+          setConnectedUserRoles(prevRoles => [...prevRoles, { id: socketId, name:username, role: 'editor' }])
         }
       );
 
@@ -257,6 +257,7 @@ const EditorPage = () => {
           );
           return updatedClients;
         });
+        setConnectedUserRoles(prevRoles => prevRoles.filter(user => user.username !== username))
       });
       socketRef.current.on(
         ACTIONS.MESSAGE_RECEIVE,
@@ -279,26 +280,31 @@ const EditorPage = () => {
           });
         }
       )
-      // socketRef.current.on(ACTIONS.ROLE_CHANGE, ({ username, newRole }) => {
-      //   setConnectedUserRoles(prevRoles => prevRoles.map(prevUser => {
-      //     if (prevUser.name === username) {
-      //       return { ...prevUser, role: newRole }
-      //     }
-      //     return prevUser
-      //   }))
+      socketRef.current.on(ACTIONS.ROLE_CHANGE, ({ username, newRole }) => {
+        // console.log("yes")
+        console.log(username)
+        console.log(newRole)
+        setConnectedUserRoles(prevRoles => prevRoles.map(prevUser => {
+          if (prevUser.name === username) {
+            return { ...prevUser, role: newRole }
+          }
+          return prevUser
+        }))
 
-      //   if (username === storedUserData.name && newRole=='viewer') { 
-      //     const editor = editorRef.current.getCodeMirror()
-      //     editor.setOption('readOnly', true)
-      //   }
-      //   if (username === storedUserData.name && newRole === 'editor') {
-      //     const editor = editorRef.current.getCodeMirror()
-      //     editor.setOption('readOnly', false)
-      //   }
-      // })
-      // socketRef.current.on(ACTIONS.HOST_CHANGE, ({username}) => {
-      //   setHost(username)
-      // })
+        if (username === storedUserData.name && newRole=='viewer') { 
+          console.log("yes")
+          // const editor = editorRef.current.getCodeMirror()
+          // editor.setOption('readOnly', true)
+          editorRef.current.editor.setOption('readOnly', true)
+        }
+        if (username === storedUserData.name && newRole === 'editor') {
+          const editor = editorRef.current.getCodeMirror()
+          editor.setOption('readOnly', false)
+        }
+      })
+      socketRef.current.on(ACTIONS.HOST_CHANGE, ({username}) => {
+        setHost(username)
+      })
     }
 
     init();
@@ -323,7 +329,7 @@ const EditorPage = () => {
         if (response.ok) {
           const data = await response.json();
           console.log(data);
-          setConnectedUserroles(
+          setConnectedUserRoles(
             data.users.map((user) => ({ name: user.name, role: user.role }))
           );
           setHost(data.host);
@@ -409,18 +415,25 @@ const EditorPage = () => {
             <div className='UserListContainer'>
               <div className='UserListContainer'>
                 {isConnectedComponentOpen && connectedUsers.map((user) => (
-                  <div className='UserListItem' key={user.username}>
-                    <img src={user.profileImage} alt={user.username} className='img' onClick={handleUserMenuOpen}/>
-                    <div className='username' onClick={handleUserMenuOpen} onMouseEnter={(event) => event.target.style.cursor = 'pointer'}>{user.username.split(' ')[0]}</div>
-                    <Menu
-                      anchorEl={anchorEl}
-                      open={Boolean(anchorEl)}
-                      onClose={handleUserMenuClose}
-                      >
-                    <MenuItem>{user.role}</MenuItem>
-                    </Menu>
-                  </div>
-                ))}
+                    <div className='UserListItem' key={user.username}>
+                      <img src={user.profileImage} alt={user.username} className='img' onClick={handleUserMenuOpen}/>
+                      <div className='username' onClick={handleUserMenuOpen} onMouseEnter={(event) => event.target.style.cursor = 'pointer'}>{user.username.split(' ')[0]}</div>
+                      <Menu
+                        anchorEl={anchorEl}
+                        open={Boolean(anchorEl)}
+                        onClose={handleUserMenuClose}
+                        >
+                      <MenuItem>{user.username === host ? "host" :connectedUserRoles.find(userRole => userRole.name === user.username)?.role}</MenuItem>
+                      {storedUserData.name === host && storedUserData.name!==user.username   && (
+                        <MenuItem onClick={() => handleChangeRole(user.username)}>
+                          Change Role
+                        </MenuItem>
+                      )}
+                      </Menu>
+                    </div>
+                  )
+                )
+                }
               </div>
             </div>
           </div>
