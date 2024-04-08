@@ -48,7 +48,7 @@ const HelpPage = () => {
         message: "",
       });
     } catch (error) {
-      console.error("Error:", error);
+      // console.error("Error:", error);
       toast.error("An error occurred while submitting the form");
     } finally {
       setIsSubmitting(false);

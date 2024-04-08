@@ -90,9 +90,6 @@ fetchfile = async(req, res) => {
 }
 deletefile = async(req, res) => {
     try {
-        console.log("\n\n\n\n\n\n")
-        console.log(req.body.nodeId);
-        console.log("\n\n\n\n\n\n")
         const result = await filesys.deleteFile(req.body.nodeId);
         res.status(200).json({ success: true, message: 'File deleted successfully.' });
     } catch (error) {
