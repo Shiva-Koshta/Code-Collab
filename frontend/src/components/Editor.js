@@ -1,4 +1,4 @@
-import React, { useEffect,useRef } from 'react'
+import React, { useEffect,useRef,useState } from 'react'
 import Codemirror from 'codemirror'
 import 'codemirror/lib/codemirror.css'
 import 'codemirror/theme/dracula.css'
@@ -25,10 +25,23 @@ const Editor = ({ handleDownloadFile, socketRef, roomId, editorRef, fileContent,
   //   setContentChanged(window.localStorage.getItem("contentChanged"))
   // }, [])
   const prevCursor = useRef({ line: 0, ch: 0 })
-  const currentUser = localStorage.getItem('userData')
-  
+  let editorChanged = false
+  // const [cursorPositions, setCursorPositions] = useState({})
   window.localStorage.setItem('roomid', roomId)
 
+  const renderAllCursors = (cursorPosition,currentUserId) => {
+    console.log("Cursor position type:", typeof cursorPosition);
+    console.log("hi")
+    // console.log(userId)
+    console.log(currentUserId)
+    Object.entries(cursorPosition).forEach(([userId,cursorData]) => {
+      console.log(userId)
+      console.log(currentUserId)
+      if(userId!==currentUserId){
+        renderCursors(cursorData)
+      }
+    })
+  }
   useEffect(() => {
     // Create style element
     const style = document.createElement("style")
@@ -69,7 +82,7 @@ const Editor = ({ handleDownloadFile, socketRef, roomId, editorRef, fileContent,
       const code = fileContent
       socketRef.current.emit(ACTIONS.CODE_CHANGE, {
         roomId,
-        code
+        code,
       })
     }
   }, [fileContent, contentChanged])
@@ -96,13 +109,23 @@ const Editor = ({ handleDownloadFile, socketRef, roomId, editorRef, fileContent,
 
       editorRef.current.on('change', (instance, changes) => {
         // console.log(changes)
+        editorChanged = true
         const { origin } = changes
         const code = instance.getValue()
         if (origin !== 'setValue') {
+          const cursor = instance.getCursor();
+          const userData = JSON.parse(localStorage.getItem("userData"));
+          const cursorData = {
+            cursor: { line: cursor.line, ch: cursor.ch },
+            user: {email: userData.email, name: userData.name },
+            tab: null,
+          }
+          const socketid = socketRef.current.id
           socketRef.current.emit(ACTIONS.CODE_CHANGE, {
             roomId,
             code,
-            username: currentUser
+            cursorData,
+            socketid
           })
         }
       })
@@ -113,13 +136,13 @@ const Editor = ({ handleDownloadFile, socketRef, roomId, editorRef, fileContent,
   useEffect(() => {
     editorRef.current.on("cursorActivity", (instance) => {
       const cursor = instance.getCursor();
-      if (cursor.line !== prevCursor.current.line || cursor.ch !== prevCursor.current.ch){
-        if (currentUser){console.log("!")
-        console.log(prevCursor.current.line)
-        console.log(prevCursor.current.ch)
-        console.log(cursor.line)
-        console.log(cursor.ch)
-        console.log("!")
+      // if (cursor.line !== prevCursor.current.line || cursor.ch !== prevCursor.current.ch){
+        // console.log("!")
+        // console.log(prevCursor.current.line)
+        // console.log(prevCursor.current.ch)
+        // console.log(cursor.line)
+        // console.log(cursor.ch)
+        // console.log("!")
       const userData = JSON.parse(localStorage.getItem("userData"));
       const cursorData = {
         cursor: { line: cursor.line, ch: cursor.ch },
@@ -128,25 +151,36 @@ const Editor = ({ handleDownloadFile, socketRef, roomId, editorRef, fileContent,
       }
       console.log(cursorData);
       prevCursor.current = cursor
-      socketRef.current.emit(ACTIONS.CURSOR_CHANGE, {
+      if (!editorChanged)
+      {socketRef.current.emit(ACTIONS.CURSOR_CHANGE, {
         roomId,
         cursorData,
       })
-    }}
-    })
+      }
+      editorChanged = false
+    }
+    )
   },[editorRef])
   useEffect(() => {
     if (socketRef.current) {
-      socketRef.current.on(ACTIONS.CODE_CHANGE, ({ code }) => {
+      socketRef.current.on(ACTIONS.CODE_CHANGE, ({ code , cursorPosition}) => {
         // console.log("hi");
         if (code !== null) {
           editorRef.current.setValue(code)
         }
+        // setCursorPositions(cursorPosition)
+        console.log((cursorPosition))
+        renderAllCursors(cursorPosition,socketRef.current.id)
+        // cursorPosition.map((cursorData)=> {renderCursors(cursorData)})
       })
       socketRef.current.on(ACTIONS.CURSOR_CHANGE, ({cursorData}) => {
         console.log("cursorData retrieved from user: "+cursorData.user.name)
         console.log(cursorData)
         renderCursors(cursorData)
+      })
+      socketRef.current.on(ACTIONS.DISCONNECTED,({ username })=> {
+        const prevCursorMarkers = document.querySelectorAll(`.cursor-marker[title="${username}"]`)
+        prevCursorMarkers.forEach((marker) => marker.remove())
       })
     }
   }, [socketRef.current])

@@ -22,6 +22,7 @@ app.use(middleware)
 app.use('/filesystem', filesysrouter);
 app.use(endpoints)
 const userSocketMap = {}
+const cursorPosition = {}
 
 function getAllConnectedClients (roomId) {
   return Array.from(io.sockets.adapter.rooms.get(roomId) || []).map(
@@ -75,7 +76,7 @@ io.on('connection', (socket) => {
       console.error('Error updating user count:', error)
     }
   })
-  socket.on(ACTIONS.CODE_CHANGE, ({ roomId, code }) => {
+  socket.on(ACTIONS.CODE_CHANGE, ({ roomId, code ,cursorData, socketid}) => {
     // Save or update the code in the database
     RoomCodeMap.findOneAndUpdate(
       { roomId },
@@ -89,8 +90,9 @@ io.on('connection', (socket) => {
         console.error('Error retrieving code from database:', error)
       })
 
+    cursorPosition[socketid]= cursorData
     // Emit the code change to other sockets in the room
-    socket.in(roomId).emit(ACTIONS.CODE_CHANGE, { code })
+    socket.in(roomId).emit(ACTIONS.CODE_CHANGE, { code, cursorPosition})
   })
   socket.on(ACTIONS.CURSOR_CHANGE, ({ roomId, cursorData }) => {
     socket.in(roomId).emit(ACTIONS.CURSOR_CHANGE, { cursorData });
@@ -113,6 +115,7 @@ io.on('connection', (socket) => {
   })
 
   socket.on('disconnecting', () => {
+    delete cursorPosition[socket.id]
     // Iterate through each room the socket is connected to
     socket.rooms.forEach((roomId) => {
       // Find the document for the room ID, decrement the userCount, and return the updated document
