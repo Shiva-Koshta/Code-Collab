@@ -7,7 +7,16 @@ import 'codemirror/addon/edit/closetag'
 import 'codemirror/addon/edit/closebrackets'
 import ACTIONS from '../Actions'
 
-const Editor = ({ handleDownloadFile, socketRef, roomId, editorRef, fileContent, setFileContent, contentChanged }) => {
+const Editor = ({
+  handleDownloadFile,
+  socketRef,
+  roomId,
+  editorRef,
+  fileContent,
+  setFileContent,
+  contentChanged,
+  connectedClients,
+}) => {
   // const [fileContent, setFileContent] = useState("")
   // const [contentChanged, setContentChanged] = useState(false)
   // useEffect(() => {
@@ -27,7 +36,28 @@ const Editor = ({ handleDownloadFile, socketRef, roomId, editorRef, fileContent,
   const prevCursor = useRef({ line: 0, ch: 0 })
   let editorChanged = false
   // const [cursorPositions, setCursorPositions] = useState({})
-  window.localStorage.setItem('roomid', roomId)
+  window.localStorage.setItem("roomid", roomId);
+  const handleBeforeUnload = (event) => {
+    // Prompt the user with a confirmation dialog
+
+    if (connectedClients.current.length === 1) {
+      console.log(connectedClients.current.length);
+      const confirmationMessage =
+        "Are you sure you want to leave this page? Your data may not be saved.";
+      event.returnValue = confirmationMessage;
+    }
+  };
+
+  // Attach event listener for beforeunload event
+  useEffect(() => {
+    console.log("changed");
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
+    // Cleanup function to remove event listener
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, [connectedClients.current.length]);
 
   const renderAllCursors = (cursorPosition,currentUserId) => {
     console.log("Cursor position type:", typeof cursorPosition);
@@ -44,7 +74,7 @@ const Editor = ({ handleDownloadFile, socketRef, roomId, editorRef, fileContent,
   }
   useEffect(() => {
     // Create style element
-    const style = document.createElement("style")
+    const style = document.createElement("style");
     style.textContent = `
       @keyframes blinkCursor {
         0%, 100% {
@@ -57,57 +87,57 @@ const Editor = ({ handleDownloadFile, socketRef, roomId, editorRef, fileContent,
     `;
 
     // Append style to document head
-    document.head.appendChild(style)
+    document.head.appendChild(style);
 
     // Clean up function to remove style element when component unmounts
     return () => {
-      document.head.removeChild(style)
+      document.head.removeChild(style);
     };
-  }, [])
+  }, []);
 
   useEffect(() => {
     // console.log("hi");
-    if (!editorRef.current) return
+    if (!editorRef.current) return;
 
-    editorRef.current.setValue('')// to avoid repetition of old instances
+    editorRef.current.setValue(""); // to avoid repetition of old instances
     // console.log("fileref  current:",fileRef.current)
     if (fileContent) {
-      editorRef.current.setValue(fileContent)
+      editorRef.current.setValue(fileContent);
     }
-  }, [fileContent, contentChanged])
+  }, [fileContent, contentChanged]);
   useEffect(() => {
     // console.log("file added");
     if (fileContent) {
-      console.log(fileContent)
-      const code = fileContent
+      console.log(fileContent);
+      const code = fileContent;
       socketRef.current.emit(ACTIONS.CODE_CHANGE, {
         roomId,
         code,
       })
     }
-  }, [fileContent, contentChanged])
+  }, [fileContent, contentChanged]);
   useEffect(() => {
-    async function init () {
+    async function init() {
       editorRef.current = Codemirror.fromTextArea(
-        document.getElementById('realEditor'),
+        document.getElementById("realEditor"),
         {
-          mode: { name: 'javascript', json: true },
-          theme: 'dracula',
+          mode: { name: "javascript", json: true },
+          theme: "dracula",
           autoCloseTags: true,
           autoCloseBrackets: true,
-          lineNumbers: true
+          lineNumbers: true,
         }
-      )
+      );
 
       if (fileContent) {
-        editorRef.current.setValue(fileContent)
+        editorRef.current.setValue(fileContent);
         // socketRef.current.emit(ACTIONS.CODE_CHANGE, {
         //   roomId,
         //   fileRef.current,
         // }); // Set file content to CodeMirror editor
       }
 
-      editorRef.current.on('change', (instance, changes) => {
+      editorRef.current.on("change", (instance, changes) => {
         // console.log(changes)
         editorChanged = true
         const { origin } = changes
@@ -128,11 +158,11 @@ const Editor = ({ handleDownloadFile, socketRef, roomId, editorRef, fileContent,
             socketid
           })
         }
-      })
+      });
     }
-    init()
-  }, [])
- 
+    init();
+  }, []);
+
   useEffect(() => {
     editorRef.current.on("cursorActivity", (instance) => {
       const cursor = instance.getCursor();
@@ -146,9 +176,9 @@ const Editor = ({ handleDownloadFile, socketRef, roomId, editorRef, fileContent,
       const userData = JSON.parse(localStorage.getItem("userData"));
       const cursorData = {
         cursor: { line: cursor.line, ch: cursor.ch },
-        user: {email: userData.email, name: userData.name },
+        user: { email: userData.email, name: userData.name },
         tab: null,
-      }
+      };
       console.log(cursorData);
       prevCursor.current = cursor
       if (!editorChanged)
@@ -166,7 +196,7 @@ const Editor = ({ handleDownloadFile, socketRef, roomId, editorRef, fileContent,
       socketRef.current.on(ACTIONS.CODE_CHANGE, ({ code , cursorPosition}) => {
         // console.log("hi");
         if (code !== null) {
-          editorRef.current.setValue(code)
+          editorRef.current.setValue(code);
         }
         // setCursorPositions(cursorPosition)
         console.log((cursorPosition))
@@ -183,35 +213,35 @@ const Editor = ({ handleDownloadFile, socketRef, roomId, editorRef, fileContent,
         prevCursorMarkers.forEach((marker) => marker.remove())
       })
     }
-  }, [socketRef.current])
+  }, [socketRef.current]);
   useEffect(() => {
     // Fetch code from the backend using room ID
     if (roomId) {
-      console.log(JSON.stringify({ roomId }))
-      async function fetchCode () {
+      console.log(JSON.stringify({ roomId }));
+      async function fetchCode() {
         try {
-          const response = await fetch('http://localhost:8080/receivecode', {
-            method: 'POST',
+          const response = await fetch("http://localhost:8080/receivecode", {
+            method: "POST",
             headers: {
-              'Content-Type': 'application/json'
+              "Content-Type": "application/json",
             },
-            body: JSON.stringify({ roomId })
-          })
+            body: JSON.stringify({ roomId }),
+          });
           if (response.ok) {
-            const { code } = await response.json()
+            const { code } = await response.json();
             if (code !== null) {
-              editorRef.current.setValue(code)
+              editorRef.current.setValue(code);
             }
           } else {
-            console.error('Failed to fetch code')
+            console.error("Failed to fetch code");
           }
         } catch (error) {
-          console.error('Error fetching code:', error)
+          console.error("Error fetching code:", error);
         }
       }
-      fetchCode()
+      fetchCode();
     }
-  }, [roomId])
+  }, [roomId]);
 
   // useEffect(() => {
   //   console.log(newusernameRef.current)
@@ -239,48 +269,50 @@ const Editor = ({ handleDownloadFile, socketRef, roomId, editorRef, fileContent,
   //   }
   // }, [socketRef.current]);
   const getRandomColor = () => {
-    const letters = "0123456789ABCDEF"
-    let color = "#"
+    const letters = "0123456789ABCDEF";
+    let color = "#";
     for (let i = 0; i < 6; i++) {
-      color += letters[Math.floor(Math.random() * 16)]
+      color += letters[Math.floor(Math.random() * 16)];
     }
-    return color
+    return color;
   };
   // Function to render cursors
   const renderCursors = (cursorInfoList) => {
     if (cursorInfoList) {
-      const { cursor,tab, user } = cursorInfoList
-      const { ch, line } = cursor
+      const { cursor, tab, user } = cursorInfoList;
+      const { ch, line } = cursor;
       // const cursorMarkerId = `cursor-marker-${user.email}`;
       // let cursorMarker = document.getElementById(cursorMarkerId);
       // Create a cursor marker element if not present
       // if (!cursorMarker){
       // Get the total width of the screen
-      const totalScreenWidth = window.innerWidth
-      const sidebarWidth = (2 / 10) * totalScreenWidth
-      const cursorPosition = editorRef.current.charCoords({ line, ch })
-      const leftPosition = cursorPosition.left - sidebarWidth
+      const totalScreenWidth = window.innerWidth;
+      const sidebarWidth = (2 / 10) * totalScreenWidth;
+      const cursorPosition = editorRef.current.charCoords({ line, ch });
+      const leftPosition = cursorPosition.left - sidebarWidth;
 
-      const prevCursorMarkers = document.querySelectorAll(`.cursor-marker[title="${user.name}"]`)
-      prevCursorMarkers.forEach((marker) => marker.remove())
+      const prevCursorMarkers = document.querySelectorAll(
+        `.cursor-marker[title="${user.name}"]`
+      );
+      prevCursorMarkers.forEach((marker) => marker.remove());
 
-      const cursorMarker = document.createElement("div")
-      cursorMarker.className = "cursor-marker"
-      cursorMarker.style.position = "absolute"
-      cursorMarker.classList.add("h-8", "w-px")
+      const cursorMarker = document.createElement("div");
+      cursorMarker.className = "cursor-marker";
+      cursorMarker.style.position = "absolute";
+      cursorMarker.classList.add("h-8", "w-px");
 
-      cursorMarker.style.backgroundColor = getRandomColor() // Assign a random color
-      cursorMarker.title = user.name
+      cursorMarker.style.backgroundColor = getRandomColor(); // Assign a random color
+      cursorMarker.title = user.name;
 
       // Append cursor marker to CodeMirror editor container
-      editorRef.current.getWrapperElement().appendChild(cursorMarker)
-      cursorMarker.style.animation = "blinkCursor 1s infinite"
+      editorRef.current.getWrapperElement().appendChild(cursorMarker);
+      cursorMarker.style.animation = "blinkCursor 1s infinite";
       // }
 
       // cursorMarker.style.left = `${
       //   editorRef.current.charCoords({ line, ch }).left
       // -324}px`;
-      cursorMarker.style.left = `${leftPosition}px`
+      cursorMarker.style.left = `${leftPosition}px`;
       cursorMarker.style.top = `${
         editorRef.current.charCoords({ line, ch }).top
       }px`;
@@ -293,10 +325,10 @@ const Editor = ({ handleDownloadFile, socketRef, roomId, editorRef, fileContent,
     return () => {
       document
         .querySelectorAll(".cursor-marker")
-        .forEach((node) => node.remove())
+        .forEach((node) => node.remove());
     };
   }, []);
-  return <textarea id='realEditor' />
-}
+  return <textarea id="realEditor" />;
+};
 
-export default Editor
+export default Editor;
