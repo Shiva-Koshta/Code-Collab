@@ -87,34 +87,43 @@ const RoomCreation = () => {
     postData();
 
   }
-
-  // this function is used to join a room
-  const joinRoom = () => {
-    
-    if (!roomId || !userName ) {
-      toast.error('ROOM ID & username is required')
-      return
-    }
+  async function getRoomUsersCount() {
     const apiurl = `${process.env.REACT_APP_API_URL}/rooms/numUsersInRoom`;
-    //const id = uuidV4();
-    let timerInterval;
     const requestBody = {
       roomId: roomId
     };
     const postData = async () => {
       try {
         const response = await axios.post(apiurl, requestBody);
-        if (response.data.numUsers > 1) {
-          toast.error('Cannot join room. Room is full.');
-          return;
+        if (response.status !== 200) {
+          return -1;
         }
-      //setRoomUsersCount(response.data.numUsers);
+        return response.data.numUsers;
       } catch (error) {
-        console.error(error);
-        toast.error('Error checking room users count');
-        return;
+        return -1;
       }
     };
+    return await postData();
+  }
+
+  // this function is used to join a room
+  const joinRoom = async () => {
+
+    if (!roomId || !userName) {
+      toast.error('ROOM ID & username is required')
+      return
+    }
+
+    let numUsers = await getRoomUsersCount();
+    console.log('numUsers:', numUsers);
+    if (numUsers === -1) {
+      toast.error('Error joining room');
+      return;
+    }
+    if (numUsers >= 10) {
+      toast.error('Room is full');
+      return;
+    }
     // this will navigate to the editor page
     // axios.post("http://localhost:8080/createroom", { "roomId" : roomId})
     navigate(`/editor/${roomId}`, {
