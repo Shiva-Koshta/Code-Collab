@@ -4,7 +4,7 @@ import toast, { Toaster } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import "../index";
 import axios from "axios";
-
+const MAXUSERS = 10;
 const RoomCreation = () => {
   const navigate = useNavigate();
 
@@ -126,7 +126,7 @@ const RoomCreation = () => {
       toast.error('Error joining room');
       return;
     }
-    if (numUsers >= 10) {
+    if (numUsers >= MAXUSERS) {
       toast.error('Room is full');
       return;
     }
