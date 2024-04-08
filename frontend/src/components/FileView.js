@@ -158,7 +158,20 @@ const FileView = ({ fileContent, setFileContent, editorRef, contentChanged, setC
       setFolders([...folders])
     }
   }
-
+  const sortAlphabetically = (array) => {
+    if (!Array.isArray(array)) {
+      return array; 
+    }
+    return array.sort((a, b) => {
+      if (a.type === 'directory' && b.type !== 'directory') {
+        return -1;
+      } else if (a.type !== 'directory' && b.type === 'directory') {
+        return 1; 
+      } else {
+        return a.name.localeCompare(b.name);
+      }
+    });
+  };
   const createFile = (parentFolder) => {
     toggleFolder(parentFolder, true)
     const newFileName = prompt('Enter file name:')
@@ -172,6 +185,7 @@ const FileView = ({ fileContent, setFileContent, editorRef, contentChanged, setC
           });
           const newFile = { _id: response.data.file._id, name: response.data.file.name, type: response.data.file.type }
           parentFolder.children.push(newFile)
+          parentFolder.children = sortAlphabetically(parentFolder.children);
           console.log("pushed")
           setFolders([...folders])
 
@@ -196,6 +210,7 @@ const FileView = ({ fileContent, setFileContent, editorRef, contentChanged, setC
           });
           const newFolder = { _id: response.data.directory._id, name: response.data.directory.name, type: response.data.directory.type, children: [] }
           parentFolder.children.push(newFolder);
+          parentFolder.children = sortAlphabetically(parentFolder.children);
           setFolders([...folders]);
         } catch (error) {
           console.log(error);
@@ -226,6 +241,7 @@ const FileView = ({ fileContent, setFileContent, editorRef, contentChanged, setC
   };
 
   const renderFolder = (folder, depth = 0, parentFolder = null) => {
+    const sortedChildren = sortAlphabetically(folder.children);
     return (
       <div
         key={folder.name}
