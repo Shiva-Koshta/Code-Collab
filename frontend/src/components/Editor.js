@@ -145,8 +145,7 @@ const Editor = ({
         cursor: { line: cursor.line, ch: cursor.ch },
         user: { email: userData.email, name: userData.name },
         tab: null,
-      };const updatedUsers = updatedClients.map(client => ({ username: client.username, profileImage: client.picture }));
-      setConnectedUsers(updatedUsers);
+      };
       console.log(cursorData);
       socketRef.current.emit(ACTIONS.CURSOR_CHANGE, {
         roomId,
