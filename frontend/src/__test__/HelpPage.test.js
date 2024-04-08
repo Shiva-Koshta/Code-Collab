@@ -24,6 +24,11 @@ Object.defineProperty(window, "matchMedia", {
     dispatchEvent: jest.fn(),
   })),
 });
+import { ArrowBackIcon, HomeOutlinedIcon } from '../pages/HelpPage'
+
+// Mocking the navigate function
+const navigate = jest.fn();
+
 
 describe("Routing", () => {
   it("renders HelpPage component when /help URL is called", () => {
@@ -114,6 +119,37 @@ describe("Button functionality", () => {
     const submitButton = getByText("Submit");
     expect(submitButton).toBeInTheDocument();
   });
+
+  it('ArrowBackIcon navigates to "/" when clicked', () => {
+    const { useNavigate } = require("react-router-dom");
+    const navigate = jest.fn();
+    useNavigate.mockReturnValue(navigate); // Mock useNavigate
+
+    const { getByTestId } = render(
+      <MemoryRouter>
+        <HelpPage />
+      </MemoryRouter>
+    );
+
+    fireEvent.click(getByTestId('ArrowBackIcon'));
+    expect(navigate).toHaveBeenCalledWith("/");
+  });
+
+  it('HomeOutlinedIcon navigates to "/" when clicked', () => {
+    const { useNavigate } = require("react-router-dom");
+    const navigate = jest.fn();
+    useNavigate.mockReturnValue(navigate); // Mock useNavigate
+
+    const { getByTestId } = render(
+      <MemoryRouter>
+        <HelpPage />
+      </MemoryRouter>
+    );
+    const icon = getByTestId('HomeOutlinedIcon');
+    fireEvent.click(icon);
+    expect(navigate).toHaveBeenCalledWith("/");
+  });
+
 });
 
 describe("Form functionality", () => {
