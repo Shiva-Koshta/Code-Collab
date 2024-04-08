@@ -1,5 +1,5 @@
 import React from "react";
-import { render, fireEvent, waitFor,act } from "@testing-library/react";
+import { render, fireEvent, waitFor, act } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter, Routes, Route, useNavigate } from "react-router-dom";
 import HelpPage from "../pages/HelpPage"; // Assuming this is your HelpPage component
@@ -24,11 +24,10 @@ Object.defineProperty(window, "matchMedia", {
     dispatchEvent: jest.fn(),
   })),
 });
-import { ArrowBackIcon, HomeOutlinedIcon } from '../pages/HelpPage'
+import { ArrowBackIcon, HomeOutlinedIcon } from "../pages/HelpPage";
 
 // Mocking the navigate function
 const navigate = jest.fn();
-
 
 describe("Routing", () => {
   it("renders HelpPage component when /help URL is called", () => {
@@ -131,7 +130,7 @@ describe("Button functionality", () => {
       </MemoryRouter>
     );
 
-    fireEvent.click(getByTestId('ArrowBackIcon'));
+    fireEvent.click(getByTestId("ArrowBackIcon"));
     expect(navigate).toHaveBeenCalledWith("/");
   });
 
@@ -145,11 +144,10 @@ describe("Button functionality", () => {
         <HelpPage />
       </MemoryRouter>
     );
-    const icon = getByTestId('HomeOutlinedIcon');
+    const icon = getByTestId("HomeOutlinedIcon");
     fireEvent.click(icon);
     expect(navigate).toHaveBeenCalledWith("/");
   });
-
 });
 
 describe("Form functionality", () => {
@@ -169,7 +167,9 @@ describe("Form functionality", () => {
     );
 
     // Click the submit button
-    fireEvent.click(getByText("Submit"));
+    act(() => {
+      fireEvent.click(getByText("Submit"));
+    });
 
     // Wait for a certain period of time for the toast message to appear
     await waitFor(() => {
@@ -191,47 +191,62 @@ describe("Form functionality", () => {
     });
   });
 
-    it('handles form submission failure', async () => {
-      // Mock fetch to return a failed response
-      jest.spyOn(global, 'fetch').mockResolvedValueOnce({
-        ok: false,
+  it("handles form submission failure", async () => {
+    // Mock fetch to return a failed response
+    jest.spyOn(global, "fetch").mockResolvedValueOnce({
+      ok: false,
+    });
+
+    // Render the component with the form
+    const { getByLabelText, getByText } = render(<HelpPage />);
+
+    // Fill out the form fields
+    act(() => {
+      fireEvent.change(getByLabelText("Name"), { target: { value: "John" } });
+      fireEvent.change(getByLabelText("Email"), {
+        target: { value: "john@example.com" },
+      });
+      fireEvent.change(getByLabelText("Message"), {
+        target: { value: "Hello, World!" },
       });
 
-      // Render the component with the form
-      const { getByLabelText, getByText } = render(
-        <HelpPage />
-      );
-
-      // Fill out the form fields
-      fireEvent.change(getByLabelText('Name'), { target: { value: 'John' } });
-      fireEvent.change(getByLabelText('Email'), { target: { value: 'john@example.com' } });
-      fireEvent.change(getByLabelText('Message'), { target: { value: 'Hello, World!' } });
-
       // Submit the form
-      userEvent.click(getByText('Submit'));
-
-      // Assert that the form submission failure message appears
-      await waitFor(() => expect(getByText('Form submission failed')).toBeInTheDocument());
+      userEvent.click(getByText("Submit"));
     });
 
-    it('handles form submission error', async () => {
-      // Mock fetch to throw an error
-      jest.spyOn(global, 'fetch').mockRejectedValueOnce(new Error('Network Error'));
+    // Assert that the form submission failure message appears
+    await waitFor(() =>
+      expect(getByText("Form submission failed")).toBeInTheDocument()
+    );
+  });
 
-      // Render the component with the form
-      const { getByLabelText, getByText } = render(
-        <HelpPage />
-      );
+  it("handles form submission error", async () => {
+    // Mock fetch to throw an error
+    jest
+      .spyOn(global, "fetch")
+      .mockRejectedValueOnce(new Error("Network Error"));
 
-      // Fill out the form fields
-      fireEvent.change(getByLabelText('Name'), { target: { value: 'John' } });
-      fireEvent.change(getByLabelText('Email'), { target: { value: 'john@example.com' } });
-      fireEvent.change(getByLabelText('Message'), { target: { value: 'Hello, World!' } });
+    // Render the component with the form
+    const { getByLabelText, getByText } = render(<HelpPage />);
+
+    // Fill out the form fields
+    act(() => {
+      fireEvent.change(getByLabelText("Name"), { target: { value: "John" } });
+      fireEvent.change(getByLabelText("Email"), {
+        target: { value: "john@example.com" },
+      });
+      fireEvent.change(getByLabelText("Message"), {
+        target: { value: "Hello, World!" },
+      });
 
       // Submit the form
-      userEvent.click(getByText('Submit'));
-
-      // Assert that the form submission error message appears
-      await waitFor(() => expect(getByText('An error occurred while submitting the form')).toBeInTheDocument());
+      userEvent.click(getByText("Submit"));
     });
+    // Assert that the form submission error message appears
+    await waitFor(() =>
+      expect(
+        getByText("An error occurred while submitting the form")
+      ).toBeInTheDocument()
+    );
+  });
 });
