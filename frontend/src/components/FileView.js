@@ -93,42 +93,17 @@ const FileView = ({ fileContent, setFileContent, editorRef, contentChanged, setC
   const renameFolder = (folder) => {
     const newName = prompt('Enter new folder name:', folder.name)
     if (newName) {
-      (async () => {
-        try {
-          const response = await axios.put(`${process.env.REACT_APP_API_URL}/filesystem/renamedirectory`, {
-            name: newName,
-            nodeId: folder._id
-          });
-          console.log("renamed directory")
-          folder.name = newName
-          setFolders([...folders])
-          setSelectedFileFolder(folder)
-          window.location.reload();
-        } catch(error) {
-          console.log("error in renaming directory",error)
-        }
-      })();
+      folder.name = newName
+      setFolders([...folders])
+      setSelectedFileFolder(folder)
     }
   }
 
   const renameFile = (file) => {
     const newName = prompt('Enter new file name:', file.name)
     if (newName) {
-      (async () => {
-        try {
-          console.log(file);
-          const response = await axios.put(`${process.env.REACT_APP_API_URL}/filesystem/renamefile`, {
-            name: newName,
-            nodeId: file._id
-          });
-          console.log("renamed file")
-          file.name = response.name
-          setFolders([...folders])
-          window.location.reload();
-        } catch(error) {
-          console.log("error in renaming file",error)
-        }
-      })();
+      file.name = newName
+      setFolders([...folders])
     }
   }
 
@@ -146,36 +121,25 @@ const FileView = ({ fileContent, setFileContent, editorRef, contentChanged, setC
     }
   }
 
-  async function deleteFolder(folderId) {
-    try {
-        const response = await axios.delete(`${process.env.REACT_APP_API_URL}/filesystem/deletedirectory`, {
-          data: {
-              nodeId: folderId,
-              fileType: 'folder'
-          }
-        });
-        window.location.reload();
-        return response.data;
-    } catch (error) {
-        console.error('Error deleting folder:', error.message);
-        throw new Error('Failed to delete folder.');
+  const deleteFolder = (folder, parentFolder) => {
+    console.log(folder, parentFolder)
+    if (folder.type !== 'root') { // Check if folder is not the root folder
+      const index = parentFolder.children.indexOf(folder)
+      if (index !== -1) {
+        parentFolder.children.splice(index, 1)
+        setFolders([...folders])
+      }
     }
-}
-  async function deleteFile(fileId) {
-    try {
-        const response = await axios.delete(`${process.env.REACT_APP_API_URL}/filesystem/deletefile`, {
-            data: {
-                nodeId: fileId,
-                fileType: 'file'
-            }
-        });
-        window.location.reload();
-        return response.data;
-    } catch (error) {
-        console.error('Error deleting file:', error.message);
-        throw new Error('Failed to delete file.');
+  }
+
+  const deleteFile = (file, parentFolder) => {
+    const index = parentFolder.children.indexOf(file)
+    console.log(parentFolder)
+    if (index !== -1) {
+      parentFolder.children.splice(index, 1)
+      setFolders([...folders])
     }
-}
+  }
 
   const createFile = (parentFolder) => {
     toggleFolder(parentFolder, true)
@@ -192,7 +156,7 @@ const FileView = ({ fileContent, setFileContent, editorRef, contentChanged, setC
           parentFolder.children.push(newFile)
           console.log("pushed")
           setFolders([...folders])
-          window.location.reload();
+          
         } catch (error) {
           console.log(error);
         }
@@ -221,7 +185,6 @@ const FileView = ({ fileContent, setFileContent, editorRef, contentChanged, setC
           const newFolder = { _id: response.data.directory._id, name: response.data.directory.name, type: response.data.directory.type, children: []}
           parentFolder.children.push(newFolder);
           setFolders([...folders]);
-          window.location.reload();
         } catch (error) {
           console.log(error);
         }
@@ -307,7 +270,6 @@ const FileView = ({ fileContent, setFileContent, editorRef, contentChanged, setC
             {selectedFileFolder.type === 'root' && (
               <div className='flex items-center'>
                 <button onClick={() => createFolder(selectedFileFolder)} title="Add Folder"><CreateNewFolderIcon /></button>
-                
                 <button onClick={() => createFile(selectedFileFolder)} title="Add File"><AddIcon /></button>
                 <button onClick={() => renameFolder(selectedFileFolder)} title="Rename Folder"><CreateIcon /></button>
               </div>
