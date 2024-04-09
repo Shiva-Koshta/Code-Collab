@@ -24,7 +24,6 @@ Object.defineProperty(window, "matchMedia", {
     dispatchEvent: jest.fn(),
   })),
 });
-import { ArrowBackIcon, HomeOutlinedIcon } from "../pages/HelpPage";
 
 // Mocking the navigate function
 const navigate = jest.fn();
