@@ -90,7 +90,7 @@ async function deleteFile(nodeId) {
         if (!deletedNode) {
             throw new Error('File node not found.');
         }
-        return { success: true, message: 'File deleted successfully.' };
+        return { success: true, message: 'File deleted successfully.', deletedNode };
     } catch (error) {
         console.error('Error deleting file:', error.message);
         return { success: false, message: 'Failed to delete file.' };
@@ -101,14 +101,11 @@ async function deleteFile(nodeId) {
 async function deleteDirectory(nodeId) {
     try {
         const deletedNode = await FileNode.findOneAndDelete({ _id: nodeId });
-        console.log(deletedNode)
         // Check if the file node exists
         if (!deletedNode) {
             throw new Error('File node not found.');
         }
-        // Delete the file node
-        await fileNode.remove();
-        return { success: true, message: 'File deleted successfully.' };
+        return { success: true, message: 'File deleted successfully.', deletedNode };
     } catch (error) {
         console.error('Error deleting file:', error.message);
         return { success: false, message: 'Failed to delete file.' };

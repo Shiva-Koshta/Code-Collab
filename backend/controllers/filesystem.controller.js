@@ -103,8 +103,8 @@ generatetree = async(req, res) => {
 
 deletefile = async(req, res) => {
     try {
-        const result = await filesys.deleteFile(req.body.nodeId);
-        res.status(200).json({ success: true, message: 'File deleted successfully.' });
+        const file = await filesys.deleteFile(req.body.nodeId);
+        res.status(200).json({ success: true, message: 'File deleted successfully.', file });
     } catch (error) {
         res.status(500).json({ success: false, error: error.message });
     }
@@ -112,7 +112,7 @@ deletefile = async(req, res) => {
 deletedirectory = async(req, res) => {
     try {
         dir = await filesys.deleteDirectory(req.body.nodeId);  
-        res.status(200).json({ success: true, message: 'Directory deleted successfully.' });
+        res.status(200).json({ success: true, message: 'Directory deleted successfully.', dir });
     } catch (error) {
         console.log(error)
     }

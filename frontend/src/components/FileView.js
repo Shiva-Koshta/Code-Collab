@@ -93,17 +93,39 @@ const FileView = ({ fileContent, setFileContent, editorRef, contentChanged, setC
   const renameFolder = (folder) => {
     const newName = prompt('Enter new folder name:', folder.name)
     if (newName) {
-      folder.name = newName
-      setFolders([...folders])
-      setSelectedFileFolder(folder)
+      (async () => {
+        try {
+          const response = await axios.put(`${process.env.REACT_APP_API_URL}/filesystem/renamedirectory`, {
+            name: newName,
+            nodeId: folder._id
+          });
+          console.log("renamed directory")
+          folder.name = newName
+          setFolders([...folders])
+          setSelectedFileFolder(folder)
+        } catch(error) {
+          console.log("error in renaming directory",error)
+        }
+      })();
     }
   }
 
   const renameFile = (file) => {
     const newName = prompt('Enter new file name:', file.name)
     if (newName) {
-      file.name = newName
-      setFolders([...folders])
+      (async () => {
+        try {
+          const response = await axios.put(`${process.env.REACT_APP_API_URL}/filesystem/renamefile`, {
+            name: newName,
+            nodeId: file._id
+          });
+          console.log("renamed file")
+          file.name = newName
+          setFolders([...folders])
+        } catch(error) {
+          console.log("error in renaming file",error)
+        }
+      })();
     }
   }
 
@@ -121,23 +143,41 @@ const FileView = ({ fileContent, setFileContent, editorRef, contentChanged, setC
     }
   }
 
-  const deleteFolder = (folder, parentFolder) => {
-    console.log(folder, parentFolder)
-    if (folder.type !== 'root') { // Check if folder is not the root folder
-      const index = parentFolder.children.indexOf(folder)
-      if (index !== -1) {
-        parentFolder.children.splice(index, 1)
-        setFolders([...folders])
-      }
+  async function deleteFolder(folderId, parentFolder) {
+    try {
+        const index = parentFolder.children.indexOf(folderId)
+        const response = await axios.delete(`${process.env.REACT_APP_API_URL}/filesystem/deletedirectory`, {
+          data: {
+            nodeId: folderId,
+            fileType: 'folder'
+          }
+        });
+        if (index !== -1) {
+          parentFolder.children.splice(index, 1)
+          setFolders([...folders])
+        }
+    } catch (error) {
+      console.error('Error deleting folder:', error.message);
+      throw new Error('Failed to delete folder.');
     }
   }
 
-  const deleteFile = (file, parentFolder) => {
-    const index = parentFolder.children.indexOf(file)
-    console.log(parentFolder)
-    if (index !== -1) {
-      parentFolder.children.splice(index, 1)
-      setFolders([...folders])
+  async function deleteFile(fileId, parentFolder) {
+    try {
+        const index = parentFolder.children.indexOf(fileId)
+        const response = await axios.delete(`${process.env.REACT_APP_API_URL}/filesystem/deletefile`, {
+            data: {
+              nodeId: fileId,
+              fileType: 'file'
+            }
+        });
+        if (index !== -1) {
+          parentFolder.children.splice(index, 1)
+          setFolders([...folders])
+        }
+    } catch (error) {
+        console.error('Error deleting file:', error.message);
+        throw new Error('Failed to delete file.');
     }
   }
 
@@ -216,7 +256,7 @@ const FileView = ({ fileContent, setFileContent, editorRef, contentChanged, setC
   const renderFolder = (folder, depth = 0, parentFolder = null) => {
     return (
       <div 
-        key={folder.name} 
+        key={folder._id} 
         className='flex flex-col mb-1 h-fit'
         style={{ marginLeft: `${depth === 0 ? 0 : 20}px` }}>
         <div className={`flex items-center p-px ${(selectedFileFolder && selectedFileFolder._id === folder._id) ? 'Selected-file-folder' : ''} rounded-md`}>
