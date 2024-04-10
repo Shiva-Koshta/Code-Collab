@@ -3,7 +3,7 @@ import { v4 as uuidV4 } from "uuid";
 import toast, { Toaster } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import "../index";
-const axios = require('axios'); // Mock axios using CommonJS syntax
+import axios from "axios";
 const MAXUSERS = 10;
 const RoomCreation = () => {
   const navigate = useNavigate();
