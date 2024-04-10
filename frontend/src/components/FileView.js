@@ -34,8 +34,7 @@ import pdfIcon from '../icons/pdf.png';
 import pythonIcon from '../icons/python.png';
 import textIcon from '../icons/text.png';
 import videoIcon from '../icons/video.png';
-// Import other file type icons as needed
-
+import { toast } from 'react-hot-toast';
 
 const FileView = ({ fileContent, setFileContent, editorRef, contentChanged, setContentChanged }) => {
   const { roomId } = useParams()
@@ -59,6 +58,21 @@ const FileView = ({ fileContent, setFileContent, editorRef, contentChanged, setC
   const [selectedFileFolderParent, setSelectedFileFolderParent] = useState({});
   const [isFolderOpen, setIsFolderOpen] = useState({ '0': false })
   const [isSmallScreen, setIsSmallScreen] = useState(false);
+  useEffect(() => {
+    const handleCtrlS = (event) => {
+      if (event.ctrlKey && event.key === 's') {
+        handleSaveFile(selectedFileFolder._id);
+        event.preventDefault();
+      }
+    };
+    document.addEventListener('keydown', handleCtrlS);
+    return () => {
+      document.removeEventListener('keydown', handleCtrlS);
+    };
+  }, [selectedFileFolder._id]);
+  const handleSaveFile = (fileId) => {
+    toast.success(`File saved! file id:-  ${fileId}`);
+  };
 
   useEffect(() => {
     (async () => {
@@ -74,6 +88,8 @@ const FileView = ({ fileContent, setFileContent, editorRef, contentChanged, setC
         console.log(error)
       }
     })();
+
+
 
     function handleResize() {
       setIsSmallScreen(window.innerWidth < 1290); // Adjust the threshold as needed
@@ -116,7 +132,7 @@ const FileView = ({ fileContent, setFileContent, editorRef, contentChanged, setC
     // console.log('fileref here:',fileContent)
     event.target.value = null
   }
-  
+
   const handleFileClick = async (fileId) => {
     try {
       const response = await axios.post(`${process.env.REACT_APP_API_URL}/filesystem/fetchfile`, {
@@ -152,8 +168,8 @@ const FileView = ({ fileContent, setFileContent, editorRef, contentChanged, setC
           folder.name = newName
           setFolders([...folders])
           setSelectedFileFolder(folder)
-        } catch(error) {
-          console.log("error in renaming directory",error)
+        } catch (error) {
+          console.log("error in renaming directory", error)
         }
       })();
     }
@@ -171,8 +187,8 @@ const FileView = ({ fileContent, setFileContent, editorRef, contentChanged, setC
           console.log("renamed file")
           file.name = newName
           setFolders([...folders])
-        } catch(error) {
-          console.log("error in renaming file",error)
+        } catch (error) {
+          console.log("error in renaming file", error)
         }
       })();
     }
@@ -194,17 +210,17 @@ const FileView = ({ fileContent, setFileContent, editorRef, contentChanged, setC
 
   async function deleteFolder(folderId, parentFolder) {
     try {
-        const index = parentFolder.children.indexOf(folderId)
-        const response = await axios.delete(`${process.env.REACT_APP_API_URL}/filesystem/deletedirectory`, {
-          data: {
-            nodeId: folderId,
-            fileType: 'folder'
-          }
-        });
-        if (index !== -1) {
-          parentFolder.children.splice(index, 1)
-          setFolders([...folders])
+      const index = parentFolder.children.indexOf(folderId)
+      const response = await axios.delete(`${process.env.REACT_APP_API_URL}/filesystem/deletedirectory`, {
+        data: {
+          nodeId: folderId,
+          fileType: 'folder'
         }
+      });
+      if (index !== -1) {
+        parentFolder.children.splice(index, 1)
+        setFolders([...folders])
+      }
     } catch (error) {
       console.error('Error deleting folder:', error.message);
       throw new Error('Failed to delete folder.');
@@ -213,31 +229,31 @@ const FileView = ({ fileContent, setFileContent, editorRef, contentChanged, setC
 
   async function deleteFile(fileId, parentFolder) {
     try {
-        const index = parentFolder.children.indexOf(fileId)
-        const response = await axios.delete(`${process.env.REACT_APP_API_URL}/filesystem/deletefile`, {
-            data: {
-              nodeId: fileId,
-              fileType: 'file'
-            }
-        });
-        if (index !== -1) {
-          parentFolder.children.splice(index, 1)
-          setFolders([...folders])
+      const index = parentFolder.children.indexOf(fileId)
+      const response = await axios.delete(`${process.env.REACT_APP_API_URL}/filesystem/deletefile`, {
+        data: {
+          nodeId: fileId,
+          fileType: 'file'
         }
+      });
+      if (index !== -1) {
+        parentFolder.children.splice(index, 1)
+        setFolders([...folders])
+      }
     } catch (error) {
-        console.error('Error deleting file:', error.message);
-        throw new Error('Failed to delete file.');
+      console.error('Error deleting file:', error.message);
+      throw new Error('Failed to delete file.');
     }
   }
   const sortAlphabetically = (array) => {
     if (!Array.isArray(array)) {
-      return array; 
+      return array;
     }
     return array.sort((a, b) => {
       if (a.type === 'directory' && b.type !== 'directory') {
         return -1;
       } else if (a.type !== 'directory' && b.type === 'directory') {
-        return 1; 
+        return 1;
       } else {
         return a.name.localeCompare(b.name);
       }
@@ -315,8 +331,8 @@ const FileView = ({ fileContent, setFileContent, editorRef, contentChanged, setC
     const sortedChildren = sortAlphabetically(folder.children);
     return (
 
-      <div 
-        key={folder._id} 
+      <div
+        key={folder._id}
 
         className='flex flex-col mb-1 h-fit'
         style={{ marginLeft: `${depth === 0 ? 0 : 10}px`, maxWidth: `${depth === 0 ? `${parentWidth}px` : `${parentWidth - depth * 10}px`}` }}>
@@ -370,69 +386,6 @@ const FileView = ({ fileContent, setFileContent, editorRef, contentChanged, setC
       </div>
     )
   }
-  // const fileIconMap = {
-  //       txt: <TextFileIcon className='mr-2 pb-0.5' style={{ fontSize: 20 }} />,
-  //       json: <ImageIcon/>,
-  //       py: <AudiotrackIcon />,
-  //       html: <ImageIcon />,
-  //       css: <TextFileIcon />,
-  //       java: <MovieIcon />,
-  //       cpp: <PictureAsPdfIcon />,
-  //       c: <PictureAsPdfIcon />,
-  //       js: <MovieIcon />,
-  //     jpg: <ImageIcon />, // Image File
-  //     pdf: <PictureAsPdfIcon />, // PDF File
-  //     mp3: <AudiotrackIcon />, // Audio File
-  //     mp4: <MovieIcon />, // Video File
-  //       // Add more mappings as needed
-  //     };
-  //     const getFileIcon = (extension) => {
-  //       return fileIconMap[extension] || <MovieIcon />;
-  //     };
-  //     const renderFileIcon = (file) => {
-  //       const extension = file.name.split('.').pop().toLowerCase();
-  //       const icon = getFileIcon(extension);
-  //       return <div className='file-icon'>{icon}</div>;
-  //     };
-
-
-
-  //const fileIconMap = {
-  //   txt: '../images/Logo.png',
-  //   json: '../images/Logo.png',
-  //   py: '../images/Logo.png',
-  //   html: '../images/Logo.png',
-  //   css: '../images/Logo.png',
-  //   java: '../images/Logo.png',
-  //   cpp: '../images/Logo.png',
-  //   c: '../images/Logo.png',
-  //   js: '../images/Logo.png',
-  // jpg: '../images/Logo.png', // Image File
-  // pdf: '../images/Logo.png', // PDF File
-  // mp3: '../images/Logo.png', // Audio File
-  // mp4: '../images/Logo.png', // Video File
-  // default: '..images/Logo.png',
-  //};
-  // const getFileIcon = (extension) => {
-  //   // Check if extension exists in the icon map, otherwise return default icon
-  //   return fileIconMap[extension.toLowerCase()] || fileIconMap['default'];
-  // };
-
-  // const renderFileIcon = (file) => {
-  //   // Extract extension from file name
-  //   const extension = (file.name.split('.').pop() || '').toLowerCase();
-  //   // Get corresponding icon URL
-  //   const iconUrl = getFileIcon(extension);
-  //   // Render icon
-  //   return (
-  //     <div className='file-icon'>
-  //       <img src={iconUrl} alt={`${extension} icon`} onError={(e) => {
-  //         // If the image fails to load, display a placeholder or fallback image
-  //         e.target.src = fileIconMap['default'];
-  //       }} />
-  //     </div>
-  //   );
-  // };
 
   const fileIconMap = {
     mp3: audioIcon,
@@ -451,10 +404,8 @@ const FileView = ({ fileContent, setFileContent, editorRef, contentChanged, setC
     py: pythonIcon,
     txt: textIcon,
     mp4: videoIcon,
-    // Add mappings for other file types with corresponding image files
   };
   const getFileIcon = (extension) => {
-    // Check if extension exists in the icon map, otherwise return default icon
     return fileIconMap[extension.toLowerCase()] || defaultIcon;
   };
 
@@ -538,7 +489,6 @@ const FileView = ({ fileContent, setFileContent, editorRef, contentChanged, setC
                 <label htmlFor='folderInput'>
                   <DriveFolderUploadIcon className='text-white cursor-pointer' />
                 </label>
-                {/* <button className='' title="Upload Folder"><DriveFolderUploadIcon /></button> */}
                 <div className='absolute bottom-0 hidden hover:bg-gray-100 hover:rounded hover:p-2 hover:block hover:z-10 hover:border hover:border-gray-300'>Upload Folder</div>
                 <button className='renameFolderIcon update-buttons ' onClick={() => renameFolder(selectedFileFolder)} title="Rename Folder"><CreateIcon /></button>
                 <div className='absolute bottom-0 hidden hover:bg-gray-100 hover:rounded hover:p-2 hover:block hover:z-10 hover:border hover:border-gray-300 hover:top-7'>Rename Folder</div>
@@ -570,7 +520,6 @@ const FileView = ({ fileContent, setFileContent, editorRef, contentChanged, setC
                 <label htmlFor='folderInput'>
                   <DriveFolderUploadIcon className='text-white cursor-pointer' />
                 </label>
-                {/* <button className='' title="Upload Folder"><DriveFolderUploadIcon /></button> */}
                 <div className='absolute bottom-0 hidden hover:bg-gray-100 hover:rounded hover:p-2 hover:block hover:z-10 hover:border hover:border-gray-300'>Upload Folder</div>
                 <button className='renameFolderIcon update-buttons ' onClick={() => renameFolder(selectedFileFolder)} title="Rename Folder"><CreateIcon /></button>
                 <div className='absolute bottom-0 hidden hover:bg-gray-100 hover:rounded hover:p-2 hover:block hover:z-10 hover:border hover:border-gray-300 hover:top-7'>Rename Folder</div>
