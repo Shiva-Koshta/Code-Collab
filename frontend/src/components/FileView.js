@@ -74,7 +74,8 @@ const FileView = ({ fileContent, setFileContent, editorRef, contentChanged, setC
   // useEffect(() => {
   // }, []);
 
-  const handleFileChange = (event) => {
+  // this will need to be changed
+  const handleFileChange = (event, parentFolder=selectedFileFolder) => {
     console.log('reached')
     // console.log(event)
     const file = event.target.files[0]
@@ -84,11 +85,31 @@ const FileView = ({ fileContent, setFileContent, editorRef, contentChanged, setC
 
     window.localStorage.setItem('contentChanged', contentChanged)
     reader.onload = (e) => {
-      const content = e.target.result
-      setFileContent(content)
-      window.localStorage.setItem('fileContent', JSON.stringify(fileContent))
-      // console.log(content)
-      // fileRef.current = content
+      const content = e.target.result;
+
+      // code before
+      // // setFileContent(content)
+      // window.localStorage.setItem('fileContent', JSON.stringify(fileContent))
+      // // console.log(content)
+      // // fileRef.current = content
+
+      (async () => {
+        try {
+          const response = await axios.post(`${process.env.REACT_APP_API_URL}/filesystem/uploadfile`, {
+            name: file.name,
+            parentId: parentFolder._id,
+            roomId: roomId,
+            content: content,
+          });
+          const newFile = { _id: response.data.file._id, name: response.data.file.name, type: response.data.file.type }
+          parentFolder.children.push(newFile)
+          console.log("pushed");
+          setFolders([...folders]);
+        } catch (error) {
+          console.log(error);
+        }
+      })();
+
     }
     if (file) {
       reader.readAsText(file)
@@ -309,7 +330,7 @@ const FileView = ({ fileContent, setFileContent, editorRef, contentChanged, setC
   const sendDataToServer = async (data) => {
     try {
       console.log('Data to be sent to the server:', data);
-      const response = await axios.post(`${process.env.REACT_APP_API_URL}`, data);
+      // const response = await axios.post(`${process.env.REACT_APP_API_URL}`, data);
       console.log('Server response:', response.data);
     } catch (error) {
       console.error('Error sending data to server:', error);

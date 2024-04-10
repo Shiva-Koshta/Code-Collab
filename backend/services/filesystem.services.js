@@ -23,7 +23,7 @@ async function fetchFile(nodeId) {
     if (!fileNode || fileNode.type !== 'file') {
         throw new Error('Node not found or is not a file.');
     }
-    return fileNode.content;
+    return fileNode;
 }
 
 // Add a function to create a root directory for a room

@@ -1,3 +1,4 @@
+const { stringify } = require('uuid');
 const filesys = require('../services/filesystem.services');
 
 
@@ -75,14 +76,15 @@ fetchfile = async(req, res) => {
         file = await filesys.fetchFile(req.body.nodeId); 
         responseJSON = {
             message: 'File fetched',
-            root: {
+            file: {
                 _id: file._id,
                 name: file.name,
                 type: file.type,
                 parent: file.parent,
-                content: file.content
+                content: file.content.toString()
             } 
         }    
+        console.log(file.content.toString());
         res.status(200).json(responseJSON);
     } catch (error) {
         console.log(error)
