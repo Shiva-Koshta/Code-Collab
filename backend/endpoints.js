@@ -4,12 +4,14 @@ const RoomCodeMap = require("./models/RoomCodeMap");
 const RoomUserCount = require("./models/RoomUserCount");
 const authRoute = require("./routes/auth");
 const nodemailer = require("nodemailer");
+//initialise env file
+require("dotenv").config();
 
 let transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
-    user: "codecollabhelp@gmail.com",
-    pass: "dogk zdwu jdws dxpp",
+    user: process.env.MAILER_EMAIL_ID,
+    pass: process.env.MAILER_PASSWORD,
   },
 });
 
@@ -19,7 +21,9 @@ router.use("/auth", authRoute);
 router.post("/rooms/numUsersInRoom", async (req, res) => {
   try {
     const { roomId } = req.body;
-
+    if (!roomId) {
+      return res.status(400).json({ error: "Room ID is required" });
+    }
     // Fetch the room from the database
     const room = await RoomUserCount.findOne({ roomId });
 
@@ -38,6 +42,9 @@ router.post("/rooms/numUsersInRoom", async (req, res) => {
 // Endpoint to handle receiving code
 router.post("/receivecode", async (req, res) => {
   const { roomId } = req.body;
+  if(!roomId){
+    return res.status(400).json({ error: "Room ID is required" });
+  }
 
   try {
     const roomMap = await RoomCodeMap.findOne({ roomId });
@@ -62,7 +69,9 @@ router.post("/receivecode", async (req, res) => {
 router.post("/delete-entry", async (req, res) => {
   const { roomId } = req.body;
   //   console.log("hi", roomId);
-
+  if (!roomId) {
+    return res.status(400).json({ error: "Room ID is required" });
+  }
   try {
     const room = await RoomUserCount.findOne({ roomId });
     if (!room) {
@@ -84,9 +93,82 @@ router.post("/delete-entry", async (req, res) => {
     return res.status(500).json({ error: "Internal server error" });
   }
 });
+
+router.post("/initialize", async (req, res) => {
+  // console.log("hey");
+  const { roomId, username } = req.body;
+
+  try {
+    // Check if the room exists
+    const existingRoom = await RoomUserCount.findOne({ roomId });
+
+    if (!existingRoom) {
+      // If the room doesn't exist, create a new room document
+      const newRoom = new RoomUserCount({
+        roomId,
+        userCount: 0, // Initial user count is 1
+        hostname: username, // Set the hostname to the username of the current user
+        users: [{ username, role: "editor" }], // Add the current user as the host with role 'editor'
+      });
+
+      // Save the new room document
+      await newRoom.save();
+
+      // Respond with success message
+      return res.status(200).json({ message: "Room initialized successfully" });
+    }
+
+    // If the room already exists
+    // Check if the user is already present in the room
+    const existingUser = existingRoom.users.find(
+      (user) => user.username === username
+    );
+    if (!existingUser) {
+      // If the user is not already present, add the user to the room as an editor
+      existingRoom.users.push({ username, role: "editor" });
+      await existingRoom.save();
+    }
+
+    // Respond with success message
+    return res.status(200).json({ message: "Room initialized successfully" });
+  } catch (error) {
+    console.error("Error initializing room:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+});
+router.post("/getdetails", async (req, res) => {
+  console.log("hi");
+  const { roomId } = req.body; // Assuming roomId is sent as a query parameter
+
+  try {
+    // Fetch room details including user list and hostname
+    const roomDetails = await RoomUserCount.findOne({ roomId });
+
+    if (!roomDetails) {
+      return res.status(404).json({ error: "Room not found" });
+    }
+
+    // Extract usernames and roles from the room details
+    const userRoles = roomDetails.users.map((user) => ({
+      name: user.username,
+      role: user.role,
+    }));
+    const host = roomDetails.hostname;
+
+    // Respond with user details and hostname
+    return res.status(200).json({ users: userRoles, host });
+  } catch (error) {
+    console.error("Error fetching room details:", error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+});
+
 router.post("/help", async (req, res) => {
   try {
     const { name, email, message } = req.body;
+    if(!name || !email || !message){
+      return res.status(400).json({ error: "Name, Email and Message are required" });
+    }
     console.log(email);
     let mailOptions = {
       from: "codecollabhelp@gmail.com",

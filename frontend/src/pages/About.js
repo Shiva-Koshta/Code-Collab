@@ -1,14 +1,16 @@
-import React from 'react'
-import '../index'
-import Logo from '../images/Logo.png'
-import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined'
-import { useNavigate } from 'react-router-dom'
+import React from 'react';
+import Logo from '../images/Logo.png';
+import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
+import { useNavigate } from 'react-router-dom';
+import '../styles/About.css';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 const About = () => {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
+  
   return (
     <div
-      className='about-us-container flex flex-col gap-32 h-screen min-h-screen p-5 w-screen bg-cover'
+      className='about-us-container flex flex-col gap-32 h-screen min-h-screen p-5 w-screen bg-cover overflow-y-scroll'
       style={{
         backgroundColor: '#1c1e29'
       }}
@@ -31,53 +33,37 @@ const About = () => {
           onClick={() => navigate('/')}
         />
       </div>
-      <div className='grid grid-cols-12 h-3/4 mx-12'>
-        <div className='text-container flex flex-col justify-center gap-16 col-span-7 text-right p-8 relative'>
-          <div className='flex flex-col gap-8 pr-4'>
-            <h2 className='text-red-300 font-bold text-5xl satisfy-regular'>
-              ABOUT US
-            </h2>
-            <div className='flex justify-end'>
-              <p className='poppins-medium-italic text-red-100 w-5/6 text-2xl '>
-                At Code Collab, we're passionate about fostering collaboration
-                and innovation in software development. Our platform empowers
-                developers to work together in real-time, sharing ideas and code
-                to create remarkable solutions. Join us on a journey of
-                creativity and excellence as we shape the future of software
-                development together.
-              </p>
-            </div>
+    
+    <div className='about-us-container h-screen bg-cover relative flex flex-row '>
+      <div className='text-container-container flex flex-grow justify-center items-center md:w-60'>
+        <div className='text-container text-center'>
+          <h2 className='text-red-300 font-bold text-5xl satisfy-regular'>ABOUT US</h2>
+          <div>
+            <p className='poppins-medium-italic text-red-100 text-xl'>
+              At Code Collab, we're passionate about fostering collaboration and innovation in software development. Our platform empowers developers to work together in real-time, sharing ideas and code to create remarkable solutions. Join us on a journey of creativity and excellence as we shape the future of software development together.
+            </p>
           </div>
-          <div className='flex flex-col left-2 gap-8 pr-4 text-left'>
-            <h2 className='text-red-300 font-bold text-5xl satisfy-regular text-end'>
-              Contact Us
-            </h2>
-            <div className='flex flex-col text-right'>
-              <div className='flex justify-end gap-4'>
-                <p className='text-red-100 poppins-medium-italic text-2xl font-bold  my-1'>
-                  Email:{' '}
-                </p>
-                <p className='text-red-100 poppins-medium-italic text-2xl my-1'>
-                  xyz@gmail.com
-                </p>
+          <div>
+            <h2 className='text-red-300 font-bold text-5xl satisfy-regular mt-5'>Contact Us</h2>
+            <div className='flex flex-col'>
+              <div className='flex justify-center gap-4'>
+                <p className='text-red-100 poppins-medium-italic font-bold my-1'>Email:</p>
+                <p className='text-red-100 poppins-medium-italic my-1'>xyz@gmail.com</p>
               </div>
-              <div className='flex justify-end gap-4'>
-                <p className='text-red-100 poppins-medium-italic text-2xl my-1 font-bold'>
-                  Phone no:{' '}
-                </p>
-                <p className='text-red-100 poppins-medium-italic text-2xl my-1'>
-                  1234567890
-                </p>
+              <div className='flex justify-center gap-4'>
+                <p className='text-red-100 poppins-medium-italic font-bold my-1'>Phone no:</p>
+                <p className='text-red-100 poppins-medium-italic my-1'>1234567890</p>
               </div>
             </div>
           </div>
-        </div>
-        <div className='Logo col-span-5 object-fill pr-20'>
-          <img src={Logo} />
         </div>
       </div>
+      <div className='Logo-container hidden md:block md:w-40'>
+        <img src={Logo} alt='Logo' className='max-h-100' />
+      </div>
     </div>
-  )
+    </div>
+  );
 }
 
-export default About
+export default About;
