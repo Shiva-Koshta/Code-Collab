@@ -6,27 +6,28 @@ const http = require("http");
 const mongoose = require("mongoose");
 const { Server } = require("socket.io");
 const filesysrouter = require("./routes/filesystem.routes");
-const endpoints = require("./endpoints");
-const middleware = require("./middleware");
-const RoomCodeMap = require("./models/RoomCodeMap");
-const RoomUserCount = require("./models/RoomUserCount");
-const ACTIONS = require("../frontend/src/Actions");
-const { log } = require("console");
+const endpoints = require('./endpoints')
+const middleware = require('./middleware')
+const RoomCodeMap = require('./models/RoomCodeMap')
+const RoomUserCount = require('./models/RoomUserCount')
+const ACTIONS = require('../frontend/src/Actions')
+const { log } = require('console')
+const FileNodeSchema = require('./models/FileNode')
 
-const app = express();
-const server = http.createServer(app);
-const io = new Server(server);
-const port = process.env.PORT || 8080;
+const app = express()
+const server = http.createServer(app)
+const io = new Server(server)
+const port = process.env.PORT || 8080
 
-app.use(middleware);
-app.use("/filesystem", filesysrouter);
-app.use(endpoints);
-const userSocketMap = {};
+app.use(middleware)
+app.use('/filesystem', filesysrouter);
+app.use(endpoints)
+const userSocketMap = {}
 const usercnt = {};
 const cursorPosition = {}
 
+function getAllConnectedClients (roomId) {
 
-function getAllConnectedClients(roomId) {
   return Array.from(io.sockets.adapter.rooms.get(roomId) || []).map(
     (socketId) => {
       console.log("userSocketMap:");

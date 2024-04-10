@@ -101,7 +101,7 @@ const Editor = ({
     editorRef.current.setValue(""); // to avoid repetition of old instances
     // console.log("fileref  current:",fileRef.current)
     if (fileContent) {
-      editorRef.current.setValue(fileContent);
+      editorRef.current.setValue(fileContent)
     }
   }, [fileContent, contentChanged]);
   useEffect(() => {

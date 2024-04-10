@@ -9,6 +9,7 @@ const About = () => {
   const navigate = useNavigate();
   
   return (
+
     <div className='bigCont'>
       <div className='mt-5 ml-5'>
           <HomeOutlinedIcon
@@ -16,6 +17,7 @@ const About = () => {
             fontSize="large"
             onClick={() => navigate("/")}
           />
+
       </div>
     
     <div className='about-us-container h-screen bg-cover relative flex flex-row '>
