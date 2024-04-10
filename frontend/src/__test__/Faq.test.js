@@ -1,41 +1,25 @@
-import React from 'react';
-import { render, fireEvent } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
-import Faq from '../pages/Faq';
-// Mock useNavigate
-jest.mock('react-router-dom', () => ({
-  ...jest.requireActual('react-router-dom'),
-  useNavigate: jest.fn(),
-}));
+import React from "react";
+import { render, fireEvent } from "@testing-library/react";
 
-// describe('Faq component', () => {
-//   it('renders without crashing', () => {
-//     render(
-//       <MemoryRouter>
-//         <Faq />
-//       </MemoryRouter>
-//     );
-//   });
+import { MemoryRouter } from "react-router-dom"; // Import MemoryRouter
+import Faq from "../pages/Faq"; // Adjust the path as per your project structure
 
-//   it('navigates to home when ArrowBackIcon is clicked', () => {
-//     const { getByTestId } = render(
-//       <MemoryRouter>
-//         <Faq />
-//       </MemoryRouter>
-//     );
+// Mock the entire react-router-dom module
+jest.mock("react-router-dom", () => {
+  const originalModule = jest.requireActual("react-router-dom");
 
-//     fireEvent.click(getByTestId('ArrowBackIcon'));
-//     expect(require('react-router-dom').useNavigate).toHaveBeenCalledWith('/');
-//   });
+  return {
+    ...originalModule,
+    useNavigate: jest.fn(),
+  };
+});
 
-//   it('navigates to home when HomeOutlinedIcon is clicked', () => {
-//     const { getByTestId } = render(
-//       <MemoryRouter>
-//         <Faq />
-//       </MemoryRouter>
-//     );
-
-//     fireEvent.click(getByTestId('HomeOutlinedIcon'));
-//     expect(require('react-router-dom').useNavigate).toHaveBeenCalledWith('/');
-//   });
-// });
+describe("Faq component", () => {
+  it("renders without crashing", () => {
+    render(
+      <MemoryRouter>
+        <Faq />
+      </MemoryRouter>
+    );
+  });
+});

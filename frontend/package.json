@@ -2,6 +2,11 @@
   "name": "frontend",
   "version": "0.1.0",
   "private": true,
+  "jest": {
+    "moduleNameMapper": {
+      "^axios$": "axios/dist/node/axios.cjs"
+    }
+  },
   "dependencies": {
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
     "@emotion/react": "^11.11.4",
@@ -39,9 +44,7 @@
     "styled-components": "^6.1.8",
     "uuid": "^9.0.1",
     "web-vitals": "^2.1.4"
-  },
-  "jest": {
-    "verbose": true
+  
   },
   "scripts": {
     "start": "react-scripts start",
