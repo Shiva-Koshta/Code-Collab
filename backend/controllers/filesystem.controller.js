@@ -1,9 +1,7 @@
 const filesys = require('../services/filesystem.services');
 
 
-createfile = async (req, res) => {
-    if (!req.body.name || !req.body.parentId || !req.body.roomId) 
-        return res.status(400).json({ message: 'Please provide all required fields' })
+createfile = async(req, res) => {
     try {
         file = await filesys.uploadFile(req.body.name, '', req.body.parentId, req.body.roomId)
         responseJSON = {
@@ -14,16 +12,13 @@ createfile = async (req, res) => {
                 type: file.type,
                 parent: file.parentId,
             }
-        }
+        }     
         res.status(200).json(responseJSON);
     } catch (error) {
         console.log(error)
-        res.status(500).json({ message: 'Error creating file' })
     }
 }
-uploadfile = async (req, res) => {
-    if (!req.body.name || !req.body.content || !req.body.parentId || !req.body.roomId) 
-        return res.status(400).json({ message: 'Please provide all required fields' })
+uploadfile = async(req, res) => {
     try {
         file = await filesys.uploadFile(req.body.name, req.body.content, req.body.parentId, req.body.roomId)
         responseJSON = {
@@ -34,16 +29,13 @@ uploadfile = async (req, res) => {
                 type: file.type,
                 parent: file.parentId,
             }
-        }
+        }     
         res.status(200).json(responseJSON);
     } catch (error) {
         console.log(error)
-        res.status(500).json({ message: 'Error uploading file' })
     }
 }
-createdirectory = async (req, res) => {
-    if (!req.body.name || !req.body.parentId || !req.body.roomId) 
-        return res.status(400).json({ message: 'Please provide all required fields' })
+createdirectory = async(req, res) => {
     try {
         dir = await filesys.createDirectory(req.body.name, req.body.parentId, req.body.roomId)
         responseJSON = {
@@ -54,18 +46,15 @@ createdirectory = async (req, res) => {
                 type: dir.type,
                 parent: dir.parent,
             }
-        }
+        }     
         res.status(200).json(responseJSON);
     } catch (error) {
         console.log(error)
-        res.status(500).json({ message: 'Error creating directory' })
     }
 }
-createrootdirectory = async (req, res) => {
-    if (!req.body.roomId) 
-        return res.status(400).json({ message: 'Please provide all required fields' })
+createrootdirectory = async(req, res) => {
     try {
-        rootDir = await filesys.createRootDirectory(req.body.roomId);
+        rootDir = await filesys.createRootDirectory(req.body.roomId); 
         responseJSON = {
             message: 'Root directory created',
             root: {
@@ -73,20 +62,17 @@ createrootdirectory = async (req, res) => {
                 name: rootDir.name,
                 type: rootDir.type,
                 parent: rootDir.parent,
-            }
-        }
+            } 
+        }    
         res.status(200).json(responseJSON);
     } catch (error) {
         console.log(error)
-        res.status(500).json({ message: 'Error creating root directory' })
     }
 
 }
-fetchfile = async (req, res) => {
-    if (!req.body.nodeId) 
-        return res.status(400).json({ message: 'Please provide all required fields' })
+fetchfile = async(req, res) => {
     try {
-        file = await filesys.fetchFile(req.body.nodeId);
+        file = await filesys.fetchFile(req.body.nodeId); 
         responseJSON = {
             message: 'File fetched',
             root: {
@@ -95,29 +81,66 @@ fetchfile = async (req, res) => {
                 type: file.type,
                 parent: file.parent,
                 content: file.content
-            }
-        }
+            } 
+        }    
         res.status(200).json(responseJSON);
     } catch (error) {
         console.log(error)
-        res.status(500).json({ message: 'Error fetching file' })
     }
 }
-generatetree = async (req, res) => {
-    if (!req.body.roomId) 
-        return res.status(400).json({ message: 'Please provide all required fields' })
+generatetree = async(req, res) => {
     try {
-        tree = await filesys.generateTree(req.body.roomId);
+        tree = await filesys.generateTree(req.body.roomId); 
         responseJSON = {
             message: 'File fetched',
             tree: tree,
-        }
+        }    
         res.status(200).json(responseJSON);
     } catch (error) {
         console.log(error)
-        res.status(500).json({ message: 'Error fetching File Tree' })
     }
 }
+
+deletefile = async(req, res) => {
+    try {
+        const file = await filesys.deleteFile(req.body.nodeId);
+        res.status(200).json({ success: true, message: 'File deleted successfully.', file });
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+}
+deletedirectory = async(req, res) => {
+    try {
+        dir = await filesys.deleteDirectory(req.body.nodeId);  
+        res.status(200).json({ success: true, message: 'Directory deleted successfully.', dir });
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+renamefile = async(req, res) => {
+    try {
+        file = await filesys.renameFile(req.body.nodeId, req.body.name)
+        responseJSON = {
+            message: 'Renamed file',
+        }     
+        res.status(200).json(responseJSON);
+    } catch (error) {
+        console.log(error)
+    }
+}
+renamedirectory = async(req, res) => {
+    try {
+        dir = await filesys.renameDirectory(req.body.nodeId, req.body.name)
+        responseJSON = {
+            message: 'Rename directory',
+        }     
+        res.status(200).json(responseJSON);
+    } catch (error) {
+        console.log(error)
+    }
+}
+
 
 module.exports = {
     createfile,
@@ -126,4 +149,8 @@ module.exports = {
     createrootdirectory,
     generatetree,
     fetchfile,
+    deletefile,
+    deletedirectory,
+    renamefile,
+    renamedirectory
 }

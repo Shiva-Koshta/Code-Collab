@@ -24,16 +24,11 @@ const Faq = () => {
 
   return (
     <div style={{paddingTop: "6px", paddingLeft: "10px"}}>
-      <ArrowBackIcon
-            className="text-slate-300 cursor-pointer mt-3 ml-5"
-            fontSize="large"
-            onClick={() => navigate("/")}
-          />
-          <HomeOutlinedIcon
-            className="text-slate-200 cursor-pointer mt-3"
-            fontSize="large"
-            onClick={() => navigate("/")}
-          />
+      <HomeOutlinedIcon
+        className="text-slate-200 cursor-pointer mt-3 ml-5"
+        fontSize="large"
+        onClick={() => navigate("/")}
+      />
       <div className="bigCont flex flex-col overflow-y-auto">
         
         <div
