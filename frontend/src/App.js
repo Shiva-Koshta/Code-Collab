@@ -10,7 +10,8 @@ import {
 } from 'react-router-dom'
 
 import { useEffect, useState } from 'react'
-import axios from 'axios'
+// import axios from 'axios'
+const axios = require('axios'); // Mock axios using CommonJS syntax
 
 import RoomCreation from './pages/RoomCreation'
 import EditorPage from './pages/EditorPage'

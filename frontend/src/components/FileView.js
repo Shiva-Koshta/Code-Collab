@@ -16,6 +16,26 @@ import ArrowRightIcon from '@mui/icons-material/ArrowRight'
 import { FolderCopy } from '@mui/icons-material'
 import DriveFolderUploadIcon from '@mui/icons-material/DriveFolderUpload';
 import axios from 'axios'
+// import ImageIcon from '@mui/icons-material/Image'; // Image File
+// import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf'; // PDF File
+// import AudiotrackIcon from '@mui/icons-material/Audiotrack'; // Audio File
+// import MovieIcon from '@mui/icons-material/Movie'; // Video File
+import audioIcon from '../icons/audio.png';
+import cIcon from '../icons/c.png';
+import cppIcon from '../icons/cpp.png';
+import csharpIcon from '../icons/cs.png';
+import cssIcon from '../icons/css.png';
+import defaultIcon from '../icons/default.png';
+import htmlIcon from '../icons/html.png';
+import imageIcon from '../icons/image.png';
+import jsIcon from '../icons/js.png';
+import jsonIcon from '../icons/json.png';
+import pdfIcon from '../icons/pdf.png';
+import pythonIcon from '../icons/python.png';
+import textIcon from '../icons/text.png';
+import videoIcon from '../icons/video.png';
+// Import other file type icons as needed
+
 
 const FileView = ({ fileContent, setFileContent, editorRef, contentChanged, setContentChanged }) => {
   const { roomId } = useParams()
@@ -77,11 +97,11 @@ const FileView = ({ fileContent, setFileContent, editorRef, contentChanged, setC
   // this will need to be changed
   const handleFileChange = (event, parentFolder=selectedFileFolder) => {
     console.log('reached')
-    // console.log(event)
+    console.log(event)
     const file = event.target.files[0]
     const reader = new FileReader()
     setContentChanged(!contentChanged)
-    // console.log(contentChanged)
+    console.log(contentChanged)
 
     window.localStorage.setItem('contentChanged', contentChanged)
     reader.onload = (e) => {
@@ -117,7 +137,18 @@ const FileView = ({ fileContent, setFileContent, editorRef, contentChanged, setC
     // console.log('fileref here:',fileContent)
     event.target.value = null
   }
-
+  
+  const handleFileClick = async (fileId) => {
+    try {
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/filesystem/fetchfile`, {
+        fileId: fileId
+      });
+      console.log(response.data.fileContent);
+      setFileContent(response.data.fileContent);
+    } catch (error) {
+      console.error(error);
+    }
+  };
   const handleDownloadFile = () => {
     const myContent = editorRef.current.getValue()
     const element = document.createElement('a')
@@ -132,17 +163,39 @@ const FileView = ({ fileContent, setFileContent, editorRef, contentChanged, setC
   const renameFolder = (folder) => {
     const newName = prompt('Enter new folder name:', folder.name)
     if (newName) {
-      folder.name = newName
-      setFolders([...folders])
-      setSelectedFileFolder(folder)
+      (async () => {
+        try {
+          const response = await axios.put(`${process.env.REACT_APP_API_URL}/filesystem/renamedirectory`, {
+            name: newName,
+            nodeId: folder._id
+          });
+          console.log("renamed directory")
+          folder.name = newName
+          setFolders([...folders])
+          setSelectedFileFolder(folder)
+        } catch(error) {
+          console.log("error in renaming directory",error)
+        }
+      })();
     }
   }
 
   const renameFile = (file) => {
     const newName = prompt('Enter new file name:', file.name)
     if (newName) {
-      file.name = newName
-      setFolders([...folders])
+      (async () => {
+        try {
+          const response = await axios.put(`${process.env.REACT_APP_API_URL}/filesystem/renamefile`, {
+            name: newName,
+            nodeId: file._id
+          });
+          console.log("renamed file")
+          file.name = newName
+          setFolders([...folders])
+        } catch(error) {
+          console.log("error in renaming file",error)
+        }
+      })();
     }
   }
 
@@ -160,26 +213,57 @@ const FileView = ({ fileContent, setFileContent, editorRef, contentChanged, setC
     }
   }
 
-  const deleteFolder = (folder, parentFolder) => {
-    console.log(folder, parentFolder)
-    if (folder.type !== 'root') { // Check if folder is not the root folder
-      const index = parentFolder.children.indexOf(folder)
-      if (index !== -1) {
-        parentFolder.children.splice(index, 1)
-        setFolders([...folders])
+  async function deleteFolder(folderId, parentFolder) {
+    try {
+        const index = parentFolder.children.indexOf(folderId)
+        const response = await axios.delete(`${process.env.REACT_APP_API_URL}/filesystem/deletedirectory`, {
+          data: {
+            nodeId: folderId,
+            fileType: 'folder'
+          }
+        });
+        if (index !== -1) {
+          parentFolder.children.splice(index, 1)
+          setFolders([...folders])
+        }
+    } catch (error) {
+      console.error('Error deleting folder:', error.message);
+      throw new Error('Failed to delete folder.');
+    }
+  }
+
+  async function deleteFile(fileId, parentFolder) {
+    try {
+        const index = parentFolder.children.indexOf(fileId)
+        const response = await axios.delete(`${process.env.REACT_APP_API_URL}/filesystem/deletefile`, {
+            data: {
+              nodeId: fileId,
+              fileType: 'file'
+            }
+        });
+        if (index !== -1) {
+          parentFolder.children.splice(index, 1)
+          setFolders([...folders])
+        }
+    } catch (error) {
+        console.error('Error deleting file:', error.message);
+        throw new Error('Failed to delete file.');
+    }
+  }
+  const sortAlphabetically = (array) => {
+    if (!Array.isArray(array)) {
+      return array; 
+    }
+    return array.sort((a, b) => {
+      if (a.type === 'directory' && b.type !== 'directory') {
+        return -1;
+      } else if (a.type !== 'directory' && b.type === 'directory') {
+        return 1; 
+      } else {
+        return a.name.localeCompare(b.name);
       }
-    }
-  }
-
-  const deleteFile = (file, parentFolder) => {
-    const index = parentFolder.children.indexOf(file)
-    console.log(parentFolder)
-    if (index !== -1) {
-      parentFolder.children.splice(index, 1)
-      setFolders([...folders])
-    }
-  }
-
+    });
+  };
   const createFile = (parentFolder) => {
     toggleFolder(parentFolder, true)
     const newFileName = prompt('Enter file name:')
@@ -193,6 +277,7 @@ const FileView = ({ fileContent, setFileContent, editorRef, contentChanged, setC
           });
           const newFile = { _id: response.data.file._id, name: response.data.file.name, type: response.data.file.type }
           parentFolder.children.push(newFile)
+          parentFolder.children = sortAlphabetically(parentFolder.children);
           console.log("pushed")
           setFolders([...folders])
 
@@ -217,6 +302,7 @@ const FileView = ({ fileContent, setFileContent, editorRef, contentChanged, setC
           });
           const newFolder = { _id: response.data.directory._id, name: response.data.directory.name, type: response.data.directory.type, children: [] }
           parentFolder.children.push(newFolder);
+          parentFolder.children = sortAlphabetically(parentFolder.children);
           setFolders([...folders]);
         } catch (error) {
           console.log(error);
@@ -247,9 +333,12 @@ const FileView = ({ fileContent, setFileContent, editorRef, contentChanged, setC
   };
 
   const renderFolder = (folder, depth = 0, parentFolder = null) => {
+    const sortedChildren = sortAlphabetically(folder.children);
     return (
-      <div
-        key={folder.name}
+
+      <div 
+        key={folder._id} 
+
         className='flex flex-col mb-1 h-fit'
         style={{ marginLeft: `${depth === 0 ? 0 : 10}px`, maxWidth: `${depth === 0 ? `${parentWidth}px` : `${parentWidth - depth * 10}px`}` }}>
         <div className={`flex items-center p-px  overflow-hidden ${(selectedFileFolder && selectedFileFolder._id === folder._id) ? 'Selected-file-folder' : ''} rounded-md`}>
@@ -288,8 +377,11 @@ const FileView = ({ fileContent, setFileContent, editorRef, contentChanged, setC
                 onClick={() => {
                   setSelectedFileFolder(folder)
                   setSelectedFileFolderParent(parentFolder)
+                  // handleFileClick(folder._id)
+                  // console.log(findNodeById(folder._id));
                 }}>
-                <TextFileIcon className='mr-2 pb-0.5' style={{ fontSize: 20 }} />
+                {/* <TextFileIcon className='mr-2 pb-0.5' style={{ fontSize: 20 }} /> */}
+                {renderFileIcon(folder)}
                 <div className='truncate'>{folder.name}</div>
               </div>
             )}
@@ -299,6 +391,105 @@ const FileView = ({ fileContent, setFileContent, editorRef, contentChanged, setC
       </div>
     )
   }
+  // const fileIconMap = {
+  //       txt: <TextFileIcon className='mr-2 pb-0.5' style={{ fontSize: 20 }} />,
+  //       json: <ImageIcon/>,
+  //       py: <AudiotrackIcon />,
+  //       html: <ImageIcon />,
+  //       css: <TextFileIcon />,
+  //       java: <MovieIcon />,
+  //       cpp: <PictureAsPdfIcon />,
+  //       c: <PictureAsPdfIcon />,
+  //       js: <MovieIcon />,
+  //     jpg: <ImageIcon />, // Image File
+  //     pdf: <PictureAsPdfIcon />, // PDF File
+  //     mp3: <AudiotrackIcon />, // Audio File
+  //     mp4: <MovieIcon />, // Video File
+  //       // Add more mappings as needed
+  //     };
+  //     const getFileIcon = (extension) => {
+  //       return fileIconMap[extension] || <MovieIcon />;
+  //     };
+  //     const renderFileIcon = (file) => {
+  //       const extension = file.name.split('.').pop().toLowerCase();
+  //       const icon = getFileIcon(extension);
+  //       return <div className='file-icon'>{icon}</div>;
+  //     };
+
+
+
+  //const fileIconMap = {
+  //   txt: '../images/Logo.png',
+  //   json: '../images/Logo.png',
+  //   py: '../images/Logo.png',
+  //   html: '../images/Logo.png',
+  //   css: '../images/Logo.png',
+  //   java: '../images/Logo.png',
+  //   cpp: '../images/Logo.png',
+  //   c: '../images/Logo.png',
+  //   js: '../images/Logo.png',
+  // jpg: '../images/Logo.png', // Image File
+  // pdf: '../images/Logo.png', // PDF File
+  // mp3: '../images/Logo.png', // Audio File
+  // mp4: '../images/Logo.png', // Video File
+  // default: '..images/Logo.png',
+  //};
+  // const getFileIcon = (extension) => {
+  //   // Check if extension exists in the icon map, otherwise return default icon
+  //   return fileIconMap[extension.toLowerCase()] || fileIconMap['default'];
+  // };
+
+  // const renderFileIcon = (file) => {
+  //   // Extract extension from file name
+  //   const extension = (file.name.split('.').pop() || '').toLowerCase();
+  //   // Get corresponding icon URL
+  //   const iconUrl = getFileIcon(extension);
+  //   // Render icon
+  //   return (
+  //     <div className='file-icon'>
+  //       <img src={iconUrl} alt={`${extension} icon`} onError={(e) => {
+  //         // If the image fails to load, display a placeholder or fallback image
+  //         e.target.src = fileIconMap['default'];
+  //       }} />
+  //     </div>
+  //   );
+  // };
+
+  const fileIconMap = {
+    mp3: audioIcon,
+    c: cIcon,
+    cs: csharpIcon,
+    cpp: cppIcon,
+    css: cssIcon,
+    html: htmlIcon,
+    jpg: imageIcon,
+    jpeg: imageIcon,
+    png: imageIcon,
+    svg: imageIcon,
+    js: jsIcon,
+    json: jsonIcon,
+    pdf: pdfIcon,
+    py: pythonIcon,
+    txt: textIcon,
+    mp4: videoIcon,
+    // Add mappings for other file types with corresponding image files
+  };
+  const getFileIcon = (extension) => {
+    // Check if extension exists in the icon map, otherwise return default icon
+    return fileIconMap[extension.toLowerCase()] || defaultIcon;
+  };
+
+  const renderFileIcon = (file) => {
+    const extension = (file.name.split('.').pop() || '').toLowerCase();
+    const iconUrl = getFileIcon(extension);
+    return (
+      <div className='file-icon'>
+        <img src={iconUrl} alt={`${extension} icon`} style={{ width: '20px', height: '20px' }} />
+      </div>
+    );
+  };
+
+
   const [files, setFiles] = useState([]);
   const handleUpload = async (event) => {
     const items = event.target.files;

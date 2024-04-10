@@ -48,7 +48,7 @@ const HelpPage = () => {
         message: "",
       });
     } catch (error) {
-      console.error("Error:", error);
+      // console.error("Error:", error);
       toast.error("An error occurred while submitting the form");
     } finally {
       setIsSubmitting(false);
@@ -62,11 +62,6 @@ const HelpPage = () => {
     <>
       <div className="bigger-container">
         <div className="inner-container">
-          <ArrowBackIcon
-            className="text-slate-300 cursor-pointer mt-3"
-            fontSize="large"
-            onClick={() => navigate("/")}
-          />
           <HomeOutlinedIcon
             className="text-slate-200 cursor-pointer mt-3"
             fontSize="large"

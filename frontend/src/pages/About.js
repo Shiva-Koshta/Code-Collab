@@ -9,29 +9,15 @@ const About = () => {
   const navigate = useNavigate();
   
   return (
-    <div
-      className='about-us-container flex flex-col gap-32 h-screen min-h-screen p-5 w-screen bg-cover overflow-y-scroll'
-      style={{
-        backgroundColor: '#1c1e29'
-      }}
-    >
-      <div
-        className='flex justify-start gap-5 border-2 border-gray-600'
-        style={{
-          backgroundColor: '#111',
-          padding: '10px',
-          color: 'white',
-          fontSize: '24px',
-          fontWeight: 'bold',
-          textAlign: 'left',
-          fontFamily: 'Arial, sans-serif'
-        }}
-      >
-        <HomeOutlinedIcon
-          className='text-slate-300 cursor-pointer ml-8'
-          fontSize='large'
-          onClick={() => navigate('/')}
-        />
+
+    <div className='bigCont'>
+      <div className='mt-5 ml-5'>
+          <HomeOutlinedIcon
+            className="text-slate-200 cursor-pointer mt-3 ml-5"
+            fontSize="large"
+            onClick={() => navigate("/")}
+          />
+
       </div>
     
     <div className='about-us-container h-screen bg-cover relative flex flex-row '>
