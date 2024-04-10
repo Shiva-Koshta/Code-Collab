@@ -6,23 +6,23 @@ import {
   useParams,
 } from "react-router-dom";
 // import "./Editor.css";
-import ACTIONS from '../Actions'
-import toast, { Toaster } from 'react-hot-toast'
-import Editor from '../components/Editor'
-import FileView from '../components/FileView'
-import { initSocket } from '../socket'
-import UplaodFilesFolders from '../components/UploadFilesFolders';
-import '../styles/EditorPage.css'
-import '../styles/Chat.css'
-import logo from '../images/Logo.png'
-import Chat from '../components/Chat'
-import { ChevronLeft, ChevronRight } from '@mui/icons-material'
-import { ToastContainer, toast as reactToastify } from 'react-toastify';
-import ChatIcon from '@mui/icons-material/Chat';
-import 'react-toastify/dist/ReactToastify.css';
-import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
-import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
-import UploadFilesFolders from '../components/UploadFilesFolders'
+import ACTIONS from "../Actions";
+import toast, { Toaster } from "react-hot-toast";
+import Editor from "../components/Editor";
+import FileView from "../components/FileView";
+import { initSocket } from "../socket";
+import UplaodFilesFolders from "../components/UploadFilesFolders";
+import "../styles/EditorPage.css";
+import "../styles/Chat.css";
+import logo from "../images/Logo.png";
+import Chat from "../components/Chat";
+import { ChevronLeft, ChevronRight } from "@mui/icons-material";
+import { ToastContainer, toast as reactToastify } from "react-toastify";
+import ChatIcon from "@mui/icons-material/Chat";
+import "react-toastify/dist/ReactToastify.css";
+import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
+import ArrowDropUpIcon from "@mui/icons-material/ArrowDropUp";
+import UploadFilesFolders from "../components/UploadFilesFolders";
 
 const EditorPage = () => {
   const editorRef = useRef(null);
@@ -90,11 +90,6 @@ const EditorPage = () => {
     }
   }, [messages, isChatOpen]);
 
-  const leaveRoom = () => {
-    reactNavigator("/", {
-      roomId,
-    });
-  };
   const handleToggle = () => {
     setIsConnectedComponentOpen(!isConnectedComponentOpen);
   };
@@ -223,6 +218,9 @@ const EditorPage = () => {
           });
         }
       );
+      socketRef.current.on(ACTIONS.HOST_CHANGE, ({}) => {
+        console.log("host changed");
+      });
     };
 
     init();
@@ -265,6 +263,28 @@ const EditorPage = () => {
   if (!location.state) {
     return <Navigate to="/" />;
   }
+  const leaveRoom = async () => {
+    try {
+      const userData = JSON.parse(localStorage.getItem("userData"));
+      const response = await fetch("http://localhost:8080/delete-entry", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ roomId, username: userData.name }), // Include roomId and username in the request body
+      });
+      if (response.ok) {
+        const data = await response.json();
+        console.log(data); // log the response if needed
+        reactNavigator("/", { roomId }); // Navigate to the home page after leaving the room
+      } else {
+        reactNavigator("/", { roomId });
+      }
+    } catch (error) {
+      console.error("Error leaving room:", error);
+      // Handle errors as needed
+    }
+  };
 
   async function copyRoomId() {
     try {
@@ -349,37 +369,40 @@ const EditorPage = () => {
               </div>
             </div>
           </div>
-          <div className='p-4'>
-            <div className='flex gap-2'>
-            <button className="btn chat-btn" onClick={toggleChat} style={{ position: 'relative' }}>
-            Chat{' '}
-            {unreadMessages > 0 && (
-              <span
-                className="unread-messages"
-                style={{
-                  position: 'absolute',
-                  top: '-5px', // Adjust the positioning to align properly
-                  right: '-5px', // Adjust the positioning to align properly
-                  color: 'black',
-                  borderRadius: '50%',
-                  width: '30px',
-                  height: '30px',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  textAlign: 'center',
-                  fontSize: '14px',
-                  fontWeight: 'bold',
-                  border: '2px solid black',
-                  background: 'white',
-                }}
+          <div className="p-4">
+            <div className="flex gap-2">
+              <button
+                className="btn chat-btn"
+                onClick={toggleChat}
+                style={{ position: "relative" }}
               >
-                {unreadMessages}
-              </span>
-            )}
-          </button>
-              <button className='btn-edit copyBtn' onClick={copyRoomId}>
-
+                Chat{" "}
+                {unreadMessages > 0 && (
+                  <span
+                    className="unread-messages"
+                    style={{
+                      position: "absolute",
+                      top: "-5px", // Adjust the positioning to align properly
+                      right: "-5px", // Adjust the positioning to align properly
+                      color: "black",
+                      borderRadius: "50%",
+                      width: "30px",
+                      height: "30px",
+                      display: "inline-flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      textAlign: "center",
+                      fontSize: "14px",
+                      fontWeight: "bold",
+                      border: "2px solid black",
+                      background: "white",
+                    }}
+                  >
+                    {unreadMessages}
+                  </span>
+                )}
+              </button>
+              <button className="btn-edit copyBtn" onClick={copyRoomId}>
                 Copy ROOM ID
               </button>
             </div>
@@ -389,7 +412,6 @@ const EditorPage = () => {
           </div>
 
           <div className="absolute right-0 top-1/2 transform transition duration-500 hover:animate-bounce-left">
-
             <button onClick={toggleLeftDiv}>{leftIcon}</button>
           </div>
         </div>
@@ -410,9 +432,7 @@ const EditorPage = () => {
             connectedClients={connectedUsernamesRef}
           />
           {!isLeftDivOpen && (
-
             <div className="absolute left-0 top-1/2 transform transition duration-500 hover:animate-bounce-right">
-
               <button className="text-white" onClick={toggleLeftDiv}>
                 {leftIcon}
               </button>
