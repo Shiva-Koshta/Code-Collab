@@ -96,11 +96,11 @@ const FileView = ({ fileContent, setFileContent, editorRef, contentChanged, setC
 
   const handleFileChange = (event) => {
     console.log('reached')
-    // console.log(event)
+    console.log(event)
     const file = event.target.files[0]
     const reader = new FileReader()
     setContentChanged(!contentChanged)
-    // console.log(contentChanged)
+    console.log(contentChanged)
 
     window.localStorage.setItem('contentChanged', contentChanged)
     reader.onload = (e) => {
@@ -116,7 +116,18 @@ const FileView = ({ fileContent, setFileContent, editorRef, contentChanged, setC
     // console.log('fileref here:',fileContent)
     event.target.value = null
   }
-
+  
+  const handleFileClick = async (fileId) => {
+    try {
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/filesystem/fetchfile`, {
+        fileId: fileId
+      });
+      console.log(response.data.fileContent);
+      setFileContent(response.data.fileContent);
+    } catch (error) {
+      console.error(error);
+    }
+  };
   const handleDownloadFile = () => {
     const myContent = editorRef.current.getValue()
     const element = document.createElement('a')
@@ -303,6 +314,8 @@ const FileView = ({ fileContent, setFileContent, editorRef, contentChanged, setC
                 onClick={() => {
                   setSelectedFileFolder(folder)
                   setSelectedFileFolderParent(parentFolder)
+                  // handleFileClick(folder._id)
+                  // console.log(findNodeById(folder._id));
                 }}>
                 {/* <TextFileIcon className='mr-2 pb-0.5' style={{ fontSize: 20 }} /> */}
                 {renderFileIcon(folder)}
