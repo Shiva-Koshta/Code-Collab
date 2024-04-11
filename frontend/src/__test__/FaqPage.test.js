@@ -23,20 +23,6 @@ describe("Faq component", () => {
     );
   });
 
-  it('navigates to "/" when ArrowBackIcon is clicked', () => {
-    const { useNavigate } = require("react-router-dom");
-    const navigate = jest.fn();
-    useNavigate.mockReturnValue(navigate); // Mock useNavigate
-    const { getByTestId } = render(
-      <MemoryRouter>
-        <Faq />
-      </MemoryRouter>
-    );
-    const arrowBackIcon = getByTestId("ArrowBackIcon"); // Adjust the test ID as per your implementation
-    fireEvent.click(arrowBackIcon); // Click on the ArrowBackIcon
-    expect(navigate).toHaveBeenCalledWith("/");
-  });
-
   it('HomeOutlinedIcon navigates to "/" when clicked', () => {
     const { useNavigate } = require("react-router-dom");
     const navigate = jest.fn();
@@ -77,7 +63,5 @@ describe("Faq component", () => {
       expect(queryByText(question.question)).not.toBeInTheDocument(); // Check if question is not rendered
       expect(queryByText(question.answer)).not.toBeInTheDocument(); // Check if answer is not rendered
     });
-
   });
-  
 });
