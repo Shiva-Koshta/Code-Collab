@@ -1,5 +1,9 @@
 import './App.css'
 import Login from './pages/Login'
+import RoomCreation from './pages/RoomCreation'
+import EditorPage from './pages/EditorPage'
+import HelpPage from './pages/HelpPage'
+import About from './pages/About'
 
 import Faq from './pages/Faq'
 import {
@@ -13,10 +17,6 @@ import { useEffect, useState } from 'react'
 // import axios from 'axios'
 const axios = require('axios'); // Mock axios using CommonJS syntax
 
-import RoomCreation from './pages/RoomCreation'
-import EditorPage from './pages/EditorPage'
-import HelpPage from './pages/HelpPage'
-import About from './pages/About'
 
 function App () {
   const [user, setUser] = useState(null)
