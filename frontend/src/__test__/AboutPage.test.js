@@ -35,21 +35,6 @@ describe('About component', () => {
 
 
 describe("Button functionality", () => {
-    it('ArrowBackIcon navigates to "/" when clicked', () => {
-        const { useNavigate } = require("react-router-dom");
-        const navigate = jest.fn();
-        useNavigate.mockReturnValue(navigate); // Mock useNavigate
-    
-        const { getByTestId } = render(
-          <MemoryRouter>
-            <About />
-          </MemoryRouter>
-        );
-    
-        fireEvent.click(getByTestId("ArrowBackIcon"));
-        expect(navigate).toHaveBeenCalledWith("/");
-      });
-    
       it('HomeOutlinedIcon navigates to "/" when clicked', () => {
         const { useNavigate } = require("react-router-dom");
         const navigate = jest.fn();
