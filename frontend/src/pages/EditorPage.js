@@ -6,6 +6,7 @@ import {
   useParams,
 } from "react-router-dom";
 // import "./Editor.css";
+
 import ACTIONS from '../Actions'
 import toast, { Toaster } from 'react-hot-toast'
 import Editor from '../components/Editor'
@@ -21,6 +22,7 @@ import ChatIcon from '@mui/icons-material/Chat';
 import 'react-toastify/dist/ReactToastify.css';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
+
 
 const EditorPage = () => {
   const editorRef = useRef(null);
@@ -266,6 +268,9 @@ const EditorPage = () => {
           });
         }
       );
+      socketRef.current.on(ACTIONS.HOST_CHANGE, ({}) => {
+        console.log("host changed");
+      });
     };
 
     init();
@@ -308,6 +313,28 @@ const EditorPage = () => {
   if (!location.state) {
     return <Navigate to="/" />;
   }
+  const leaveRoom = async () => {
+    try {
+      const userData = JSON.parse(localStorage.getItem("userData"));
+      const response = await fetch("http://localhost:8080/delete-entry", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ roomId, username: userData.name }), // Include roomId and username in the request body
+      });
+      if (response.ok) {
+        const data = await response.json();
+        console.log(data); // log the response if needed
+        reactNavigator("/", { roomId }); // Navigate to the home page after leaving the room
+      } else {
+        reactNavigator("/", { roomId });
+      }
+    } catch (error) {
+      console.error("Error leaving room:", error);
+      // Handle errors as needed
+    }
+  };
 
   async function copyRoomId() {
     try {
@@ -391,14 +418,17 @@ const EditorPage = () => {
               </div>
             </div>
           </div>
+
           <div className='p-4'>
             <div className='flex gap-2'>
               <button className="btn chat-btn" onClick={toggleChat} style={{ position: 'relative' }}>
                 Chat{' '}
+
                 {unreadMessages > 0 && (
                   <span
                     className="unread-messages"
                     style={{
+
                       position: 'absolute',
                       top: '-5px', // Adjust the positioning to align properly
                       right: '-5px', // Adjust the positioning to align properly
@@ -414,13 +444,16 @@ const EditorPage = () => {
                       fontWeight: 'bold',
                       border: '2px solid black',
                       background: 'white',
+
                     }}
                   >
                     {unreadMessages}
                   </span>
                 )}
               </button>
+
               <button className='btn-edit copyBtn' onClick={copyRoomId}>
+
 
                 Copy ROOM ID
               </button>
@@ -431,7 +464,6 @@ const EditorPage = () => {
           </div>
 
           <div className="absolute right-0 top-1/2 transform transition duration-500 hover:animate-bounce-left">
-
             <button onClick={toggleLeftDiv}>{leftIcon}</button>
           </div>
         </div>
@@ -451,9 +483,7 @@ const EditorPage = () => {
             connectedClients={connectedUsernamesRef}
           />
           {!isLeftDivOpen && (
-
             <div className="absolute left-0 top-1/2 transform transition duration-500 hover:animate-bounce-right">
-
               <button className="text-white" onClick={toggleLeftDiv}>
                 {leftIcon}
               </button>
