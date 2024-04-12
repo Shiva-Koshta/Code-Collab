@@ -53,6 +53,18 @@ createdirectory = async(req, res) => {
         console.log(error)
     }
 }
+uploaddirectory = async(req, res) => {
+    try {
+        const treeDir = await filesys.uploadDirectory(req.body.parentId, req.body.data, req.body.roomId);
+        responseJSON = {
+            message: 'Folder uploaded',
+            directory: treeDir,
+        }    
+        res.status(200).json(responseJSON);
+    } catch (error) {
+        console.log(error)
+    }
+}
 createrootdirectory = async(req, res) => {
     try {
         rootDir = await filesys.createRootDirectory(req.body.roomId); 
@@ -148,6 +160,7 @@ module.exports = {
     createfile,
     uploadfile,
     createdirectory,
+    uploaddirectory,
     createrootdirectory,
     generatetree,
     fetchfile,
