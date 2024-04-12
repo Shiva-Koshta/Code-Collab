@@ -88,12 +88,6 @@ const EditorPage = () => {
     }
   }, [messages, isChatOpen]);
 
-  // const leaveRoom = () => {
-  //   reactNavigator("/", {
-  //     roomId,
-  //   });
-  // };
-
   const leaveRoom = async () => {
     try {
       const response = await fetch("http://localhost:8080/rooms/numUsersInRoom", {
@@ -101,7 +95,7 @@ const EditorPage = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ roomId }), // Send room ID to the API endpoint
+        body: JSON.stringify({ roomId }),
       });
 
       if (response.ok) {
@@ -109,7 +103,6 @@ const EditorPage = () => {
         const userCount = data.numUsers;
 
         if (userCount === 1) {
-          // If the user count is 1, give a warning with options
           const confirmDownload = window.confirm(
             "You are the last user in the room. Leaving room without downloading will erase the content premanently. Do you want to download the files before leaving the room?"
           );
@@ -128,7 +121,7 @@ const EditorPage = () => {
               reactNavigator("/", {
                 roomId,
               });
-            }, 2000); // Change the delay time as needed
+            }, 2000);
           }
         } else {
           reactNavigator("/", {
