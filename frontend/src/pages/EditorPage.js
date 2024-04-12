@@ -11,7 +11,6 @@ import toast, { Toaster } from 'react-hot-toast'
 import Editor from '../components/Editor'
 import FileView from '../components/FileView'
 import { initSocket } from '../socket'
-import UplaodFilesFolders from '../components/UploadFilesFolders';
 import '../styles/EditorPage.css'
 import '../styles/Chat.css'
 import logo from '../images/Logo.png'
@@ -22,7 +21,6 @@ import ChatIcon from '@mui/icons-material/Chat';
 import 'react-toastify/dist/ReactToastify.css';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
-import UploadFilesFolders from '../components/UploadFilesFolders'
 
 const EditorPage = () => {
   const editorRef = useRef(null);
@@ -90,11 +88,63 @@ const EditorPage = () => {
     }
   }, [messages, isChatOpen]);
 
-  const leaveRoom = () => {
-    reactNavigator("/", {
-      roomId,
-    });
+  // const leaveRoom = () => {
+  //   reactNavigator("/", {
+  //     roomId,
+  //   });
+  // };
+
+  const leaveRoom = async () => {
+    try {
+      const response = await fetch("http://localhost:8080/rooms/numUsersInRoom", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ roomId }), // Send room ID to the API endpoint
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        const userCount = data.numUsers;
+
+        if (userCount === 1) {
+          // If the user count is 1, give a warning with options
+          const confirmDownload = window.confirm(
+            "You are the last user in the room. Leaving room without downloading will erase the content premanently. Do you want to download the files before leaving the room?"
+          );
+
+          if (confirmDownload) {
+            handleDownloadFile();
+            reactNavigator("/", {
+              roomId,
+            });
+          } else {
+            reactNavigator("/", {
+              roomId,
+            });
+
+            setTimeout(() => {
+              reactNavigator("/", {
+                roomId,
+              });
+            }, 2000); // Change the delay time as needed
+          }
+        } else {
+          reactNavigator("/", {
+            roomId,
+          });
+        }
+      } else {
+        throw new Error("Failed to fetch user count from the server");
+      }
+    } catch (error) {
+      console.error("Error checking user count:", error);
+      toast.error("Error checking user count, please try again later.");
+    }
   };
+
+
   const handleToggle = () => {
     setIsConnectedComponentOpen(!isConnectedComponentOpen);
   };
@@ -301,9 +351,8 @@ const EditorPage = () => {
         {/* {isLeftDivOpen && ( */}
 
         <div
-          className={`flex flex-col justify-between h-screen text-white px-4 relative transition-all duration-500 ease-in-out transform ${
-            isLeftDivOpen ? "col-span-2 " : "-translate-x-full"
-          }`}
+          className={`flex flex-col justify-between h-screen text-white px-4 relative transition-all duration-500 ease-in-out transform ${isLeftDivOpen ? "col-span-2 " : "-translate-x-full"
+            }`}
           style={{ backgroundColor: "#1c1e29" }}
         >
           <div className="logo flex items-center">
@@ -351,33 +400,33 @@ const EditorPage = () => {
           </div>
           <div className='p-4'>
             <div className='flex gap-2'>
-            <button className="btn chat-btn" onClick={toggleChat} style={{ position: 'relative' }}>
-            Chat{' '}
-            {unreadMessages > 0 && (
-              <span
-                className="unread-messages"
-                style={{
-                  position: 'absolute',
-                  top: '-5px', // Adjust the positioning to align properly
-                  right: '-5px', // Adjust the positioning to align properly
-                  color: 'black',
-                  borderRadius: '50%',
-                  width: '30px',
-                  height: '30px',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  textAlign: 'center',
-                  fontSize: '14px',
-                  fontWeight: 'bold',
-                  border: '2px solid black',
-                  background: 'white',
-                }}
-              >
-                {unreadMessages}
-              </span>
-            )}
-          </button>
+              <button className="btn chat-btn" onClick={toggleChat} style={{ position: 'relative' }}>
+                Chat{' '}
+                {unreadMessages > 0 && (
+                  <span
+                    className="unread-messages"
+                    style={{
+                      position: 'absolute',
+                      top: '-5px', // Adjust the positioning to align properly
+                      right: '-5px', // Adjust the positioning to align properly
+                      color: 'black',
+                      borderRadius: '50%',
+                      width: '30px',
+                      height: '30px',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      textAlign: 'center',
+                      fontSize: '14px',
+                      fontWeight: 'bold',
+                      border: '2px solid black',
+                      background: 'white',
+                    }}
+                  >
+                    {unreadMessages}
+                  </span>
+                )}
+              </button>
               <button className='btn-edit copyBtn' onClick={copyRoomId}>
 
                 Copy ROOM ID
@@ -394,9 +443,8 @@ const EditorPage = () => {
           </div>
         </div>
         <div
-          className={`${
-            isLeftDivOpen ? "col-span-8" : "w-full absolute top-0 left-0 "
-          }  overflow-y-auto transition-all duration-500 ease-in-out`}
+          className={`${isLeftDivOpen ? "col-span-8" : "w-full absolute top-0 left-0 "
+            }  overflow-y-auto transition-all duration-500 ease-in-out`}
           style={{ width: isChatOpen ? `calc(100% - 300px)` : "100%" }}
         >
           <Editor
