@@ -8,31 +8,17 @@ import "codemirror/addon/edit/closebrackets";
 import ACTIONS from "../Actions";
 
 const Editor = ({
-  handleDownloadFile,
+  // handleDownloadFile,
   socketRef,
   roomId,
-  editorRef,
-  fileContent,
-  setFileContent,
-  contentChanged,
-  connectedClients,
+  // editorRef,
+  // fileContent,
+  // setFileContent,
+  // contentChanged,
 }) => {
-  // const [fileContent, setFileContent] = useState("")
-  // const [contentChanged, setContentChanged] = useState(false)
-  // useEffect(() => {
-  //   const handleStorageChange = () => {
-  //     setFileContent(window.localStorage.getItem('fileContent'))
-  //     setContentChanged(window.localStorage.getItem('contentChange'))
-  //   }
-  //   window.addEventListener('storage', handleStorageChange)
-  //   return () => {
-  //     window.removeEventListener('storage', handleStorageChange)
-  //   }
-  // }, [])
-  // useEffect(() => {
-  //   setFileContent(window.localStorage.getItem("fileContent"))
-  //   setContentChanged(window.localStorage.getItem("contentChanged"))
-  // }, [])
+  const [contentChanged, setContentChanged] = useState(false);
+  const [fileContent, setFileContent] = useState("");
+  const editorRef = useRef(null);
   let editorChanged = false;
   window.localStorage.setItem("roomid", roomId);
 
@@ -281,9 +267,8 @@ const Editor = ({
       //   editorRef.current.charCoords({ line, ch }).left
       // -324}px`;
       cursorMarker.style.left = `${leftPosition}px`;
-      cursorMarker.style.top = `${
-        editorRef.current.charCoords({ line, ch }).top
-      }px`;
+      cursorMarker.style.top = `${editorRef.current.charCoords({ line, ch }).top
+        }px`;
       // console.log(editorRef.current.charCoords({ line, ch }).top);
       // Define CSS keyframes for blinking effect
     }

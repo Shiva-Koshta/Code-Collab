@@ -16,10 +16,6 @@ import ArrowRightIcon from '@mui/icons-material/ArrowRight'
 import { FolderCopy } from '@mui/icons-material'
 import DriveFolderUploadIcon from '@mui/icons-material/DriveFolderUpload';
 import axios from 'axios'
-// import ImageIcon from '@mui/icons-material/Image'; // Image File
-// import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf'; // PDF File
-// import AudiotrackIcon from '@mui/icons-material/Audiotrack'; // Audio File
-// import MovieIcon from '@mui/icons-material/Movie'; // Video File
 import audioIcon from '../icons/audio.png';
 import cIcon from '../icons/c.png';
 import cppIcon from '../icons/cpp.png';
@@ -36,7 +32,7 @@ import textIcon from '../icons/text.png';
 import videoIcon from '../icons/video.png';
 import { toast } from 'react-hot-toast';
 
-const FileView = ({ fileContent, setFileContent, editorRef, contentChanged, setContentChanged }) => {
+const FileView = () => {
   const { roomId } = useParams()
   const [isDownloadTrue, setIsDownloadTrue] = useState(false)
   const [downloadFileExtension, setFileExtension] = useState('')
@@ -55,6 +51,7 @@ const FileView = ({ fileContent, setFileContent, editorRef, contentChanged, setC
     type: 'root',
     children: [],
   });
+  const [fileContent, setFileContent] = useState("");
   const [selectedFileFolderParent, setSelectedFileFolderParent] = useState({});
   const [isFolderOpen, setIsFolderOpen] = useState({ '0': false })
   const [isSmallScreen, setIsSmallScreen] = useState(false);
@@ -111,7 +108,8 @@ const FileView = ({ fileContent, setFileContent, editorRef, contentChanged, setC
   // }, []);
 
   // this will need to be changed
-  const handleFileChange = (event, parentFolder=selectedFileFolder) => {
+  const [contentChanged, setContentChanged] = useState(false);
+  const handleFileChange = (event, parentFolder = selectedFileFolder) => {
     console.log('reached')
     console.log(event)
     const file = event.target.files[0]
@@ -165,6 +163,7 @@ const FileView = ({ fileContent, setFileContent, editorRef, contentChanged, setC
       console.error(error);
     }
   };
+  const editorRef = useRef(null);
   const handleDownloadFile = () => {
     const myContent = editorRef.current.getValue()
     const element = document.createElement('a')
