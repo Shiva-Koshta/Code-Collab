@@ -8,13 +8,8 @@ import "codemirror/addon/edit/closebrackets";
 import ACTIONS from "../Actions";
 
 const Editor = ({
-  // handleDownloadFile,
   socketRef,
   roomId,
-  // editorRef,
-  // fileContent,
-  // setFileContent,
-  // contentChanged,
 }) => {
   const [contentChanged, setContentChanged] = useState(false);
   const [fileContent, setFileContent] = useState("");

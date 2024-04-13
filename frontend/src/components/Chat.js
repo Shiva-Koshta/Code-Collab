@@ -6,10 +6,6 @@ import '../styles/Chat.css'
 const Chat = ({
   setIsChatOpen,
   messages,
-  // inputText,
-  // setInputText,
-  // handleKeyPress,
-  // handleMessageSend
   roomId,
   socketRef,
   storedUserData

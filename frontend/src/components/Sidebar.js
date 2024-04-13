@@ -6,19 +6,9 @@ import FileView from "./FileView";
 import toast from "react-hot-toast";
 import { useNavigate, useParams } from "react-router-dom";
 const Sidebar = ({
-    // contentChanged,
-    // setContentChanged,
-    // fileContent,
-    // setFileContent,
-    // editorRef,
-    // isConnectedComponentOpen,
-    // handleToggle,
     connectedUsers,
     toggleChat,
     unreadMessages,
-    // copyRoomId,
-    // leaveRoom,
-    // roomId,
     isLeftDivOpen,
     toggleLeftDiv,
     leftIcon
@@ -88,13 +78,7 @@ const Sidebar = ({
                     </p>
                 </div>
             </div>
-            <FileView
-            // contentChanged={contentChanged}
-            // setContentChanged={setContentChanged}
-            // fileContent={fileContent}
-            // setFileContent={setFileContent}
-            // editorRef={editorRef}
-            />
+            <FileView />
             <div className="Users z-10">
                 <div
                     className="flex justify-between items-center"
