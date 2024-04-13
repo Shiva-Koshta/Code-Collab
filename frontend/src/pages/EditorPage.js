@@ -182,10 +182,15 @@ const EditorPage = () => {
         );
         console.log(`${username} left the room`);
         console.log(clients); // added because clients was not used anywhere to avoid linting error
-        setClients((prev) => {
-          const updatedClients = prev.filter(
-            (client) => client.username !== username
-          );
+        setClients((prevClients) => {
+          let removed = false;
+          const updatedClients = prevClients.filter((client) => {
+            if (!removed && client.username === username) {
+              removed = true;
+              return false;
+            }
+            return true;
+          });
           const updatedUsers = updatedClients.map((client) => ({
             username: client.username,
             profileImage: client.picture,
