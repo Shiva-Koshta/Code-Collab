@@ -157,10 +157,10 @@ const FileView = ({ fileContent, setFileContent, editorRef, contentChanged, setC
   const handleFileClick = async (fileId) => {
     try {
       const response = await axios.post(`${process.env.REACT_APP_API_URL}/filesystem/fetchfile`, {
-        fileId: fileId
+        nodeId: fileId
       });
-      console.log(response.data.fileContent);
-      setFileContent(response.data.fileContent);
+      console.log(response.data.file.content);
+      setFileContent(response.data.file.content);
     } catch (error) {
       console.error(error);
     }
@@ -393,7 +393,7 @@ const FileView = ({ fileContent, setFileContent, editorRef, contentChanged, setC
                 onClick={() => {
                   setSelectedFileFolder(folder)
                   setSelectedFileFolderParent(parentFolder)
-                  // handleFileClick(folder._id)
+                  handleFileClick(folder._id)
                   // console.log(findNodeById(folder._id));
                 }}>
                 {/* <TextFileIcon className='mr-2 pb-0.5' style={{ fontSize: 20 }} /> */}
