@@ -16,10 +16,10 @@ import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import { FolderCopy } from "@mui/icons-material";
 import DriveFolderUploadIcon from "@mui/icons-material/DriveFolderUpload";
 import axios from "axios";
-// import ImageIcon from '@mui/icons-material/Image' // Image File
-// import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf' // PDF File
-// import AudiotrackIcon from '@mui/icons-material/Audiotrack' // Audio File
-// import MovieIcon from '@mui/icons-material/Movie' // Video File
+// import ImageIcon from '@mui/icons-material/Image'; // Image File
+// import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf'; // PDF File
+// import AudiotrackIcon from '@mui/icons-material/Audiotrack'; // Audio File
+// import MovieIcon from '@mui/icons-material/Movie'; // Video File
 import audioIcon from "../icons/audio.png";
 import cIcon from "../icons/c.png";
 import cppIcon from "../icons/cpp.png";
@@ -115,6 +115,10 @@ const FileView = ({
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  // useEffect(() => {
+  // }, []);
+
+  // this will need to be changed
   const handleFileChange = (event, parentFolder = selectedFileFolder) => {
     console.log("reached");
     console.log(event);
@@ -126,6 +130,12 @@ const FileView = ({
     window.localStorage.setItem("contentChanged", contentChanged);
     reader.onload = (e) => {
       const content = e.target.result;
+
+      // code before
+      // // setFileContent(content)
+      // window.localStorage.setItem('fileContent', JSON.stringify(fileContent))
+      // // console.log(content)
+      // // fileRef.current = content
 
       (async () => {
         try {
@@ -154,6 +164,7 @@ const FileView = ({
     if (file) {
       reader.readAsText(file);
     }
+    // console.log('fileref here:',fileContent)
     event.target.value = null;
   };
 
@@ -165,6 +176,7 @@ const FileView = ({
           nodeId: fileId,
         }
       );
+      // console.log(response.data.file.content);
       setFileContent(response.data.file.content);
     } catch (error) {
       console.error(error);
@@ -219,7 +231,6 @@ const FileView = ({
           console.log("renamed file");
           file.name = newName;
           setFolders([...folders]);
-          setSelectedFileFolder(file);
         } catch (error) {
           console.log("error in renaming file", error);
         }
@@ -227,267 +238,553 @@ const FileView = ({
     }
   };
 
-  return (
-    <div
-      ref={parentRef}
-      style={{
-        height: "100%",
-        overflow: "hidden",
-        display: "flex",
-        flexDirection: "column",
-        position: "relative",
-      }}
-    >
+  const toggleFolder = (folder, flag = false) => {
+    if (flag && folder.type !== "file") {
+      let folderOpen = isFolderOpen;
+      folderOpen[folder._id] = true;
+      setIsFolderOpen(folderOpen);
+      setFolders([...folders]);
+    } else if (!flag && folder.type !== "file") {
+      let folderOpen = isFolderOpen;
+      folderOpen[folder._id] = !isFolderOpen[folder._id];
+      setIsFolderOpen(folderOpen);
+      setFolders([...folders]);
+    }
+  };
+
+  async function deleteFolder(folderId, parentFolder) {
+    try {
+      const index = parentFolder.children.indexOf(folderId);
+      const response = await axios.delete(
+        `${process.env.REACT_APP_API_URL}/filesystem/deletedirectory`,
+        {
+          data: {
+            nodeId: folderId,
+            fileType: "folder",
+          },
+        }
+      );
+      if (index !== -1) {
+        parentFolder.children.splice(index, 1);
+        setFolders([...folders]);
+      }
+    } catch (error) {
+      console.error("Error deleting folder:", error.message);
+      throw new Error("Failed to delete folder.");
+    }
+  }
+
+  async function deleteFile(fileId, parentFolder) {
+    try {
+      const index = parentFolder.children.indexOf(fileId);
+      const response = await axios.delete(
+        `${process.env.REACT_APP_API_URL}/filesystem/deletefile`,
+        {
+          data: {
+            nodeId: fileId,
+            fileType: "file",
+          },
+        }
+      );
+      if (index !== -1) {
+        parentFolder.children.splice(index, 1);
+        setFolders([...folders]);
+      }
+    } catch (error) {
+      console.error("Error deleting file:", error.message);
+      throw new Error("Failed to delete file.");
+    }
+  }
+  const sortAlphabetically = (array) => {
+    if (!Array.isArray(array)) {
+      return array;
+    }
+    return array.sort((a, b) => {
+      if (a.type === "directory" && b.type !== "directory") {
+        return -1;
+      } else if (a.type !== "directory" && b.type === "directory") {
+        return 1;
+      } else {
+        return a.name.localeCompare(b.name);
+      }
+    });
+  };
+  const createFile = (parentFolder) => {
+    toggleFolder(parentFolder, true);
+    const newFileName = prompt("Enter file name:");
+    if (newFileName) {
+      (async () => {
+        try {
+          const response = await axios.post(
+            `${process.env.REACT_APP_API_URL}/filesystem/createfile`,
+            {
+              name: newFileName,
+              parentId: parentFolder._id,
+              roomId: roomId,
+            }
+          );
+          const newFile = {
+            _id: response.data.file._id,
+            name: response.data.file.name,
+            type: response.data.file.type,
+          };
+          parentFolder.children.push(newFile);
+          parentFolder.children = sortAlphabetically(parentFolder.children);
+          console.log("pushed");
+          setFolders([...folders]);
+        } catch (error) {
+          console.log(error);
+        }
+      })();
+    }
+  };
+
+  const createFolder = (parentFolder) => {
+    toggleFolder(parentFolder, true);
+    const newFolderName = prompt("Enter folder name:");
+    if (newFolderName) {
+      (async () => {
+        try {
+          const response = await axios.post(
+            `${process.env.REACT_APP_API_URL}/filesystem/createdirectory`,
+            {
+              name: newFolderName,
+              parentId: parentFolder._id,
+              roomId: roomId,
+            }
+          );
+          const newFolder = {
+            _id: response.data.directory._id,
+            name: response.data.directory.name,
+            type: response.data.directory.type,
+            children: [],
+          };
+          parentFolder.children.push(newFolder);
+          parentFolder.children = sortAlphabetically(parentFolder.children);
+          setFolders([...folders]);
+        } catch (error) {
+          console.log(error);
+        }
+      })();
+    }
+  };
+
+  const findNodeById = (id, nodes) => {
+    // Iterate through each node in the tree
+    for (const node of nodes) {
+      // Check if the current node's ID matches the target ID
+      if (node._id === id) {
+        // Return the node if found
+        return node;
+      }
+      // If the current node has children, recursively search them
+      if (node.children && node.children.length > 0) {
+        const foundNode = findNodeById(id, node.children);
+        // If the node is found in the children, return it
+        if (foundNode) {
+          return foundNode;
+        }
+      }
+    }
+    // Return null if the node with the specified ID is not found
+    return null;
+  };
+
+  const renderFolder = (folder, depth = 0, parentFolder = null) => {
+    const sortedChildren = sortAlphabetically(folder.children);
+    return (
       <div
+        key={folder._id}
+        className="flex flex-col mb-1 h-fit"
         style={{
-          width: "100%",
-          backgroundColor: "#f5f6fa",
-          display: "flex",
-          alignItems: "center",
-          padding: "10px",
-          borderBottom: "1px solid #dfe4ea",
-          position: "relative",
-          zIndex: "100",
+          marginLeft: `${depth === 0 ? 0 : 10}px`,
+          maxWidth: `${
+            depth === 0 ? `${parentWidth}px` : `${parentWidth - depth * 10}px`
+          }`,
         }}
       >
         <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            flex: "0 0 auto",
-            marginRight: "5px",
-          }}
+          className={`flex items-center p-px  overflow-hidden ${
+            selectedFileFolder && selectedFileFolder._id === folder._id
+              ? "Selected-file-folder"
+              : ""
+          } rounded-md`}
         >
-          <FolderOpenIcon
-            style={{ color: "#57606f", fontSize: "20px", marginRight: "5px" }}
-          />
-          <ArrowRightIcon style={{ color: "#57606f", fontSize: "20px" }} />
-        </div>
-        <div style={{ flex: "0 0 auto", width: "100%" }}>
-          <div
-            style={{
-              fontSize: "15px",
-              fontWeight: "500",
-              color: "#57606f",
-              marginRight: "5px",
-            }}
-          >
-            {selectedFileFolder.name}
-          </div>
-        </div>
-        <div style={{ flex: "0 0 auto" }}>
-          <IconButton
-            onClick={() => {
-              setIsDownloadTrue(true);
-              setFileExtension("txt");
-              setFileName("test");
-              handleDownloadFile();
-            }}
-            style={{ padding: "5px" }}
-          >
-            <DownloadIcon style={{ fontSize: "20px", color: "#57606f" }} />
-          </IconButton>
-          <IconButton
-            onClick={() => {
-              const folderName = prompt("Enter the folder name:", "New Folder");
-              if (folderName) {
-                (async () => {
-                  try {
-                    const response = await axios.post(
-                      `${process.env.REACT_APP_API_URL}/filesystem/createfolder`,
-                      {
-                        name: folderName,
-                        parentId: selectedFileFolder._id,
-                        roomId: roomId,
-                      }
-                    );
-                    console.log(response.data);
-                    const newFolder = response.data.directory;
-                    selectedFileFolder.children.push(newFolder);
-                    setFolders([...folders]);
-                    setSelectedFileFolder(selectedFileFolder);
-                  } catch (error) {
-                    console.log(error);
-                  }
-                })();
-              }
-            }}
-            style={{ padding: "5px" }}
-          >
-            <CreateNewFolderIcon
-              style={{ fontSize: "20px", color: "#57606f" }}
-            />
-          </IconButton>
-          <IconButton
-            onClick={() => {
-              if (selectedFileFolderParent.name !== "Root") {
-                const folderName = prompt(
-                  "Enter the folder name:",
-                  "New Folder"
-                );
-                if (folderName) {
-                  (async () => {
-                    try {
-                      const response = await axios.post(
-                        `${process.env.REACT_APP_API_URL}/filesystem/createfolder`,
-                        {
-                          name: folderName,
-                          parentId: selectedFileFolderParent._id,
-                          roomId: roomId,
-                        }
-                      );
-                      console.log(response.data);
-                      const newFolder = response.data.directory;
-                      selectedFileFolderParent.children.push(newFolder);
-                      setFolders([...folders]);
-                      setSelectedFileFolder(selectedFileFolderParent);
-                    } catch (error) {
-                      console.log(error);
-                    }
-                  })();
-                }
-              }
-            }}
-            style={{ padding: "5px" }}
-          >
-            <CreateNewFolderIcon
-              style={{ fontSize: "20px", color: "#57606f" }}
-            />
-          </IconButton>
-        </div>
-        <div
-          style={{
-            position: "absolute",
-            top: "0",
-            right: "0",
-            height: "100%",
-            backgroundColor: "#f5f6fa",
-            display: "flex",
-            alignItems: "center",
-            padding: "10px",
-            borderBottom: "1px solid #dfe4ea",
-          }}
-        >
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              flex: "0 0 auto",
-              marginRight: "5px",
-            }}
-          >
-            <FolderOpenIcon
-              style={{
-                color: "#57606f",
-                fontSize: "20px",
-                marginRight: "5px",
-              }}
-            />
-            <ArrowRightIcon style={{ color: "#57606f", fontSize: "20px" }} />
-          </div>
-          <div
-            style={{
-              fontSize: "15px",
-              fontWeight: "500",
-              color: "#57606f",
-              marginRight: "5px",
-            }}
-          >
-            {selectedFileFolderParent.name}
-          </div>
-        </div>
-      </div>
-      <div style={{ flex: "1", overflow: "auto" }}>
-        <ul
-          style={{
-            margin: "0",
-            padding: "0",
-            listStyle: "none",
-            paddingLeft: "20px",
-          }}
-        >
-          {selectedFileFolder.children.map((child) => (
-            <li
-              key={child._id}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                marginBottom: "5px",
-              }}
-            >
-              {child.type === "directory" ? (
-                <FolderIcon
-                  onClick={() => {
-                    setIsFolderOpen({
-                      ...isFolderOpen,
-                      [child._id]: !isFolderOpen[child._id],
-                    });
-                    setSelectedFileFolderParent(selectedFileFolder);
-                    setSelectedFileFolder(child);
-                  }}
-                  style={{ color: "#57606f", fontSize: "20px" }}
-                />
-              ) : (
-                <TextFileIcon
-                  onClick={() => handleFileClick(child._id)}
-                  style={{ color: "#57606f", fontSize: "20px" }}
-                />
-              )}
+          <div className="grow flex relative overflow-hidden">
+            {folder.type === "root" && (
+              <div
+                onClick={() => {
+                  toggleFolder(folder);
+                  setSelectedFileFolder(folder);
+                }}
+                style={{
+                  maxWidth: `${depth === 0 ? "328px" : `${328 - depth}px`}`,
+                }}
+                className="cursor-pointer mr-2 grow flex overflow-hidden"
+              >
+                {isFolderOpen[folder._id] ? (
+                  <ArrowDropDownIcon />
+                ) : (
+                  <ArrowRightIcon />
+                )}
+                {isFolderOpen[folder._id] ? (
+                  <FolderIcon className="mr-2" style={{ fontSize: 20 }} />
+                ) : (
+                  <FolderOpenIcon className="mr-2" style={{ fontSize: 20 }} />
+                )}
+
+                <div className="truncate">{folder.name}</div>
+              </div>
+            )}
+            {folder.type === "directory" && (
+              <div
+                onClick={() => {
+                  toggleFolder(folder);
+                  setSelectedFileFolder(folder);
+                  setSelectedFileFolderParent(parentFolder);
+                }}
+                style={{
+                  maxWidth: `${depth === 0 ? "328px" : `${328 - depth}px`}`,
+                }}
+                className="cursor-pointer mr-2 grow flex overflow-hidden"
+              >
+                {isFolderOpen[folder._id] ? (
+                  <ArrowDropDownIcon />
+                ) : (
+                  <ArrowRightIcon />
+                )}
+                {isFolderOpen[folder._id] ? (
+                  <FolderIcon className="mr-2" style={{ fontSize: 20 }} />
+                ) : (
+                  <FolderOpenIcon className="mr-2" style={{ fontSize: 20 }} />
+                )}
+                <div className="truncate">{folder.name}</div>
+              </div>
+            )}
+            {folder.type === "file" && (
               <div
                 style={{
-                  fontSize: "15px",
-                  fontWeight: "500",
-                  color: "#57606f",
-                  marginLeft: "5px",
-                  cursor: "pointer",
-                  width: "100%",
-                  whiteSpace: "nowrap",
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
+                  maxWidth: `${depth === 0 ? "328px" : `${328 - depth}px`}`,
+                }}
+                className="grow cursor-pointer mr-2 flex overflow-hidden"
+                onClick={() => {
+                  setSelectedFileFolder(folder);
+                  setSelectedFileFolderParent(parentFolder);
+                  handleFileClick(folder._id);
+                  // console.log(findNodeById(folder._id));
                 }}
               >
-                {child.name}
+                {/* <TextFileIcon className='mr-2 pb-0.5' style={{ fontSize: 20 }} /> */}
+                {renderFileIcon(folder)}
+                <div className="truncate">{folder.name}</div>
               </div>
-              {child.type === "directory" ? null : (
-                <IconButton
-                  onClick={() => {
-                    if (
-                      window.confirm(
-                        `Are you sure you want to delete ${child.name}?`
-                      )
-                    ) {
-                      (async () => {
-                        try {
-                          const response = await axios.delete(
-                            `${process.env.REACT_APP_API_URL}/filesystem/deletefile`,
-                            {
-                              data: {
-                                nodeId: child._id,
-                              },
-                            }
-                          );
-                          console.log(response.data);
-                          const index =
-                            selectedFileFolder.children.indexOf(child);
-                          selectedFileFolder.children.splice(index, 1);
-                          setFolders([...folders]);
-                        } catch (error) {
-                          console.log(error);
-                        }
-                      })();
-                    }
-                  }}
-                  style={{ padding: "5px" }}
+            )}
+          </div>
+        </div>
+        {isFolderOpen[folder._id] &&
+          folder.children.map((child) =>
+            renderFolder(child, depth + 1, folder)
+          )}
+      </div>
+    );
+  };
+
+  const fileIconMap = {
+    mp3: audioIcon,
+    c: cIcon,
+    cs: csharpIcon,
+    cpp: cppIcon,
+    css: cssIcon,
+    html: htmlIcon,
+    jpg: imageIcon,
+    jpeg: imageIcon,
+    png: imageIcon,
+    svg: imageIcon,
+    js: jsIcon,
+    json: jsonIcon,
+    pdf: pdfIcon,
+    py: pythonIcon,
+    txt: textIcon,
+    mp4: videoIcon,
+  };
+  const getFileIcon = (extension) => {
+    return fileIconMap[extension.toLowerCase()] || defaultIcon;
+  };
+
+  const renderFileIcon = (file) => {
+    const extension = (file.name.split(".").pop() || "").toLowerCase();
+    const iconUrl = getFileIcon(extension);
+    return (
+      <div className="file-icon">
+        <img
+          src={iconUrl}
+          alt={`${extension} icon`}
+          style={{ width: "20px", height: "20px" }}
+        />
+      </div>
+    );
+  };
+
+  const [files, setFiles] = useState([]);
+  const handleUpload = async (event) => {
+    const items = event.target.files;
+    const entries = await Promise.all(
+      Array.from(items).map(async (item) => {
+        const path = item.webkitRelativePath || item.name;
+        const isDirectory = item.isDirectory || false;
+        let content = null;
+        if (!isDirectory) {
+          content = await readFileAsync(item);
+        }
+        return { path, isDirectory, content };
+      })
+    );
+    sendDataToServer(entries);
+    setFiles(entries);
+  };
+  const readFileAsync = (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        resolve(event.target.result);
+      };
+      reader.onerror = (error) => {
+        reject(error);
+      };
+      reader.readAsText(file);
+    });
+  };
+
+  const sendDataToServer = async (data) => {
+    try {
+      console.log("Data to be sent to the server:", data);
+      // const response = await axios.post(`${process.env.REACT_APP_API_URL}`, data);
+      console.log("Server response:", response.data);
+    } catch (error) {
+      console.error("Error sending data to server:", error);
+    }
+  };
+  return (
+    <div className="flex flex-col justify-between h-full">
+      <div className="flex justify-between mx-1 relative h-fit grow">
+        <div className="flex flex-col grow overflow-hidden">
+          <div
+            className={`text-lg font-bold flex justify-between items-center my-3 ${
+              isSmallScreen ? "flex-col" : "flex-row"
+            }`}
+          >
+            <p>File Explorer</p>
+            {selectedFileFolder.type === "root" && (
+              <div className="flex items-center relative">
+                <button
+                  className=""
+                  onClick={() => createFolder(selectedFileFolder)}
+                  title="Add Folder"
                 >
-                  <DeleteIcon style={{ fontSize: "20px", color: "#57606f" }} />
-                </IconButton>
-              )}
-            </li>
-          ))}
-        </ul>
+                  <CreateNewFolderIcon />
+                </button>
+                <div className="absolute bottom-0 hidden hover:bg-gray-100 hover:rounded hover:p-2 hover:block hover:z-10 hover:border hover:border-gray-300">
+                  Add Folder
+                </div>
+                <button
+                  className=""
+                  onClick={() => createFile(selectedFileFolder)}
+                  title="Add File"
+                >
+                  <AddIcon />
+                </button>
+                <div className="absolute bottom-0 hidden hover:bg-gray-100 hover:rounded hover:p-2 hover:block hover:z-10 hover:border hover:border-gray-300">
+                  Add File
+                </div>
+                <input
+                  type="file"
+                  id="fileInput"
+                  style={{ display: "none" }}
+                  onChange={handleFileChange}
+                />
+                <label htmlFor="fileInput">
+                  <UploadFileIcon className="text-white cursor-pointer" />
+                </label>
+                <input
+                  type="file"
+                  id="folderInput"
+                  directory=""
+                  webkitdirectory=""
+                  style={{ display: "none" }}
+                  onChange={handleUpload}
+                />
+                <label htmlFor="folderInput">
+                  <DriveFolderUploadIcon className="text-white cursor-pointer" />
+                </label>
+                <div className="absolute bottom-0 hidden hover:bg-gray-100 hover:rounded hover:p-2 hover:block hover:z-10 hover:border hover:border-gray-300">
+                  Upload Folder
+                </div>
+                <button
+                  className="renameFolderIcon update-buttons "
+                  onClick={() => renameFolder(selectedFileFolder)}
+                  title="Rename Folder"
+                >
+                  <CreateIcon />
+                </button>
+                <div className="absolute bottom-0 hidden hover:bg-gray-100 hover:rounded hover:p-2 hover:block hover:z-10 hover:border hover:border-gray-300 hover:top-7">
+                  Rename Folder
+                </div>
+              </div>
+            )}
+            {selectedFileFolder.type === "directory" && (
+              <div className="flex items-center relative">
+                <button
+                  className="addFolderIcon update-buttons "
+                  onClick={() => createFolder(selectedFileFolder)}
+                  title="Add Folder"
+                >
+                  <CreateNewFolderIcon />
+                </button>
+                <div className="absolute bottom-0 hidden hover:bg-gray-100 hover:rounded hover:p-2 hover:block hover:z-10 hover:border hover:border-gray-300 hover:top-7">
+                  Add Folder
+                </div>
+                <button
+                  className="addFileIcon update-buttons "
+                  onClick={() => createFile(selectedFileFolder)}
+                  title="Add File"
+                >
+                  <AddIcon />
+                </button>
+                <div className="absolute bottom-0 hidden hover:bg-gray-100 hover:rounded hover:p-2 hover:block hover:z-10 hover:border hover:border-gray-300 hover:top-7">
+                  Add File
+                </div>
+                <input
+                  type="file"
+                  id="fileInput"
+                  style={{ display: "none" }}
+                  onChange={handleFileChange}
+                />
+                <label htmlFor="fileInput">
+                  <UploadFileIcon className="text-white" />
+                </label>
+                <input
+                  type="file"
+                  id="folderInput"
+                  directory=""
+                  webkitdirectory=""
+                  style={{ display: "none" }}
+                  onChange={handleUpload}
+                />
+                <label htmlFor="folderInput">
+                  <DriveFolderUploadIcon className="text-white cursor-pointer" />
+                </label>
+                <div className="absolute bottom-0 hidden hover:bg-gray-100 hover:rounded hover:p-2 hover:block hover:z-10 hover:border hover:border-gray-300">
+                  Upload Folder
+                </div>
+                <button
+                  className="renameFolderIcon update-buttons "
+                  onClick={() => renameFolder(selectedFileFolder)}
+                  title="Rename Folder"
+                >
+                  <CreateIcon />
+                </button>
+                <div className="absolute bottom-0 hidden hover:bg-gray-100 hover:rounded hover:p-2 hover:block hover:z-10 hover:border hover:border-gray-300 hover:top-7">
+                  Rename Folder
+                </div>
+                <button
+                  className="deleteFolderIcon update-buttons "
+                  onClick={() =>
+                    deleteFolder(selectedFileFolder, selectedFileFolderParent)
+                  }
+                  title="Delete Folder"
+                >
+                  <DeleteIcon />
+                </button>
+                <div className="absolute bottom-0 hidden hover:bg-gray-100 hover:rounded hover:p-2 hover:block hover:z-10 hover:border hover:border-gray-300 hover:top-7">
+                  Delete Folder
+                </div>
+              </div>
+            )}
+            {selectedFileFolder.type === "file" && (
+              <div className="flex items-center relative">
+                <button
+                  className="renameFileIcon update-buttons "
+                  onClick={() => renameFile(selectedFileFolder)}
+                  title="Rename File"
+                >
+                  <CreateIcon />
+                </button>
+                <div className="absolute bottom-0 hidden hover:bg-gray-100 hover:rounded hover:p-2 hover:block hover:z-10 hover:border hover:border-gray-300 hover:top-7">
+                  Add Folder
+                </div>
+                <button
+                  className="deleteFileIcon update-buttons "
+                  onClick={() =>
+                    deleteFile(selectedFileFolder, selectedFileFolderParent)
+                  }
+                  title="Delete File"
+                >
+                  <DeleteIcon />
+                </button>
+                <div className="absolute bottom-0 hidden hover:bg-gray-100 hover:rounded hover:p-2 hover:block hover:z-10 hover:border hover:border-gray-300 hover:top-7">
+                  Delete Folder
+                </div>
+              </div>
+            )}
+          </div>
+          <div className="flex justify-between grow">
+            <div className="grow relative overflow-y-scroll" ref={parentRef}>
+              {folders.map((folder) => renderFolder(folder))}
+            </div>
+          </div>
+        </div>
+        {isDownloadTrue && (
+          <div className="absolute top-10 bg-slate-700 p-4 rounded-lg shadow-md shadow-slate-400">
+            <div className="flex justify-end mb-4">
+              <CloseOutlinedIcon
+                className="absolute top-2 right-2 cursor-pointer text-gray-300"
+                onClick={() => {
+                  setIsDownloadTrue(false);
+                }}
+              />
+            </div>
+            <input
+              type="text"
+              value={downloadFileName}
+              onChange={(e) => setFileName(e.target.value)}
+              placeholder="Enter file name"
+              className="mb-3 px-2 py-1 w-full bg-slate-300 rounded border-2 opacity border-gray-400 focus:outline-none focus:border-blue-500"
+              style={{
+                color: "#1c1e29",
+                "::placeholder": { color: "#1c1e29" },
+              }}
+            />
+            <select
+              value={downloadFileExtension}
+              onChange={(e) => setFileExtension(e.target.value)}
+              className="mb-3 px-2 py-1 w-full bg-slate-300 rounded border-2 border-gray-400 focus:outline-none focus:border-blue-500"
+              style={{ color: "#1c1e29" }}
+            >
+              <option value="">Select type</option>
+              <option value="txt">Text</option>
+              <option value="json">JSON</option>
+              <option value="py">Python</option>
+              <option value="html">HTML</option>
+              <option value="css">CSS</option>
+              <option value="java">Java</option>
+              <option value="cpp">C++</option>
+              <option value="c">C</option>
+              <option value="js">Javascript</option>
+            </select>
+            <button
+              className="w-full px-2 py-1 font-semibold bg-blue-600"
+              onClick={() => {
+                handleDownloadFile();
+                setIsDownloadTrue(false);
+              }}
+            >
+              Download
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
 };
 
-export default FolderView;
+export default FileView;
