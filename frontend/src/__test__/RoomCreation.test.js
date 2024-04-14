@@ -83,13 +83,6 @@ describe("RoomCreation component", () => {
   });
 
   test("displays error message if room is full", async () => {
-    // render(
-    //   <MemoryRouter>
-    //     <ToastProvider> {/* Wrap the component with ToastProvider */}
-    //       <RoomCreation />
-    //     </ToastProvider>
-    //   </MemoryRouter>
-    // );
     render(
       <MemoryRouter>
         <RoomCreation />
