@@ -11,7 +11,6 @@ import toast, { Toaster } from "react-hot-toast";
 import Editor from "../components/Editor";
 import FileView from "../components/FileView";
 import { initSocket } from "../socket";
-import UplaodFilesFolders from "../components/UploadFilesFolders";
 import "../styles/EditorPage.css";
 import "../styles/Chat.css";
 import logo from "../images/Logo.png";
@@ -22,7 +21,6 @@ import ChatIcon from "@mui/icons-material/Chat";
 import "react-toastify/dist/ReactToastify.css";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import ArrowDropUpIcon from "@mui/icons-material/ArrowDropUp";
-import UploadFilesFolders from "../components/UploadFilesFolders";
 
 const EditorPage = () => {
   const editorRef = useRef(null);
@@ -182,10 +180,15 @@ const EditorPage = () => {
         );
         console.log(`${username} left the room`);
         console.log(clients); // added because clients was not used anywhere to avoid linting error
-        setClients((prev) => {
-          const updatedClients = prev.filter(
-            (client) => client.username !== username
-          );
+        setClients((prevClients) => {
+          let removed = false;
+          const updatedClients = prevClients.filter((client) => {
+            if (!removed && client.username === username) {
+              removed = true;
+              return false;
+            }
+            return true;
+          });
           const updatedUsers = updatedClients.map((client) => ({
             username: client.username,
             profileImage: client.picture,
@@ -218,7 +221,7 @@ const EditorPage = () => {
           });
         }
       );
-      socketRef.current.on(ACTIONS.HOST_CHANGE, ({}) => {
+      socketRef.current.on(ACTIONS.HOST_CHANGE, ({ }) => {
         console.log("host changed");
       });
     };
@@ -266,25 +269,80 @@ const EditorPage = () => {
   const leaveRoom = async () => {
     try {
       const userData = JSON.parse(localStorage.getItem("userData"));
-      const response = await fetch("http://localhost:8080/delete-entry", {
+      const userCountResponse = await fetch("http://localhost:8080/rooms/numUsersInRoom", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ roomId, username: userData.name }), // Include roomId and username in the request body
+        body: JSON.stringify({ roomId }),
       });
-      if (response.ok) {
-        const data = await response.json();
-        console.log(data); // log the response if needed
-        reactNavigator("/", { roomId }); // Navigate to the home page after leaving the room
+      if (userCountResponse.ok) {
+        const { numUsers } = await userCountResponse.json();
+        if (numUsers === 1) {
+          const confirmDownload = window.confirm(
+            "You are the last user in the room. Once leaving the room the data will be deleted permanently. Do you want to download the content of the room before leaving ?"
+          );
+          if (confirmDownload) {
+            handleDownloadFile();
+            setTimeout(async () => {
+              const leaveResponse = await fetch("http://localhost:8080/delete-entry", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ roomId, username: userData.name }),
+              });
+
+              if (leaveResponse.ok) {
+                const data = await leaveResponse.json();
+                console.log(data);
+                reactNavigator("/", { roomId });
+              } else {
+                reactNavigator("/", { roomId });
+              }
+            }, 2000);
+          } else {
+            const leaveResponse = await fetch("http://localhost:8080/delete-entry", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ roomId, username: userData.name }),
+            });
+
+            if (leaveResponse.ok) {
+              const data = await leaveResponse.json();
+              console.log(data);
+              reactNavigator("/", { roomId });
+            } else {
+              reactNavigator("/", { roomId });
+            }
+          }
+        } else {
+          const leaveResponse = await fetch("http://localhost:8080/delete-entry", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ roomId, username: userData.name }),
+          });
+
+          if (leaveResponse.ok) {
+            const data = await leaveResponse.json();
+            console.log(data);
+            reactNavigator("/", { roomId });
+          } else {
+            reactNavigator("/", { roomId });
+          }
+        }
       } else {
-        reactNavigator("/", { roomId });
+        throw new Error("Failed to fetch user count from the server");
       }
     } catch (error) {
       console.error("Error leaving room:", error);
-      // Handle errors as needed
     }
   };
+
 
   async function copyRoomId() {
     try {
@@ -321,9 +379,8 @@ const EditorPage = () => {
         {/* {isLeftDivOpen && ( */}
 
         <div
-          className={`flex flex-col justify-between h-screen text-white px-4 relative transition-all duration-500 ease-in-out transform ${
-            isLeftDivOpen ? "col-span-2 " : "-translate-x-full"
-          }`}
+          className={`flex flex-col justify-between h-screen text-white px-4 relative transition-all duration-500 ease-in-out transform ${isLeftDivOpen ? "col-span-2 " : "-translate-x-full"
+            }`}
           style={{ backgroundColor: "#1c1e29" }}
         >
           <div className="logo flex items-center">
@@ -416,9 +473,8 @@ const EditorPage = () => {
           </div>
         </div>
         <div
-          className={`${
-            isLeftDivOpen ? "col-span-8" : "w-full absolute top-0 left-0 "
-          }  overflow-y-auto transition-all duration-500 ease-in-out`}
+          className={`${isLeftDivOpen ? "col-span-8" : "w-full absolute top-0 left-0 "
+            }  overflow-y-auto transition-all duration-500 ease-in-out`}
           style={{ width: isChatOpen ? `calc(100% - 300px)` : "100%" }}
         >
           <Editor
