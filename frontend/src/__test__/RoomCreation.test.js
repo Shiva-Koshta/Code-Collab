@@ -144,4 +144,18 @@ describe("RoomCreation component", () => {
     // Assert that useNavigate is called with the correct URL
     expect(navigate).toHaveBeenCalledWith("/faq");
   });
+
+  test('clicking on the "Log Out" button calls logout function', () => {
+    // Mock window.open
+    const windowOpenMock = jest.spyOn(window, 'open').mockImplementation(() => {});
+
+    // Render the component
+    const { getByText } = render(<RoomCreation />);
+
+    // Simulate clicking on the "Log Out" button
+    fireEvent.click(getByText('Log Out'));
+
+    // Assert that window.open is called with the correct URL
+    expect(windowOpenMock).toHaveBeenCalledWith(`${process.env.REACT_APP_API_URL}/auth/logout`, "_self");
+  });
 });
