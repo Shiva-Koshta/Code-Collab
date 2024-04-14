@@ -35,8 +35,17 @@ const Editor = ({
   // }, [])
   const prevCursor = useRef({ line: 0, ch: 0 })
   let editorChanged = false
+  const [UserName,setUserName] = useState();
   // const [cursorPositions, setCursorPositions] = useState({})
   window.localStorage.setItem("roomid", roomId);
+  useEffect(() => {
+    // Retrieve user data from local storage
+    const storedUserData = window.localStorage.getItem("userData");
+    if (storedUserData) {
+      const userData = JSON.parse(storedUserData);
+      setUserName(userData.name);
+    }
+  }, []);
   const handleBeforeUnload = (event) => {
     // Prompt the user with a confirmation dialog
 
@@ -126,6 +135,7 @@ const Editor = ({
           autoCloseTags: true,
           autoCloseBrackets: true,
           lineNumbers: true,
+          readOnly: false,
         }
       );
 
@@ -279,6 +289,7 @@ const Editor = ({
   // Function to render cursors
   const renderCursors = (cursorInfoList) => {
     if (cursorInfoList) {
+
       const { cursor, tab, user } = cursorInfoList;
       const { ch, line } = cursor;
       // const cursorMarkerId = `cursor-marker-${user.email}`;
@@ -286,6 +297,7 @@ const Editor = ({
       // Create a cursor marker element if not present
       // if (!cursorMarker){
       // Get the total width of the screen
+      if (!connectedClients.current.includes(user.name) || user.name===UserName) return
       const totalScreenWidth = window.innerWidth;
       const sidebarWidth = (2 / 10) * totalScreenWidth;
       const cursorPosition = editorRef.current.charCoords({ line, ch });
