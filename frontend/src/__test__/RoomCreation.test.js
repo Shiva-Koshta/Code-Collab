@@ -114,6 +114,7 @@ describe("RoomCreation component", () => {
     // // Check if the toast message is displayed
     // expect(screen.getByText('Room is full')).toBeInTheDocument();
   });
+  
   test("navigates to About Us page when 'About Us' button is clicked", () => {
     // Render the component
     const { useNavigate } = require("react-router-dom");
@@ -130,22 +131,24 @@ describe("RoomCreation component", () => {
     fireEvent.click(getByText("About Us"));
 
     // Assert that useNavigate is called with the correct URL
-    expect(useNavigate).toHaveBeenCalledWith("/about-us");
+    expect(navigate).toHaveBeenCalledWith("/about-us");
   });
-
+  
   test("navigates to FAQ page when 'FAQ' button is clicked", () => {
-    // Render the component
+    const { useNavigate } = require("react-router-dom");
+    const navigate = jest.fn();
+    useNavigate.mockReturnValue(navigate); // Mock useNavigate
+
     const { getByText } = render(
       <MemoryRouter>
         <RoomCreation />
       </MemoryRouter>
     );
 
-    // Simulate clicking the "FAQ" button
+    // Simulate clicking the "About Us" button
     fireEvent.click(getByText("FAQ"));
 
     // Assert that useNavigate is called with the correct URL
-    expect(useNavigate).toHaveBeenCalled();
-    expect(useNavigate.mock.calls[0][0]).toBe("/faq");
+    expect(navigate).toHaveBeenCalledWith("/faq");
   });
 });
