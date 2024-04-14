@@ -110,7 +110,8 @@ const FileView = ({ fileContent, setFileContent, editorRef, contentChanged, setC
   // useEffect(() => {
   // }, []);
 
-  const handleFileChange = (event) => {
+  // this will need to be changed
+  const handleFileChange = (event, parentFolder=selectedFileFolder) => {
     console.log('reached')
     console.log(event)
     const file = event.target.files[0]
@@ -120,11 +121,31 @@ const FileView = ({ fileContent, setFileContent, editorRef, contentChanged, setC
 
     window.localStorage.setItem('contentChanged', contentChanged)
     reader.onload = (e) => {
-      const content = e.target.result
-      setFileContent(content)
-      window.localStorage.setItem('fileContent', JSON.stringify(fileContent))
-      // console.log(content)
-      // fileRef.current = content
+      const content = e.target.result;
+
+      // code before
+      // // setFileContent(content)
+      // window.localStorage.setItem('fileContent', JSON.stringify(fileContent))
+      // // console.log(content)
+      // // fileRef.current = content
+
+      (async () => {
+        try {
+          const response = await axios.post(`${process.env.REACT_APP_API_URL}/filesystem/uploadfile`, {
+            name: file.name,
+            parentId: parentFolder._id,
+            roomId: roomId,
+            content: content,
+          });
+          const newFile = { _id: response.data.file._id, name: response.data.file.name, type: response.data.file.type }
+          parentFolder.children.push(newFile)
+          console.log("pushed");
+          setFolders([...folders]);
+        } catch (error) {
+          console.log(error);
+        }
+      })();
+
     }
     if (file) {
       reader.readAsText(file)
@@ -136,10 +157,10 @@ const FileView = ({ fileContent, setFileContent, editorRef, contentChanged, setC
   const handleFileClick = async (fileId) => {
     try {
       const response = await axios.post(`${process.env.REACT_APP_API_URL}/filesystem/fetchfile`, {
-        fileId: fileId
+        nodeId: fileId
       });
-      console.log(response.data.fileContent);
-      setFileContent(response.data.fileContent);
+      console.log(response.data.file.content);
+      setFileContent(response.data.file.content);
     } catch (error) {
       console.error(error);
     }
@@ -372,7 +393,7 @@ const FileView = ({ fileContent, setFileContent, editorRef, contentChanged, setC
                 onClick={() => {
                   setSelectedFileFolder(folder)
                   setSelectedFileFolderParent(parentFolder)
-                  // handleFileClick(folder._id)
+                  handleFileClick(folder._id)
                   // console.log(findNodeById(folder._id));
                 }}>
                 {/* <TextFileIcon className='mr-2 pb-0.5' style={{ fontSize: 20 }} /> */}
@@ -451,7 +472,7 @@ const FileView = ({ fileContent, setFileContent, editorRef, contentChanged, setC
   const sendDataToServer = async (data) => {
     try {
       console.log('Data to be sent to the server:', data);
-      const response = await axios.post(`${process.env.REACT_APP_API_URL}`, data);
+      // const response = await axios.post(`${process.env.REACT_APP_API_URL}`, data);
       console.log('Server response:', response.data);
     } catch (error) {
       console.error('Error sending data to server:', error);

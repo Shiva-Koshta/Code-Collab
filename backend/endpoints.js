@@ -4,6 +4,8 @@ const RoomCodeMap = require("./models/RoomCodeMap");
 const RoomUserCount = require("./models/RoomUserCount");
 const authRoute = require("./routes/auth");
 const nodemailer = require("nodemailer");
+const { io, server, http } = require("./server");
+const ACTIONS = require("../frontend/src/Actions");
 //initialise env file
 require("dotenv").config();
 
@@ -42,7 +44,7 @@ router.post("/rooms/numUsersInRoom", async (req, res) => {
 // Endpoint to handle receiving code
 router.post("/receivecode", async (req, res) => {
   const { roomId } = req.body;
-  if(!roomId){
+  if (!roomId) {
     return res.status(400).json({ error: "Room ID is required" });
   }
 
@@ -66,36 +68,65 @@ router.post("/receivecode", async (req, res) => {
 // });
 
 // Endpoint to handle deleting room entry
+// Endpoint to handle deleting room entry
 router.post("/delete-entry", async (req, res) => {
-  const { roomId } = req.body;
-  //   console.log("hi", roomId);
-  if (!roomId) {
-    return res.status(400).json({ error: "Room ID is required" });
-  }
+  const { roomId, username } = req.body;
+
   try {
-    const room = await RoomUserCount.findOne({ roomId });
+    // Decrement userCount in RoomUserCount model
+    const room = await RoomUserCount.findOneAndUpdate(
+      { roomId },
+      { $inc: { userCount: -1 } },
+      { new: true }
+    );
+
     if (!room) {
-      return res.status(200).json({ message: "Room not found" });
-    }
-    if (room.userCount !== 0) {
-      return res.status(200).json({ message: "done" });
+      return res.status(404).json({ message: "Room not found" });
     }
 
-    const deletedRoomCodeMap = await RoomCodeMap.findOneAndDelete({ roomId });
+    // Remove the disconnected user from the room's user list
+    const index = room.users.findIndex(user => user.username === username);
+    const updatedUsers = index !== -1 ? [...room.users.slice(0, index), ...room.users.slice(index + 1)] : room.users;
 
-    if (!deletedRoomCodeMap) {
-      return res.status(404).json({ error: "Room code map entry not found" });
+
+    // Check if the removed user was the host
+    let newHost = null;
+    if (room.hostname === username) {
+      // If the removed user was the host, find a new host among the remaining users
+      newHost = updatedUsers.length > 0 ? updatedUsers[0].username : null;
     }
 
-    return res.json({ message: "Room code map entry deleted successfully" });
+    // Update RoomUserCount model with updated users and possibly a new host
+    await RoomUserCount.findOneAndUpdate(
+      { roomId },
+      { users: updatedUsers, hostname: newHost },
+      { new: true }
+    );
+
+    // If a new host is assigned, emit a socket action for host change
+    if (newHost) {
+      console.log(`Host for room ${roomId} changed to ${newHost}.`);
+      io.to(roomId).emit(ACTIONS.HOST_CHANGE, { newHost });
+    }
+
+    // If userCount becomes 0, delete the room code map entry
+    if (room.userCount === 0) {
+      console.log("hi");
+      const deletedRoomCodeMap = await RoomCodeMap.findOneAndDelete({ roomId });
+
+      if (!deletedRoomCodeMap) {
+        return res.status(404).json({ error: "Room code map entry not found" });
+      }
+    }
+
+    return res.json({ message: "User removed successfully" });
   } catch (error) {
-    console.error("Error deleting room code map entry:", error);
+    console.error("Error removing user:", error);
     return res.status(500).json({ error: "Internal server error" });
   }
 });
 
 router.post("/initialize", async (req, res) => {
-  // console.log("hey");
   const { roomId, username } = req.body;
 
   try {
@@ -106,9 +137,9 @@ router.post("/initialize", async (req, res) => {
       // If the room doesn't exist, create a new room document
       const newRoom = new RoomUserCount({
         roomId,
-        userCount: 0, // Initial user count is 1
-        hostname: username, // Set the hostname to the username of the current user
-        users: [{ username, role: "editor" }], // Add the current user as the host with role 'editor'
+        userCount: 1, // Increment the user count by 1 when initializing the room
+        hostname: username,
+        users: [{ username, role: "editor" }],
       });
 
       // Save the new room document
@@ -126,6 +157,7 @@ router.post("/initialize", async (req, res) => {
     if (!existingUser) {
       // If the user is not already present, add the user to the room as an editor
       existingRoom.users.push({ username, role: "editor" });
+      existingRoom.userCount++; // Increment user count by 1
       await existingRoom.save();
     }
 
@@ -136,6 +168,7 @@ router.post("/initialize", async (req, res) => {
     return res.status(500).json({ message: "Internal server error" });
   }
 });
+
 router.post("/getdetails", async (req, res) => {
   console.log("hi");
   const { roomId } = req.body; // Assuming roomId is sent as a query parameter
@@ -166,8 +199,10 @@ router.post("/getdetails", async (req, res) => {
 router.post("/help", async (req, res) => {
   try {
     const { name, email, message } = req.body;
-    if(!name || !email || !message){
-      return res.status(400).json({ error: "Name, Email and Message are required" });
+    if (!name || !email || !message) {
+      return res
+        .status(400)
+        .json({ error: "Name, Email and Message are required" });
     }
     console.log(email);
     let mailOptions = {

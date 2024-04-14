@@ -7,13 +7,9 @@ const Chat = ({ setIsChatOpen, messages, CHAT_LIMIT, inputText, setInputText, ha
     <div className='chat-container'>
       <div className='chat-popup'>
         <div className='chat-header'>
-          <h2>Chat</h2>
+          Chat
           {/* <button className='close-icon' onClick={() => setIsChatOpen(false)}>X</button> */}
-          <DisabledByDefaultIcon className='close-icon mt-1' onClick={() => setIsChatOpen(false)} />
-        </div><div className='chat-header'>
-          <h2>Chat</h2>
-          {/* <button className='close-icon' onClick={() => setIsChatOpen(false)}>X</button> */}
-          <DisabledByDefaultIcon className='close-icon mt-1' onClick={() => setIsChatOpen(false)} />
+          <DisabledByDefaultIcon className='close-icon mt-1' onClick={() => setIsChatOpen(false)} /> 
         </div>
         <div className='chat-messages'>
           {messages.slice(-CHAT_LIMIT).map((message, index) => (
