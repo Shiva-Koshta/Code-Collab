@@ -1,7 +1,10 @@
+const { stringify } = require('uuid');
 const filesys = require('../services/filesystem.services');
 
 
 createfile = async(req, res) => {
+    if (!req.body.name || !req.body.parentId || !req.body.roomId) 
+    return res.status(400).json({ message: 'Please provide all required fields' })
     try {
         file = await filesys.uploadFile(req.body.name, '', req.body.parentId, req.body.roomId)
         responseJSON = {
@@ -16,9 +19,12 @@ createfile = async(req, res) => {
         res.status(200).json(responseJSON);
     } catch (error) {
         console.log(error)
+        res.status(500).json({ message: 'Error creating file' })
     }
 }
 uploadfile = async(req, res) => {
+    if (!req.body.name || !req.body.content || !req.body.parentId || !req.body.roomId) 
+    return res.status(400).json({ message: 'Please provide all required fields' })
     try {
         file = await filesys.uploadFile(req.body.name, req.body.content, req.body.parentId, req.body.roomId)
         responseJSON = {
@@ -33,9 +39,13 @@ uploadfile = async(req, res) => {
         res.status(200).json(responseJSON);
     } catch (error) {
         console.log(error)
+        res.status(500).json({ message: 'Error uploading file' })
     }
 }
 createdirectory = async(req, res) => {
+    if (!req.body.name || !req.body.parentId || !req.body.roomId)
+    return res.status(400).json({ message: 'Please provide all required fields' })
+
     try {
         dir = await filesys.createDirectory(req.body.name, req.body.parentId, req.body.roomId)
         responseJSON = {
@@ -50,9 +60,24 @@ createdirectory = async(req, res) => {
         res.status(200).json(responseJSON);
     } catch (error) {
         console.log(error)
+        res.status(500).json({ message: 'Error creating directory' })
+    }
+}
+uploaddirectory = async(req, res) => {
+    try {
+        const treeDir = await filesys.uploadDirectory(req.body.parentId, req.body.data, req.body.roomId);
+        responseJSON = {
+            message: 'Folder uploaded',
+            directory: treeDir,
+        }    
+        res.status(200).json(responseJSON);
+    } catch (error) {
+        console.log(error)
     }
 }
 createrootdirectory = async(req, res) => {
+    if (!req.body.roomId)
+    return res.status(400).json({ message: 'Please provide all required fields' })
     try {
         rootDir = await filesys.createRootDirectory(req.body.roomId); 
         responseJSON = {
@@ -67,28 +92,35 @@ createrootdirectory = async(req, res) => {
         res.status(200).json(responseJSON);
     } catch (error) {
         console.log(error)
+        res.status(500).json({ message: 'Error creating root directory' })
     }
 
 }
 fetchfile = async(req, res) => {
+    if (!req.body.nodeId) 
+    return res.status(400).json({ message: 'Please provide all required fields' })
     try {
         file = await filesys.fetchFile(req.body.nodeId); 
         responseJSON = {
             message: 'File fetched',
-            root: {
+            file: {
                 _id: file._id,
                 name: file.name,
                 type: file.type,
                 parent: file.parent,
-                content: file.content
+                content: file.content.toString()
             } 
         }    
+        console.log(file.content.toString());
         res.status(200).json(responseJSON);
     } catch (error) {
         console.log(error)
+        res.status(500).json({ message: 'Error fetching file' })
     }
 }
 generatetree = async(req, res) => {
+    if (!req.body.roomId)
+    return res.status(400).json({ message: 'Please provide all required fields' })
     try {
         tree = await filesys.generateTree(req.body.roomId); 
         responseJSON = {
@@ -98,6 +130,57 @@ generatetree = async(req, res) => {
         res.status(200).json(responseJSON);
     } catch (error) {
         console.log(error)
+        res.status(500).json({ message: 'Error fetching file' })
+    }
+}
+
+deletefile = async(req, res) => {
+    if(!req.body.nodeId) 
+        return res.status(400).json({ message: 'Please provide all required fields' })
+    try {
+        const file = await filesys.deleteFile(req.body.nodeId);
+        res.status(200).json({ success: true, message: 'File deleted successfully.', file });
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+}
+deletedirectory = async(req, res) => {
+    if(!req.body.nodeId) 
+        return res.status(400).json({ message: 'Please provide all required fields' })
+    try {
+        dir = await filesys.deleteDirectory(req.body.nodeId);  
+        res.status(200).json({ success: true, message: 'Directory deleted successfully.', dir });
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+renamefile = async(req, res) => {
+    if(!req.body.nodeId || !req.body.name) 
+        return res.status(400).json({ message: 'Please provide all required fields' })
+    try {
+        file = await filesys.renameFile(req.body.nodeId, req.body.name)
+        responseJSON = {
+            message: 'Renamed file',
+        }     
+        res.status(200).json(responseJSON);
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({ message: 'Error renaming file' })
+    }
+}
+renamedirectory = async(req, res) => {
+    if(!req.body.nodeId || !req.body.name) 
+        return res.status(400).json({ message: 'Please provide all required fields' })
+    try {
+        dir = await filesys.renameDirectory(req.body.nodeId, req.body.name)
+        responseJSON = {
+            message: 'Rename directory',
+        }     
+        res.status(200).json(responseJSON);
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({ message: 'Error renaming directory' })
     }
 }
 
@@ -106,7 +189,12 @@ module.exports = {
     createfile,
     uploadfile,
     createdirectory,
+    uploaddirectory,
     createrootdirectory,
     generatetree,
     fetchfile,
+    deletefile,
+    deletedirectory,
+    renamefile,
+    renamedirectory
 }

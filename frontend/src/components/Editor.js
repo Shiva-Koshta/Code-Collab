@@ -33,7 +33,6 @@ const Editor = ({
   //   setFileContent(window.localStorage.getItem("fileContent"))
   //   setContentChanged(window.localStorage.getItem("contentChanged"))
   // }, [])
-  const prevCursor = useRef({ line: 0, ch: 0 })
   let editorChanged = false
   const [UserName,setUserName] = useState();
   // const [cursorPositions, setCursorPositions] = useState({})
@@ -46,27 +45,7 @@ const Editor = ({
       setUserName(userData.name);
     }
   }, []);
-  const handleBeforeUnload = (event) => {
-    // Prompt the user with a confirmation dialog
 
-    if (connectedClients.current.length === 1) {
-      console.log(connectedClients.current.length);
-      const confirmationMessage =
-        "Are you sure you want to leave this page? Your data may not be saved.";
-      event.returnValue = confirmationMessage;
-    }
-  };
-
-  // Attach event listener for beforeunload event
-  useEffect(() => {
-    console.log("changed");
-    window.addEventListener("beforeunload", handleBeforeUnload);
-
-    // Cleanup function to remove event listener
-    return () => {
-      window.removeEventListener("beforeunload", handleBeforeUnload);
-    };
-  }, [connectedClients.current.length]);
 
   const renderAllCursors = (cursorPosition,currentUserId) => {
     console.log("Cursor position type:", typeof cursorPosition);
@@ -190,15 +169,14 @@ const Editor = ({
         tab: null,
       };
       console.log(cursorData);
-      prevCursor.current = cursor
-      if (!editorChanged)
-      {socketRef.current.emit(ACTIONS.CURSOR_CHANGE, {
-        roomId,
-        cursorData,
-      })
+      if (!editorChanged) {
+        socketRef.current.emit(ACTIONS.CURSOR_CHANGE, {
+          roomId,
+          cursorData,
+        })
       }
       editorChanged = false
-    }
+      }
     )
   },[editorRef])
   useEffect(() => {
@@ -208,20 +186,19 @@ const Editor = ({
         if (code !== null) {
           editorRef.current.setValue(code);
         }
-        // setCursorPositions(cursorPosition)
-        console.log((cursorPosition))
-        renderAllCursors(cursorPosition,socketRef.current.id)
-        // cursorPosition.map((cursorData)=> {renderCursors(cursorData)})
-      })
-      socketRef.current.on(ACTIONS.CURSOR_CHANGE, ({cursorData}) => {
-        console.log("cursorData retrieved from user: "+cursorData.user.name)
-        console.log(cursorData)
-        renderCursors(cursorData)
-      })
-      socketRef.current.on(ACTIONS.DISCONNECTED,({ username })=> {
-        const prevCursorMarkers = document.querySelectorAll(`.cursor-marker[title="${username}"]`)
-        prevCursorMarkers.forEach((marker) => marker.remove())
-      })
+        renderAllCursors(cursorPosition, socketRef.current.id);
+      });
+      socketRef.current.on(ACTIONS.CURSOR_CHANGE, ({ cursorData }) => {
+        console.log("cursorData retrieved from user: " + cursorData.user.name);
+        console.log(cursorData);
+        renderCursors(cursorData);
+      });
+      socketRef.current.on(ACTIONS.DISCONNECTED, ({ username }) => {
+        const prevCursorMarkers = document.querySelectorAll(
+          `.cursor-marker[title="${username}"]`
+        );
+        prevCursorMarkers.forEach((marker) => marker.remove());
+      });
     }
   }, [socketRef.current]);
   useEffect(() => {

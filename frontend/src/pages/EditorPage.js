@@ -129,11 +129,6 @@ const EditorPage = () => {
     }
   }, [messages, isChatOpen]);
 
-  const leaveRoom = () => {
-    reactNavigator("/", {
-      roomId,
-    });
-  };
   const handleToggle = () => {
     setIsConnectedComponentOpen(!isConnectedComponentOpen);
   };
@@ -229,10 +224,15 @@ const EditorPage = () => {
         );
         console.log(`${username} left the room`);
         console.log(clients); // added because clients was not used anywhere to avoid linting error
-        setClients((prev) => {
-          const updatedClients = prev.filter(
-            (client) => client.username !== username
-          );
+        setClients((prevClients) => {
+          let removed = false;
+          const updatedClients = prevClients.filter((client) => {
+            if (!removed && client.username === username) {
+              removed = true;
+              return false;
+            }
+            return true;
+          });
           const updatedUsers = updatedClients.map((client) => ({
             username: client.username,
             profileImage: client.picture,
@@ -368,6 +368,83 @@ const EditorPage = () => {
   if (!location.state) {
     return <Navigate to="/" />;
   }
+  const leaveRoom = async () => {
+    try {
+      const userData = JSON.parse(localStorage.getItem("userData"));
+      const userCountResponse = await fetch("http://localhost:8080/rooms/numUsersInRoom", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ roomId }),
+      });
+      if (userCountResponse.ok) {
+        const { numUsers } = await userCountResponse.json();
+        if (numUsers === 1) {
+          const confirmDownload = window.confirm(
+            "You are the last user in the room. Once leaving the room the data will be deleted permanently. Do you want to download the content of the room before leaving ?"
+          );
+          if (confirmDownload) {
+            handleDownloadFile();
+            setTimeout(async () => {
+              const leaveResponse = await fetch("http://localhost:8080/delete-entry", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ roomId, username: userData.name }),
+              });
+
+              if (leaveResponse.ok) {
+                const data = await leaveResponse.json();
+                console.log(data);
+                reactNavigator("/", { roomId });
+              } else {
+                reactNavigator("/", { roomId });
+              }
+            }, 2000);
+          } else {
+            const leaveResponse = await fetch("http://localhost:8080/delete-entry", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ roomId, username: userData.name }),
+            });
+
+            if (leaveResponse.ok) {
+              const data = await leaveResponse.json();
+              console.log(data);
+              reactNavigator("/", { roomId });
+            } else {
+              reactNavigator("/", { roomId });
+            }
+          }
+        } else {
+          const leaveResponse = await fetch("http://localhost:8080/delete-entry", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ roomId, username: userData.name }),
+          });
+
+          if (leaveResponse.ok) {
+            const data = await leaveResponse.json();
+            console.log(data);
+            reactNavigator("/", { roomId });
+          } else {
+            reactNavigator("/", { roomId });
+          }
+        }
+      } else {
+        throw new Error("Failed to fetch user count from the server");
+      }
+    } catch (error) {
+      console.error("Error leaving room:", error);
+    }
+  };
+
 
   async function copyRoomId() {
     try {
@@ -404,9 +481,8 @@ const EditorPage = () => {
         {/* {isLeftDivOpen && ( */}
 
         <div
-          className={`flex flex-col justify-between h-screen text-white px-4 relative transition-all duration-500 ease-in-out transform ${
-            isLeftDivOpen ? "col-span-2 " : "-translate-x-full"
-          }`}
+          className={`flex flex-col justify-between h-screen text-white px-4 relative transition-all duration-500 ease-in-out transform ${isLeftDivOpen ? "col-span-2 " : "-translate-x-full"
+            }`}
           style={{ backgroundColor: "#1c1e29" }}
         >
           <div className="logo flex items-center">
@@ -417,6 +493,7 @@ const EditorPage = () => {
               </p>
             </div>
           </div>
+          {/* <UploadFilesFolders />           */}
           <FileView
             contentChanged={contentChanged}
             setContentChanged={setContentChanged}
@@ -463,37 +540,40 @@ const EditorPage = () => {
               {/* </div> */}
             </div>
           </div>
-          <div className='p-4'>
-            <div className='flex gap-2'>
-            <button className="btn chat-btn" onClick={toggleChat} style={{ position: 'relative' }}>
-            Chat{' '}
-            {unreadMessages > 0 && (
-              <span
-                className="unread-messages"
-                style={{
-                  position: 'absolute',
-                  top: '-5px', // Adjust the positioning to align properly
-                  right: '-5px', // Adjust the positioning to align properly
-                  color: 'black',
-                  borderRadius: '50%',
-                  width: '30px',
-                  height: '30px',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  textAlign: 'center',
-                  fontSize: '14px',
-                  fontWeight: 'bold',
-                  border: '2px solid black',
-                  background: 'white',
-                }}
+          <div className="p-4">
+            <div className="flex gap-2">
+              <button
+                className="btn chat-btn"
+                onClick={toggleChat}
+                style={{ position: "relative" }}
               >
-                {unreadMessages}
-              </span>
-            )}
-          </button>
-              <button className='btn-edit copyBtn' onClick={copyRoomId}>
-
+                Chat{" "}
+                {unreadMessages > 0 && (
+                  <span
+                    className="unread-messages"
+                    style={{
+                      position: "absolute",
+                      top: "-5px", // Adjust the positioning to align properly
+                      right: "-5px", // Adjust the positioning to align properly
+                      color: "black",
+                      borderRadius: "50%",
+                      width: "30px",
+                      height: "30px",
+                      display: "inline-flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      textAlign: "center",
+                      fontSize: "14px",
+                      fontWeight: "bold",
+                      border: "2px solid black",
+                      background: "white",
+                    }}
+                  >
+                    {unreadMessages}
+                  </span>
+                )}
+              </button>
+              <button className="btn-edit copyBtn" onClick={copyRoomId}>
                 Copy ROOM ID
               </button>
             </div>
@@ -501,14 +581,14 @@ const EditorPage = () => {
               Leave
             </button>
           </div>
-          <div className="absolute right-0 top-1/2 transform -translate-y-1/2 transition duration-500 hover:animate-bounce-left">
+
+          <div className="absolute right-0 top-1/2 transform transition duration-500 hover:animate-bounce-left">
             <button onClick={toggleLeftDiv}>{leftIcon}</button>
           </div>
         </div>
         <div
-          className={`${
-            isLeftDivOpen ? "col-span-8" : "w-full absolute top-0 left-0 "
-          }  overflow-y-auto transition-all duration-500 ease-in-out`}
+          className={`${isLeftDivOpen ? "col-span-8" : "w-full absolute top-0 left-0 "
+            }  overflow-y-auto transition-all duration-500 ease-in-out`}
           style={{ width: isChatOpen ? `calc(100% - 300px)` : "100%" }}
         >
           <Editor
@@ -522,7 +602,7 @@ const EditorPage = () => {
             connectedClients={connectedUsernamesRef}
           />
           {!isLeftDivOpen && (
-            <div className="absolute left-0 top-1/2 transform -translate-y-1/2 transition duration-500 hover:animate-bounce-right">
+            <div className="absolute left-0 top-1/2 transform transition duration-500 hover:animate-bounce-right">
               <button className="text-white" onClick={toggleLeftDiv}>
                 {leftIcon}
               </button>

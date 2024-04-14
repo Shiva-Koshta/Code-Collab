@@ -4,13 +4,15 @@ import toast, { Toaster } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import "../index";
 import axios from "axios";
-
+const MAXUSERS = 10;
 const RoomCreation = () => {
   const navigate = useNavigate();
 
-  const [roomId, setRoomId] = useState("");
-  const [userName, setUserName] = useState("");
-  const [userimage, setUserimage] = useState("");
+  const [roomId, setRoomId] = useState('')
+  const [userName, setUserName] = useState('')
+  const [userimage, setUserimage] = useState('')
+  //const [roomUsersCount, setRoomUsersCount] = useState(0)
+
 
   // this function is used to logout the user
   const logout = () => {
@@ -88,15 +90,49 @@ const RoomCreation = () => {
       }
     };
     postData();
-  };
+
+  }
+  async function getRoomUsersCount() {
+    const apiurl = `${process.env.REACT_APP_API_URL}/rooms/numUsersInRoom`;
+    const requestBody = {
+      roomId: roomId
+    };
+    const postData = async () => {
+      try {
+        const response = await axios.post(apiurl, requestBody);
+        if (response.status !== 200) {
+          return -1;
+        }
+        return response.data.numUsers;
+      } catch (error) {
+        return -1;
+      }
+    };
+    return await postData();
+  }
 
   // this function is used to join a room
   const joinRoom = async () => {
+
+
     if (!roomId || !userName) {
       toast.error("ROOM ID & username is required");
       return;
     }
 
+    let numUsers = await getRoomUsersCount();
+    console.log('numUsers:', numUsers);
+    if (numUsers === -1) {
+      toast.error('Error joining room');
+      return;
+    }
+    if (numUsers >= MAXUSERS) {
+      toast.error('Room is full');
+      return;
+    }
+    // this will navigate to the editor page
+    // axios.post("http://localhost:8080/createroom", { "roomId" : roomId})
+    
     try {
       // Call the initialize endpoint with roomId and username in the request body
       await axios.post("http://localhost:8080/initialize", {
@@ -114,6 +150,7 @@ const RoomCreation = () => {
       console.error("Failed to call initialize endpoint:", error.message);
     }
   };
+
 
   const handleInputEnter = (e) => {
     if (e.code === "Enter") {
@@ -166,6 +203,7 @@ const RoomCreation = () => {
           <h2 className="text-xl">
             {" "}
             {userName && (
+
               <p className="">
                 Hello,{" "}
                 <span className=" text-2xl madimi-one-regular">{userName}</span>{" "}
@@ -222,7 +260,8 @@ const RoomCreation = () => {
         </div>
       </div>
     </div>
-  );
-};
 
-export default RoomCreation;
+  )
+}
+export default RoomCreation
+
