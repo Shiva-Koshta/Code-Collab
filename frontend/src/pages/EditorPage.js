@@ -70,12 +70,12 @@ const EditorPage = () => {
     setIsLeftDivOpen(prevState => !prevState)
   }
 
-  const handleUserMenuToggle = (username) => {
-    setMenuOpen(prevMenuOpen => ({
-      ...prevMenuOpen,
-      [username]: !prevMenuOpen[username]
-    }));
-  };
+  // const handleUserMenuToggle = (username) => {
+  //   setMenuOpen(prevMenuOpen => ({
+  //     ...prevMenuOpen,
+  //     [username]: !prevMenuOpen[username]
+  //   }));
+  // };
 
   // const handleUserMenuToggle = (username) => {
   //   setMenuOpen(prevMenuOpen => ({
@@ -352,7 +352,7 @@ const EditorPage = () => {
         }
       })
 
-      socketRef.current.on(ACTIONS.HOST_CHANGE, ({username}) => {
+      socketRef.current.on(ACTIONS.HOST_CHANGE, ({ username }) => {
 
         console.log(username)
         // setHost(username)
