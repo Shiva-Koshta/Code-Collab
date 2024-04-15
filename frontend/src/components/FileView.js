@@ -128,35 +128,35 @@ const FileView = ({
     reader.onload = (e) => {
       const content = e.target.result
 
-      // code before
-      // // setFileContent(content)
-      // window.localStorage.setItem('fileContent', JSON.stringify(fileContent))
-      // // console.log(content)
-      // // fileRef.current = content
+        // code before
+        // // setFileContent(content)
+        // window.localStorage.setItem('fileContent', JSON.stringify(fileContent))
+        // // console.log(content)
+        // // fileRef.current = content
 
-      (async () => {
-        try {
-          const response = await axios.post(
-            `${process.env.REACT_APP_API_URL}/filesystem/uploadfile`,
-            {
-              name: file.name,
-              parentId: parentFolder._id,
-              roomId: roomId,
-              content: content,
+        (async () => {
+          try {
+            const response = await axios.post(
+              `${process.env.REACT_APP_API_URL}/filesystem/uploadfile`,
+              {
+                name: file.name,
+                parentId: parentFolder._id,
+                roomId: roomId,
+                content: content,
+              }
+            )
+            const newFile = {
+              _id: response.data.file._id,
+              name: response.data.file.name,
+              type: response.data.file.type,
             }
-          )
-          const newFile = {
-            _id: response.data.file._id,
-            name: response.data.file.name,
-            type: response.data.file.type,
+            parentFolder.children.push(newFile)
+            console.log('pushed')
+            setFolders([...folders])
+          } catch (error) {
+            console.log(error)
           }
-          parentFolder.children.push(newFile)
-          console.log('pushed')
-          setFolders([...folders])
-        } catch (error) {
-          console.log(error)
-        }
-      })()
+        })()
     }
     if (file) {
       reader.readAsText(file)
@@ -393,17 +393,15 @@ const FileView = ({
         className='flex flex-col mb-1 h-fit'
         style={{
           marginLeft: `${depth === 0 ? 0 : 10}px`,
-          maxWidth: `${
-            depth === 0 ? `${parentWidth}px` : `${parentWidth - depth * 10}px`
-          }`,
+          maxWidth: `${depth === 0 ? `${parentWidth}px` : `${parentWidth - depth * 10}px`
+            }`,
         }}
       >
         <div
-          className={`flex items-center p-px  overflow-hidden ${
-            selectedFileFolder && selectedFileFolder._id === folder._id
+          className={`flex items-center p-px  overflow-hidden ${selectedFileFolder && selectedFileFolder._id === folder._id
               ? 'Selected-file-folder'
               : ''
-          } rounded-md`}
+            } rounded-md`}
         >
           <div className='grow flex relative overflow-hidden'>
             {folder.type === 'root' && (
@@ -573,7 +571,7 @@ const FileView = ({
       selectedFileFolder.children.push(newFolder)
       selectedFileFolder.children = sortAlphabetically(selectedFileFolder.children)
       setFolders([...folders])
-      
+
     } catch (error) {
       console.error('Error sending data to server:', error)
     }
@@ -583,9 +581,8 @@ const FileView = ({
       <div className='flex justify-between mx-1 relative h-fit grow'>
         <div className='flex flex-col grow overflow-hidden'>
           <div
-            className={`text-lg font-bold flex justify-between items-center my-3 ${
-              isSmallScreen ? 'flex-col' : 'flex-row'
-            }`}
+            className={`text-lg font-bold flex justify-between items-center my-3 ${isSmallScreen ? 'flex-col' : 'flex-row'
+              }`}
           >
             <p>File Explorer</p>
             {selectedFileFolder.type === 'root' && (

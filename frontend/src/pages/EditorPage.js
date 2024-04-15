@@ -20,6 +20,9 @@ import "react-toastify/dist/ReactToastify.css";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import ArrowDropUpIcon from "@mui/icons-material/ArrowDropUp";
 import Sidebar from "../components/Sidebar";
+import MoreVertSharpIcon from '@mui/icons-material/MoreVertSharp';
+import { MenuItem, Menu, IconButton } from '@mui/material';
+
 
 
 const EditorPage = () => {
@@ -32,9 +35,11 @@ const EditorPage = () => {
   const reactNavigator = useNavigate();
   const [clients, setClients] = useState([]);
   const [connectedUsernames, setConnectedUsernames] = useState([]);
-  const [storedUserData, setStoredUserData] = useState([]);
-  const [host, setHost] = useState("");
-  const [connectedUserroles, setConnectedUserroles] = useState([]);
+  // const [storedUserData, setStoredUserData] = useState([]);
+  // const [host, setHost] = useState("");
+  const storedUserData = useRef([]);
+  const host = useRef("");
+  const [connectedUserRoles, setConnectedUserRoles] = useState([]);
   const connectedUsernamesRef = useRef([]);
   // const [connectedUsernames, setConnectedUsernames] = useState([])
   const [connectedUsers, setConnectedUsers] = useState([]);
@@ -57,10 +62,41 @@ const EditorPage = () => {
   const [unreadMessages, setUnreadMessages] = useState(-1);
   const [isLeftDivOpen, setIsLeftDivOpen] = useState(true);
   const leftIcon = isLeftDivOpen ? <ChevronLeft /> : <ChevronRight />;
-
+  // const [menuOpen, setMenuOpen] = useState({})
   const toggleLeftDiv = () => {
     setIsLeftDivOpen((prevState) => !prevState);
   };
+  // const handleUserMenuToggle = (username) => {
+  //   setMenuOpen(prevMenuOpen => ({
+  //     ...prevMenuOpen,
+  //     [username]: !prevMenuOpen[username]
+  //   }));
+  // };
+  // const handleChangeRole = (username) => {
+  //   const user = connectedUserRoles.find(user => user.name === username)
+  //   if(!user)
+  //   {
+  //     console.error(`User with id ${username} not found.`)
+  //     return
+  //   }
+  //   const newRole = user.role === 'viewer' ? 'editor' : 'viewer'
+
+  //   setConnectedUserRoles(prevRoles => prevRoles.map(prevUser => {
+  //     if(prevUser.name === username)
+  //     {
+  //       return {...prevUser, role:newRole}
+  //     }
+  //     return prevUser
+  //   }))
+
+  //   socketRef.current.emit(ACTIONS.ROLE_CHANGE, {
+  //     roomId,
+  //     username,
+  //     newRole,
+  //   })
+
+  // }
+
   // const handleMessageSend = () => {
   //   console.log(storedUserData);
   //   if (inputText.trim() !== "") {
@@ -176,7 +212,8 @@ const EditorPage = () => {
       const userData = window.localStorage.getItem("userData");
       if (userData) {
         console.log(JSON.parse(userData).name);
-        setStoredUserData(JSON.parse(userData));
+        // setStoredUserData(JSON.parse(userData));
+        storedUserData.current = JSON.parse(userData)
         socketRef.current.emit(ACTIONS.JOIN, {
           roomId,
           username: JSON.parse(userData).name,
@@ -210,6 +247,8 @@ const EditorPage = () => {
           }));
           setConnectedUsers(updatedUsers);
           setConnectedUsernames(clients.map((client) => client.username));
+          setConnectedUserRoles(prevRoles => [...prevRoles, { id: socketId, name: username, role: 'editor' }])
+          console.log(host.current)
         }
       );
 
@@ -245,6 +284,7 @@ const EditorPage = () => {
           );
           return updatedClients;
         });
+        setConnectedUserRoles(prevRoles => prevRoles.filter(user => user.username !== username))
       });
       socketRef.current.on(
         ACTIONS.MESSAGE_RECEIVE,
@@ -267,9 +307,65 @@ const EditorPage = () => {
           });
         }
       );
-      socketRef.current.on(ACTIONS.HOST_CHANGE, ({ }) => {
-        console.log("host changed");
-      });
+      socketRef.current.on(ACTIONS.ROLE_CHANGE, ({ username, newRole }) => {
+        // console.log("yes")
+        console.log(username)
+        console.log(newRole)
+
+        // console.log(storedUserData.name)
+        setConnectedUserRoles(prevRoles => prevRoles.map(prevUser => {
+          if (prevUser.name === username) {
+            return { ...prevUser, role: newRole }
+          }
+          return prevUser
+        }))
+        console.log(connectedUserRoles)
+        console.log(connectedUsers)
+        if (username === storedUserData.current.name && newRole == 'viewer') {
+          console.log("yes")
+          editorRef.current.setOption('readOnly', true)
+          // editor.setOption('readOnly', true)
+          // editor.readOnly.of(true)
+        }
+        if (username === storedUserData.current.name && newRole === 'editor') {
+          editorRef.current.setOption('readOnly', false)
+          // const editor = editorRef.current.getCodeMirror()
+          // editor.setOption('readOnly', false)
+        }
+      })
+      socketRef.current.on(ACTIONS.HOST_CHANGE, ({ username }) => {
+        console.log(username)
+        // setHost(username)
+        host.current = username
+        const fetchUserDetails = async () => {
+          try {
+            const response = await fetch("http://localhost:8080/getdetails", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+
+              body: JSON.stringify({ roomId }), // Include roomId in the request body
+            });
+            if (response.ok) {
+              const data = await response.json();
+              console.log(data);
+              setConnectedUserRoles(
+                data.users.map((user) => ({ name: user.name, role: user.role }))
+              );
+              // setHost(data.host);
+              host.current = data.host;
+            } else {
+              throw new Error("Failed to fetch user details");
+            }
+          } catch (error) {
+            console.error("Error fetching user details:", error);
+          }
+        };
+
+        fetchUserDetails();
+        // fetchUserDetails();
+      })
     };
 
     init();
@@ -294,10 +390,11 @@ const EditorPage = () => {
         if (response.ok) {
           const data = await response.json();
           console.log(data);
-          setConnectedUserroles(
+          setConnectedUserRoles(
             data.users.map((user) => ({ name: user.name, role: user.role }))
           );
-          setHost(data.host);
+          // setHost(data.host);
+          host.current = data.host;
         } else {
           throw new Error("Failed to fetch user details");
         }
@@ -338,6 +435,11 @@ const EditorPage = () => {
           isLeftDivOpen={isLeftDivOpen}
           toggleLeftDiv={toggleLeftDiv}
           leftIcon={leftIcon}
+          storedUserData={storedUserData}
+          host={host}
+          connectedUserRoles={connectedUserRoles}
+          setConnectedUserRoles={setConnectedUserRoles}
+          socketRef={socketRef}
         />
         <div
           className={`${isLeftDivOpen ? "col-span-8" : "w-full absolute top-0 left-0 "
@@ -348,11 +450,11 @@ const EditorPage = () => {
             // handleDownloadFile={handleDownloadFile}
             socketRef={socketRef}
             roomId={roomId}
-          fileContent={fileContent}
-          setFileContent={setFileContent}
-          editorRef={editorRef}
-          contentChanged={contentChanged}
-          connectedClients={connectedUsernamesRef}
+            fileContent={fileContent}
+            setFileContent={setFileContent}
+            editorRef={editorRef}
+            contentChanged={contentChanged}
+            connectedClients={connectedUsernamesRef}
           />
           {!isLeftDivOpen && (
             <div className="absolute left-0 top-1/2 transform transition duration-500 hover:animate-bounce-right">

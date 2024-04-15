@@ -7,6 +7,7 @@ import { useParams } from 'react-router-dom'
 const Chat = ({
   setIsChatOpen,
   messages,
+  //CHAT_LIMIT,
   // inputText,
   // setInputText,
   // handleKeyPress,
@@ -18,14 +19,16 @@ const Chat = ({
   //17 to 36
   const [inputText, setInputText] = useState("");
   const handleMessageSend = () => {
-    console.log(storedUserData);
+    console.log(storedUserData.current);
     if (inputText.trim() !== "") {
       const message = { text: inputText };
       socketRef.current.emit(ACTIONS.MESSAGE_SEND, {
         roomId,
         message,
-        sender: storedUserData.sub,
-        sendname: storedUserData.name,
+        // sender: storedUserData.sub,
+        // sendname: storedUserData.name,
+        sender: storedUserData.current.sub,
+        sendname: storedUserData.current.name,
       });
       setInputText("");
     }
