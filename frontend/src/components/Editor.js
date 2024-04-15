@@ -8,7 +8,7 @@ import 'codemirror/addon/edit/closebrackets'
 import ACTIONS from '../Actions'
 
 const Editor = ({
-  handleDownloadFile,
+  //handleDownloadFile
   socketRef,
   roomId,
   editorRef,
@@ -302,9 +302,8 @@ const Editor = ({
       //   editorRef.current.charCoords({ line, ch }).left
       // -324}px`;
       cursorMarker.style.left = `${leftPosition}px`;
-      cursorMarker.style.top = `${
-        editorRef.current.charCoords({ line, ch }).top
-      }px`;
+      cursorMarker.style.top = `${editorRef.current.charCoords({ line, ch }).top
+        }px`;
       // console.log(editorRef.current.charCoords({ line, ch }).top);
       // Define CSS keyframes for blinking effect
     }
