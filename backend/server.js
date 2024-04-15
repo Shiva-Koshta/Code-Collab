@@ -113,6 +113,21 @@ io.on("connection", (socket) => {
     console.log(`User joined room ${roomId}`);
   });
 
+  socket.on(ACTIONS.ROLE_CHANGE, ({roomId, username, newRole}) => {
+    RoomUserCount.findOneAndUpdate(
+      { roomId, 'users.username': username },
+      { $set: { 'users.$.role': newRole } },
+      { new: true }
+    )
+    .then(() => {io.to(roomId).emit(ACTIONS.ROLE_CHANGE, {
+      username,
+      newRole
+    })})
+    .catch((error) => {
+      console.error("Error in changing role",error)
+    })
+  })
+  
   socket.on(ACTIONS.MESSAGE_SEND, ({ roomId, message, sender, sendname }) => {
     console.log(sender);
     console.log(sendname);

@@ -6,6 +6,7 @@ import {
   useParams,
 } from "react-router-dom";
 // import "./Editor.css";
+
 import ACTIONS from "../Actions";
 import toast, { Toaster } from "react-hot-toast";
 import Editor from "../components/Editor";
@@ -57,15 +58,25 @@ const EditorPage = () => {
   // const [isOpen, setIsOpen] = useState(true);
   // const [isConnectedComponentOpen, setIsConnectedComponentOpen] = useState(false);
   const [isChatOpen, setIsChatOpen] = useState(false); // State to control chat window
+
   // const downloadFileExtension = "";
   // const downloadFileName = "";
   const [unreadMessages, setUnreadMessages] = useState(-1);
   const [isLeftDivOpen, setIsLeftDivOpen] = useState(true);
   const leftIcon = isLeftDivOpen ? <ChevronLeft /> : <ChevronRight />;
   // const [menuOpen, setMenuOpen] = useState({})
+
   const toggleLeftDiv = () => {
-    setIsLeftDivOpen((prevState) => !prevState);
+    setIsLeftDivOpen(prevState => !prevState)
+  }
+
+  const handleUserMenuToggle = (username) => {
+    setMenuOpen(prevMenuOpen => ({
+      ...prevMenuOpen,
+      [username]: !prevMenuOpen[username]
+    }));
   };
+
   // const handleUserMenuToggle = (username) => {
   //   setMenuOpen(prevMenuOpen => ({
   //     ...prevMenuOpen,
@@ -164,6 +175,7 @@ const EditorPage = () => {
   //   document.body.removeChild(element);
   // };
 
+
   const toggleChat = () => {
     setIsChatOpen((prevState) => !prevState); // Toggle chat window
     setUnreadMessages(-1);
@@ -247,7 +259,9 @@ const EditorPage = () => {
           }));
           setConnectedUsers(updatedUsers);
           setConnectedUsernames(clients.map((client) => client.username));
+
           setConnectedUserRoles(prevRoles => [...prevRoles, { id: socketId, name: username, role: 'editor' }])
+
           console.log(host.current)
         }
       );
@@ -306,7 +320,9 @@ const EditorPage = () => {
             return updatedMessages;
           });
         }
-      );
+
+      )
+
       socketRef.current.on(ACTIONS.ROLE_CHANGE, ({ username, newRole }) => {
         // console.log("yes")
         console.log(username)
@@ -321,7 +337,9 @@ const EditorPage = () => {
         }))
         console.log(connectedUserRoles)
         console.log(connectedUsers)
+
         if (username === storedUserData.current.name && newRole == 'viewer') {
+
           console.log("yes")
           editorRef.current.setOption('readOnly', true)
           // editor.setOption('readOnly', true)
@@ -333,7 +351,9 @@ const EditorPage = () => {
           // editor.setOption('readOnly', false)
         }
       })
-      socketRef.current.on(ACTIONS.HOST_CHANGE, ({ username }) => {
+
+      socketRef.current.on(ACTIONS.HOST_CHANGE, ({username}) => {
+
         console.log(username)
         // setHost(username)
         host.current = username
@@ -363,10 +383,12 @@ const EditorPage = () => {
           }
         };
 
+
         fetchUserDetails();
         // fetchUserDetails();
       })
     };
+
 
     init();
 
@@ -441,6 +463,7 @@ const EditorPage = () => {
           setConnectedUserRoles={setConnectedUserRoles}
           socketRef={socketRef}
         />
+
         <div
           className={`${isLeftDivOpen ? "col-span-8" : "w-full absolute top-0 left-0 "
             }  overflow-y-auto transition-all duration-500 ease-in-out`}
