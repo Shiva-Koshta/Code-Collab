@@ -266,6 +266,9 @@ const Sidebar = ({
                     Leave
                 </button>
             </div>
+            <div className="absolute right-0 top-1/2 transform transition duration-500 hover:animate-bounce-left">
+                <button onClick={toggleLeftDiv}>{leftIcon}</button>
+            </div>
         </div>
     );
 };
