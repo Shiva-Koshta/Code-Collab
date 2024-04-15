@@ -252,7 +252,7 @@ const RoomCreation = () => {
         </div>
         <div>
           <button
-            className="p-2.5 rounded-md cursor-pointer font-bold text-base w-24 ml-auto mt-2.5 bg-red-700 hover:bg-red-800"
+            className="p-2.5 rounded-md cursor-pointer font-bold text-base w-24 ml-auto mt-2.5 bg-red-700 hover:bg-red-800 hover:scale-105"
             onClick={logout}
           >
             Log Out

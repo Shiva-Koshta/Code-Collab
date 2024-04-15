@@ -80,6 +80,8 @@ footer a {
 
 .leaveBtn:hover {
   background: #2b824c;
+  scale: 1.05;
+  
 }
 
 .createInfo {
@@ -123,13 +125,6 @@ footer a:hover {
 .navbar-button:hover {
   background-color: #777; /* Background color of the buttons on hover */
 }
-
-
-
-
-
-
-
 
 
 

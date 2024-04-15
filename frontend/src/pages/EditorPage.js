@@ -51,7 +51,7 @@ const EditorPage = () => {
   // const fileRef=useRef(null);
   // const [isOpen, setIsOpen] = useState(true);
   const [isConnectedComponentOpen, setIsConnectedComponentOpen] =
-    useState(false);
+    useState(true);
   const [isChatOpen, setIsChatOpen] = useState(false); // State to control chat window
 
   const [unreadMessages, setUnreadMessages] = useState(-1);
@@ -460,7 +460,7 @@ const EditorPage = () => {
                 )}
               </button>
               <button className="btn-edit copyBtn" onClick={copyRoomId}>
-                Copy ROOM ID
+                Copy Room ID
               </button>
             </div>
             <button className="btn-edit leaveBtn" onClick={leaveRoom}>

@@ -67,7 +67,7 @@
 }
 .copyBtn:hover {
   background: #2b824c;
-  transform: scale(1.01);
+  transform: scale(1.05);
 }
 
 .aside {
