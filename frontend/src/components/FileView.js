@@ -32,7 +32,13 @@ import textIcon from '../icons/text.png';
 import videoIcon from '../icons/video.png';
 import { toast } from 'react-hot-toast';
 
-const FileView = () => {
+const FileView = ({
+  fileContent,
+  setFileContent,
+  editorRef,
+  contentChanged,
+  setContentChanged
+}) => {
   const { roomId } = useParams()
   const [isDownloadTrue, setIsDownloadTrue] = useState(false)
   const [downloadFileExtension, setFileExtension] = useState('')
@@ -51,7 +57,6 @@ const FileView = () => {
     type: 'root',
     children: [],
   });
-  const [fileContent, setFileContent] = useState("");
   const [selectedFileFolderParent, setSelectedFileFolderParent] = useState({});
   const [isFolderOpen, setIsFolderOpen] = useState({ '0': false })
   const [isSmallScreen, setIsSmallScreen] = useState(false);
@@ -108,7 +113,7 @@ const FileView = () => {
   // }, []);
 
   // this will need to be changed
-  const [contentChanged, setContentChanged] = useState(false);
+
   const handleFileChange = (event, parentFolder = selectedFileFolder) => {
     console.log('reached')
     console.log(event)
@@ -163,7 +168,6 @@ const FileView = () => {
       console.error(error);
     }
   };
-  const editorRef = useRef(null);
   const handleDownloadFile = () => {
     const myContent = editorRef.current.getValue()
     const element = document.createElement('a')

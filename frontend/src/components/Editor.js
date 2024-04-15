@@ -8,12 +8,31 @@ import "codemirror/addon/edit/closebrackets";
 import ACTIONS from "../Actions";
 
 const Editor = ({
+  //handleDownloadFile
   socketRef,
   roomId,
+  editorRef,
+  fileContent,
+  setFileContent,
+  contentChanged,
+  connectedClients,
 }) => {
-  const [contentChanged, setContentChanged] = useState(false);
-  const [fileContent, setFileContent] = useState("");
-  const editorRef = useRef(null);
+  // const [fileContent, setFileContent] = useState("")
+  // const [contentChanged, setContentChanged] = useState(false)
+  // useEffect(() => {
+  //   const handleStorageChange = () => {
+  //     setFileContent(window.localStorage.getItem('fileContent'))
+  //     setContentChanged(window.localStorage.getItem('contentChange'))
+  //   }
+  //   window.addEventListener('storage', handleStorageChange)
+  //   return () => {
+  //     window.removeEventListener('storage', handleStorageChange)
+  //   }
+  // }, [])
+  // useEffect(() => {
+  //   setFileContent(window.localStorage.getItem("fileContent"))
+  //   setContentChanged(window.localStorage.getItem("contentChanged"))
+  // }, [])
   let editorChanged = false;
   window.localStorage.setItem("roomid", roomId);
 

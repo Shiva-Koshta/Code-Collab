@@ -12,6 +12,7 @@ import Editor from "../components/Editor";
 import { initSocket } from "../socket";
 import "../styles/EditorPage.css";
 import "../styles/Chat.css";
+import ChatIcon from "@mui/icons-material/Chat";
 import Chat from "../components/Chat";
 import { ChevronLeft, ChevronRight } from "@mui/icons-material";
 import { ToastContainer, toast as reactToastify } from "react-toastify";
@@ -21,9 +22,9 @@ import ArrowDropUpIcon from "@mui/icons-material/ArrowDropUp";
 import Sidebar from "../components/Sidebar";
 
 const EditorPage = () => {
-  // const editorRef = useRef(null);
-  // const [fileContent, setFileContent] = useState("");
-  // const [contentChanged, setContentChanged] = useState(false);
+  const editorRef = useRef(null);
+  const [fileContent, setFileContent] = useState("");
+  const [contentChanged, setContentChanged] = useState(false);
   const { roomId } = useParams();
   const socketRef = useRef(null);
   const location = useLocation();
@@ -43,8 +44,15 @@ const EditorPage = () => {
     return storedMessages ? JSON.parse(storedMessages) : [];
   });
   const CHAT_LIMIT = 15; // Global variable for chat limit
-  const [isChatOpen, setIsChatOpen] = useState(false); // State to control chat window
 
+  // const [inputText, setInputText] = useState("");
+
+  // const fileRef=useRef(null);
+  // const [isOpen, setIsOpen] = useState(true);
+  // const [isConnectedComponentOpen, setIsConnectedComponentOpen] = useState(false);
+  const [isChatOpen, setIsChatOpen] = useState(false); // State to control chat window
+  // const downloadFileExtension = "";
+  // const downloadFileName = "";
   const [unreadMessages, setUnreadMessages] = useState(-1);
   const [isLeftDivOpen, setIsLeftDivOpen] = useState(true);
   const leftIcon = isLeftDivOpen ? <ChevronLeft /> : <ChevronRight />;
@@ -52,6 +60,72 @@ const EditorPage = () => {
   const toggleLeftDiv = () => {
     setIsLeftDivOpen((prevState) => !prevState);
   };
+  // const handleMessageSend = () => {
+  //   console.log(storedUserData);
+  //   if (inputText.trim() !== "") {
+  //     const message = { text: inputText };
+  //     socketRef.current.emit(ACTIONS.MESSAGE_SEND, {
+  //       roomId,
+  //       message,
+  //       sender: storedUserData.sub,
+  //       sendname: storedUserData.name,
+  //     });
+  //     setInputText("");
+  //   }
+  // };
+
+  // const handleToggle = () => {
+  //   setIsConnectedComponentOpen(!isConnectedComponentOpen);
+  // };
+  // const leaveRoom = async () => {
+  //   try {
+  //     const userData = JSON.parse(localStorage.getItem("userData"));
+  //     const response = await fetch("http://localhost:8080/delete-entry", {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: JSON.stringify({ roomId, username: userData.name }), // Include roomId and username in the request body
+  //     });
+  //     if (response.ok) {
+  //       const data = await response.json();
+  //       console.log(data); // log the response if needed
+  //       reactNavigator("/", { roomId }); // Navigate to the home page after leaving the room
+  //     } else {
+  //       reactNavigator("/", { roomId });
+  //     }
+  //   } catch (error) {
+  //     console.error("Error leaving room:", error);
+  //     // Handle errors as needed
+  //   }
+  // };
+
+  // async function copyRoomId() {
+  //   try {
+  //     await navigator.clipboard.writeText(roomId);
+  //     toast.success("Room ID has been copied to your clipboard");
+  //   } catch (err) {
+  //     toast.error("Could not copy the Room ID");
+  //     console.error(err);
+  //   }
+  // }
+
+  // const handleKeyPress = (e) => {
+  //   if (e.key === "Enter") {
+  //     handleMessageSend();
+  //   }
+  // };
+
+  // const handleDownloadFile = () => {
+  //   const myContent = editorRef.current.getValue();
+  //   const element = document.createElement("a");
+  //   const file = new Blob([myContent], { type: "text/plain" });
+  //   element.href = URL.createObjectURL(file);
+  //   element.download = `${downloadFileName}.${downloadFileExtension}`;
+  //   document.body.appendChild(element);
+  //   element.click();
+  //   document.body.removeChild(element);
+  // };
 
   const toggleChat = () => {
     setIsChatOpen((prevState) => !prevState); // Toggle chat window
@@ -241,9 +315,19 @@ const EditorPage = () => {
         {/* {isLeftDivOpen && ( */}
 
         <Sidebar
+          contentChanged={contentChanged}
+          setContentChanged={setContentChanged}
+          fileContent={fileContent}
+          setFileContent={setFileContent}
+          editorRef={editorRef}
+          // isConnectedComponentOpen={isConnectedComponentOpen}
+          // handleToggle={handleToggle}
           connectedUsers={connectedUsers}
           toggleChat={toggleChat}
           unreadMessages={unreadMessages}
+          // copyRoomId={copyRoomId}
+          // leaveRoom={leaveRoom}
+          roomId={roomId}
           isLeftDivOpen={isLeftDivOpen}
           toggleLeftDiv={toggleLeftDiv}
           leftIcon={leftIcon}
@@ -254,8 +338,14 @@ const EditorPage = () => {
           style={{ width: isChatOpen ? `calc(100% - 300px)` : "100%" }}
         >
           <Editor
+            // handleDownloadFile={handleDownloadFile}
             socketRef={socketRef}
             roomId={roomId}
+          fileContent={fileContent}
+          setFileContent={setFileContent}
+          editorRef={editorRef}
+          contentChanged={contentChanged}
+          connectedClients={connectedUsernamesRef}
           />
           {!isLeftDivOpen && (
             <div className="absolute left-0 top-1/2 transform transition duration-500 hover:animate-bounce-right">
@@ -282,6 +372,11 @@ const EditorPage = () => {
             <Chat
               setIsChatOpen={setIsChatOpen}
               messages={messages}
+              // CHAT_LIMIT={CHAT_LIMIT}
+              // inputText={inputText}
+              // setInputText={setInputText}
+              // handleKeyPress={handleKeyPress}
+              // handleMessageSend={handleMessageSend}
               roomId={roomId}
               socketRef={socketRef}
               storedUserData={storedUserData}

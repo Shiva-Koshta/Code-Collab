@@ -2,14 +2,20 @@ import React, { useState } from 'react'
 import ACTIONS from '../Actions'
 import DisabledByDefaultIcon from '@mui/icons-material/DisabledByDefault'
 import '../styles/Chat.css'
+import { useParams } from 'react-router-dom'
 
 const Chat = ({
   setIsChatOpen,
   messages,
+  // inputText,
+  // setInputText,
+  // handleKeyPress,
+  // handleMessageSend
   roomId,
   socketRef,
   storedUserData
 }) => {
+  //17 to 36
   const [inputText, setInputText] = useState("");
   const handleMessageSend = () => {
     console.log(storedUserData);

@@ -6,18 +6,27 @@ import FileView from "./FileView";
 import toast from "react-hot-toast";
 import { useNavigate, useParams } from "react-router-dom";
 const Sidebar = ({
+    contentChanged,
+    setContentChanged,
+    fileContent,
+    setFileContent,
+    editorRef,
+    // isConnectedComponentOpen,
+    // handleToggle,
     connectedUsers,
     toggleChat,
     unreadMessages,
+    // copyRoomId,
+    // leaveRoom,
+    roomId,
     isLeftDivOpen,
     toggleLeftDiv,
     leftIcon
 }) => {
+    const [isConnectedComponentOpen, setIsConnectedComponentOpen] = useState(false);
     const handleToggle = () => {
         setIsConnectedComponentOpen(!isConnectedComponentOpen);
     };
-    const [isConnectedComponentOpen, setIsConnectedComponentOpen] = useState(false);
-    const editorRef = useRef(null);
     const [downloadFileExtension, setFileExtension] = useState('')
     const [downloadFileName, setFileName] = useState('')
     const handleDownloadFile = () => {
@@ -30,7 +39,6 @@ const Sidebar = ({
         element.click();
         document.body.removeChild(element);
     };
-    const { roomId } = useParams()
 
     const reactNavigator = useNavigate();
     const leaveRoom = async () => {
@@ -78,7 +86,13 @@ const Sidebar = ({
                     </p>
                 </div>
             </div>
-            <FileView />
+            <FileView
+                contentChanged={contentChanged}
+                setContentChanged={setContentChanged}
+                fileContent={fileContent}
+                setFileContent={setFileContent}
+                editorRef={editorRef}
+            />
             <div className="Users z-10">
                 <div
                     className="flex justify-between items-center"
