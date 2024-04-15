@@ -85,9 +85,9 @@ router.post("/delete-entry", async (req, res) => {
     }
 
     // Remove the disconnected user from the room's user list
-    const updatedUsers = room.users.filter(
-      (user) => user.username !== username
-    );
+    const index = room.users.findIndex(user => user.username === username);
+    const updatedUsers = index !== -1 ? [...room.users.slice(0, index), ...room.users.slice(index + 1)] : room.users;
+
 
     // Check if the removed user was the host
     let newHost = null;
