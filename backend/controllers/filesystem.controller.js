@@ -63,6 +63,18 @@ createdirectory = async(req, res) => {
         res.status(500).json({ message: 'Error creating directory' })
     }
 }
+uploaddirectory = async(req, res) => {
+    try {
+        const treeDir = await filesys.uploadDirectory(req.body.parentId, req.body.data, req.body.roomId);
+        responseJSON = {
+            message: 'Folder uploaded',
+            directory: treeDir,
+        }    
+        res.status(200).json(responseJSON);
+    } catch (error) {
+        console.log(error)
+    }
+}
 createrootdirectory = async(req, res) => {
     if (!req.body.roomId)
     return res.status(400).json({ message: 'Please provide all required fields' })
@@ -177,6 +189,7 @@ module.exports = {
     createfile,
     uploadfile,
     createdirectory,
+    uploaddirectory,
     createrootdirectory,
     generatetree,
     fetchfile,

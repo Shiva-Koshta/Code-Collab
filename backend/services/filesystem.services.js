@@ -17,6 +17,112 @@ async function createDirectory(name, parentId, roomId, type='directory') {
     return directoryNode;
 }
 
+async function uploadDirectory(parentId, inputArray, roomId) {
+
+    // helper function
+    async function getFolderStructure(directoryId) {
+        const stack = []; // Stack to keep track of folders to process
+        const root = {}; // Root object for the tree structure
+        const visited = new Set(); // Set to keep track of visited nodes
+    
+        // Start with the root directory
+        stack.push({ id: directoryId, node: root });
+    
+        while (stack.length > 0) {
+            const { id, node } = stack.pop();
+    
+            // Check if the node has already been visited
+            if (visited.has(id)) {
+                continue;
+            }
+    
+            // Get the node from the database
+            const currentNode = await FileNode.findById(id);
+    
+            // If the node doesn't exist, skip it
+            if (!currentNode) {
+                continue;
+            }
+    
+            // Add name, _id, and type attributes to the node
+            node.name = currentNode.name;
+            node._id = currentNode._id;
+            node.type = currentNode.type;
+    
+            // Mark the node as visited
+            visited.add(id);
+    
+            // If the node is a directory, get its children
+            if (currentNode.type === 'directory') {
+                // Initialize children array for the current directory
+                node.children = [];
+    
+                // Get the children of the current directory
+                const children = await FileNode.find({ parent: id });
+    
+                // Add children to the stack for processing
+                for (const child of children) {
+                    const childNode = {};
+                    node.children.push(childNode);
+                    stack.push({ id: child._id, node: childNode });
+                }
+            }
+        }
+    
+        return root; // Return the children of the root directory
+    }
+
+    // main body of uploadFolder function
+    let topmostFolderId = null;
+    for (const item of inputArray) {
+        const pathSegments = item.path.split('/');
+        let parent = parentId; // Set parent to parentId for the whole inputArray
+
+        for (let i = 0; i < pathSegments.length; i++) {
+            const name = pathSegments[i];
+            const isDirectory = (i < pathSegments.length - 1) || item.isDirectory;
+            const content = isDirectory ? null : item.content;
+
+            let fileNode = await FileNode.findOne({ name, parent, roomId });
+
+            if (!fileNode) {
+                // Create a new FileNode if not found
+                if(isDirectory) {
+                    fileNode = new FileNode({
+                        name,
+                        type: isDirectory ? 'directory' : 'file',
+                        parent,
+                        roomId
+                    });
+                } else {
+                    fileNode = new FileNode({
+                        name,
+                        type: isDirectory ? 'directory' : 'file',
+                        parent,
+                        content,
+                        roomId
+                    });
+
+                }
+            } else {
+                // Update existing FileNode if found
+                fileNode.type = isDirectory ? 'directory' : 'file';
+                fileNode.content = content;
+            }
+
+            await fileNode.save();
+
+            if (i === 0) {
+                topmostFolderId = fileNode._id;
+            }
+
+            // Update parent reference for next iteration
+            parent = fileNode._id;
+        }
+    }
+    return await getFolderStructure(topmostFolderId);
+}
+
 // Function to download a file
 async function fetchFile(nodeId) {
     const fileNode = await FileNode.findById(nodeId);
@@ -157,6 +263,7 @@ async function renameDirectory(nodeId, newName) {
 module.exports = {
     uploadFile,
     createDirectory,
+    uploadDirectory,
     fetchFile,
     createRootDirectory,
     generateTree,
