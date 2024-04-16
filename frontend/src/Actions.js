@@ -9,7 +9,8 @@ const ACTIONS = {
   MESSAGE_RECEIVE: "MESSAGE_RECEIVE",
   CURSOR_CHANGE: "cursor-change",
   HOST_CHANGE: "host-change",
-  ROLE_CHANGE: "role-change"
+  ROLE_CHANGE: "role-change",
+  SAVE_FILE: "save-file",
 };
 
 module.exports = ACTIONS;
