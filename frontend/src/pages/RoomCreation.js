@@ -104,7 +104,7 @@ const RoomCreation = () => {
           },
         });
       } catch (error) {
-        console.error("Error:", error);
+        //console.error("Error:", error);
       }
     };
     postData();
@@ -147,7 +147,7 @@ const RoomCreation = () => {
         },
       });
     } catch (error) {
-      console.error("Failed to call initialize endpoint:", error.message);
+      //console.error("Failed to call initialize endpoint:", error.message);
     }
   };
 
