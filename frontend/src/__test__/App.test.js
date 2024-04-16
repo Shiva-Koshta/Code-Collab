@@ -5,8 +5,8 @@ import App from '../App';
 jest.mock('axios');
 
 describe('App', () => {
-    const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
-    beforeEach(() => {
+  const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+  beforeEach(() => {
     // Mocking the response of axios.get for successful user authentication
     axios.get.mockResolvedValue({
       data: {
@@ -22,7 +22,6 @@ describe('App', () => {
     });
   });
   afterEach(() => {
-    // Restore console.error to its original implementation after each test
     consoleErrorSpy.mockRestore();
   });
   test('renders RoomCreation when user is logged in', async () => {
@@ -38,7 +37,7 @@ describe('App', () => {
 
   test('renders Login when user is not logged in', async () => {
     // Mock axios.get to simulate user not being logged in
-    axios.get.mockRejectedValueOnce(new Error('Unauthorized'));
+    axios.get.mockRejectedValueOnce({ response: { status: 401 } });
 
     // Render the App component
     render(<App />);
