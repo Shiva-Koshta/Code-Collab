@@ -9,6 +9,7 @@ const ACTIONS = {
   MESSAGE_RECEIVE: "MESSAGE_RECEIVE",
   CURSOR_CHANGE: "cursor-change",
   HOST_CHANGE: "host-change",
+  ROLE_CHANGE: "role-change"
 };
 
 module.exports = ACTIONS;
