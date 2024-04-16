@@ -4,6 +4,7 @@ const filesystem = require('../controllers/filesystem.controller');
 router.post('/createfile', filesystem.createfile);
 router.post('/uploadfile', filesystem.uploadfile);
 router.post('/createdirectory', filesystem.createdirectory);
+router.post('/uploaddirectory', filesystem.uploaddirectory);
 router.post('/createrootdirectory', filesystem.createrootdirectory);
 router.post('/generatetree', filesystem.generatetree);
 router.post('/fetchfile', filesystem.fetchfile);
