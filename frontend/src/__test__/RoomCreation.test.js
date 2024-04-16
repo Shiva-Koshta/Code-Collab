@@ -2,7 +2,7 @@ import React from "react";
 import { render, fireEvent, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import RoomCreation from "../pages/RoomCreation";
-import {getRoomUsersCount} from "../pages/RoomCreation";
+import { getRoomUsersCount } from "../pages/RoomCreation";
 const axios = require("axios");
 
 // Mock axios module
@@ -12,7 +12,7 @@ jest.mock("react-router-dom", () => ({
   ...jest.requireActual("react-router-dom"),
   useNavigate: jest.fn(),
 }));
-
+jest.spyOn(console, "log").mockImplementation(() => {});
 describe("RoomCreation component", () => {
   beforeEach(() => {
     // Reset mocks before each test
@@ -81,32 +81,6 @@ describe("RoomCreation component", () => {
     // Check if user is navigated to editor page
     // await screen.findByText(/Editor Page/i); // Assuming 'Editor Page' text exists on editor page
     // expect(screen.getByText(/Editor Page/i)).toBeInTheDocument();
-  });
-
-  test("displays error message if room is full", async () => {
-    render(
-      <MemoryRouter>
-        <RoomCreation />
-      </MemoryRouter>
-    );
-
-    // Mock axios response for getRoomUsersCount
-    axios.post.mockResolvedValueOnce({ status: 200, data: { numUsers: 10 } });
-
-    // Fill input fields and click join button
-    fireEvent.change(screen.getByPlaceholderText("ROOM ID"), {
-      target: { value: "exampleRoomId" },
-    });
-    fireEvent.change(screen.getByPlaceholderText("USERNAME"), {
-      target: { value: "exampleUsername" },
-    });
-    fireEvent.click(screen.getByText("JOIN"));
-
-    // Wait for the toast to appear
-    // await screen.findByText('Room is full');
-
-    // // Check if the toast message is displayed
-    // expect(screen.getByText('Room is full')).toBeInTheDocument();
   });
 
   test("navigates to About Us page when 'About Us' button is clicked", () => {
@@ -179,74 +153,82 @@ describe("RoomJoin", () => {
       screen.getByText("ROOM ID & username is required")
     ).toBeInTheDocument();
   });
-
   test("displays error message if room is full", async () => {
-    // Mock the getRoomUsersCount function to return MAXUSERS
+    const MAX_USERS = 10;
     const joinRoomMock = jest.fn();
-    const MAXUSERS = 10;
+
+    // Mock axios response for getRoomUsersCount
     jest
       .spyOn(axios, "post")
-      .mockResolvedValueOnce({ status: 200, data: { numUsers: MAXUSERS } });
+      .mockResolvedValueOnce({ status: 200, data: { numUsers: MAX_USERS } });
 
-    const { getByText } = render(<RoomCreation joinRoom={joinRoomMock} />);
+    const { getByText, getByPlaceholderText } = render(
+      <MemoryRouter>
+        <RoomCreation joinRoom={joinRoomMock} />
+      </MemoryRouter>
+    );
 
-    // Find the button element and simulate a click event
-    const buttonElement = getByText("JOIN");
-    fireEvent.click(buttonElement);
+    // Fill input fields and click join button
+    fireEvent.change(getByPlaceholderText("ROOM ID"), {
+      target: { value: "exampleRoomId" },
+    });
+    fireEvent.change(getByPlaceholderText("USERNAME"), {
+      target: { value: "exampleUsername" },
+    });
+    fireEvent.click(getByText("JOIN"));
+
+    // Check if the joinRoom function is not called
     expect(joinRoomMock).not.toHaveBeenCalled();
 
     // Verify that error message for room being full is displayed
-    expect(screen.getByText("Room is full")).toBeInTheDocument();
+    expect(await screen.findByText("Room is full")).toBeInTheDocument();
   });
-  // test('shows error if joining room fails', async () => {
-  //   const joinRoomMock = jest.fn();
-  //    const { getByText } = render(<RoomCreation joinRoom={joinRoomMock} />);
-  //   // Mock axios.post to simulate a failed request
-  //   axios.post.mockRejectedValueOnce(new Error('Failed to join room'));
+  test("displays error message if error joining room", async () => {
+    const joinRoomMock = jest.fn();
 
-  //   fireEvent.click(getByText('JOIN'));
+    // Mock axios response for getRoomUsersCount
+    jest
+      .spyOn(axios, "post")
+      .mockResolvedValueOnce({ status: 200, data: { numUsers: -1 } });
 
-  //   expect(axios.post).toHaveBeenCalled();
-  //   expect(navigate).not.toHaveBeenCalled();
-    
-  //   expect(screen.getByText("Error joining room")).toBeInTheDocument();
-  // });
-  // test("displays error message if error joining room", async () => {
-  //   // Mock the getRoomUsersCount function to return MAXUSERS
-  //   const joinRoomMock = jest.fn();
-  //   const MAXUSERS = -1;
-  //   jest
-  //     .spyOn(axios, "post")
-  //     .mockResolvedValueOnce({ status: 200, data: { numUsers: MAXUSERS } });
+    const { getByText, getByPlaceholderText } = render(
+      <MemoryRouter>
+        <RoomCreation joinRoom={joinRoomMock} />
+      </MemoryRouter>
+    );
 
-  //   const { getByText } = render(<RoomCreation joinRoom={joinRoomMock} />);
+    // Fill input fields and click join button
+    fireEvent.change(getByPlaceholderText("ROOM ID"), {
+      target: { value: "exampleRoomId" },
+    });
+    fireEvent.change(getByPlaceholderText("USERNAME"), {
+      target: { value: "exampleUsername" },
+    });
+    fireEvent.click(getByText("JOIN"));
 
-  //   // Find the button element and simulate a click event
-  //   const buttonElement = getByText("JOIN");
-  //   fireEvent.click(buttonElement);
-  //   expect(joinRoomMock).not.toHaveBeenCalled();
-  //   expect(screen.getByText("Error joining room")).toBeInTheDocument();
-  // });
+    // Verify that joinRoom function is not called
+    expect(joinRoomMock).not.toHaveBeenCalled();
 
-
+    // Verify that error message for error joining room is displayed
+    expect(await screen.findByText("Error joining room")).toBeInTheDocument();
+  });
 });
 
-
-describe('getRoomUsersCount', () => {
+describe("getRoomUsersCount", () => {
   afterEach(() => {
     jest.clearAllMocks();
   });
 
-  it('returns number of users in the room on successful API call', async () => {
+  it("returns number of users in the room on successful API call", async () => {
     const mockResponse = {
       status: 200,
       data: {
-        numUsers: 5
-      }
+        numUsers: 5,
+      },
     };
     axios.post.mockResolvedValue(mockResponse);
 
-    const roomId = 'roomId';
+    const roomId = "roomId";
     const result = await getRoomUsersCount(roomId);
 
     expect(result).toBe(5);
@@ -256,13 +238,13 @@ describe('getRoomUsersCount', () => {
     );
   });
 
-  it('returns -1 on unsuccessful API call', async () => {
+  it("returns -1 on unsuccessful API call", async () => {
     const mockResponse = {
-      status: 400 // Or any other non-200 status code
+      status: 400, // Or any other non-200 status code
     };
     axios.post.mockResolvedValue(mockResponse);
 
-    const roomId = 'roomId';
+    const roomId = "roomId";
     const result = await getRoomUsersCount(roomId);
 
     expect(result).toBe(-1);
@@ -272,10 +254,10 @@ describe('getRoomUsersCount', () => {
     );
   });
 
-  it('returns -1 on error', async () => {
-    axios.post.mockRejectedValue(new Error('Network Error'));
+  it("returns -1 on error", async () => {
+    axios.post.mockRejectedValue(new Error("Network Error"));
 
-    const roomId = 'roomId';
+    const roomId = "roomId";
     const result = await getRoomUsersCount(roomId);
 
     expect(result).toBe(-1);
@@ -286,11 +268,11 @@ describe('getRoomUsersCount', () => {
   });
 });
 
-describe('createNewRoom', () => {
-  test('creates a new room and navigates to the editor page', async () => {
+describe("createNewRoom", () => {
+  test("creates a new room and navigates to the editor page", async () => {
     // Mock axios.post calls
-    const mockResponse = { data: { roomId: 'exampleRoomId' } };
-    jest.spyOn(axios, 'post').mockResolvedValueOnce(mockResponse);
+    const mockResponse = { data: { roomId: "exampleRoomId" } };
+    jest.spyOn(axios, "post").mockResolvedValueOnce(mockResponse);
 
     // Mock the navigate function from react-router-dom
     const navigateMock = jest.fn();
@@ -299,18 +281,24 @@ describe('createNewRoom', () => {
     const { getByText } = render(<RoomCreation navigate={navigateMock} />);
 
     // Find and click the "Create New Room" link
-    const createNewRoomLink = getByText('Create New Room');
+    const createNewRoomLink = getByText("Create New Room");
     fireEvent.click(createNewRoomLink);
 
     // Wait for asynchronous operations to complete
     await waitFor(() => {
-      expect(axios.post).toHaveBeenCalledWith(`${process.env.REACT_APP_API_URL}/filesystem/createrootdirectory`, {
-        roomId: expect.any(String),
-      });
-      expect(axios.post).toHaveBeenCalledWith('http://localhost:8080/initialize', {
-        roomId: expect.any(String),
-        username: expect.any(String),
-      });
+      expect(axios.post).toHaveBeenCalledWith(
+        `${process.env.REACT_APP_API_URL}/filesystem/createrootdirectory`,
+        {
+          roomId: expect.any(String),
+        }
+      );
+      expect(axios.post).toHaveBeenCalledWith(
+        "http://localhost:8080/initialize",
+        {
+          roomId: expect.any(String),
+          username: expect.any(String),
+        }
+      );
       // expect(navigateMock).toHaveBeenCalledWith(`/editor/uniqueRoomId`, {
       //   state: {
       //     userName: expect.any(String),
@@ -318,4 +306,23 @@ describe('createNewRoom', () => {
       // });
     });
   });
+  // test("calls joinRoom when Enter key is pressed on input elements", async () => {
+  //   const joinRoomMock = jest.fn();
+
+  //   render(
+  //     <>
+  //       <input type="text" placeholder="ROOM ID" onKeyUp={handleInputEnter} />
+  //       <input type="text" placeholder="USERNAME" onKeyUp={handleInputEnter} />
+  //     </>
+  //   );
+
+  //   // Wait for the inputs to appear
+  //   const roomIdInput = await screen.findByPlaceholderText("ROOM ID");
+  //   const userNameInput = await screen.findByPlaceholderText("USERNAME");
+
+  //   fireEvent.keyUp(roomIdInput, { key: "Enter" });
+  //   fireEvent.keyUp(userNameInput, { key: "Enter" });
+
+  //   expect(joinRoomMock).toHaveBeenCalledTimes(2);
+  // });
 });
