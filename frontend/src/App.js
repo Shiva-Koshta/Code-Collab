@@ -28,11 +28,16 @@ function App () {
         setUser(data.user._json)
         window.localStorage.setItem('userData', JSON.stringify(data.user._json))
       } catch (err) {
-        console.log(err)
+        if (err.response && err.response.status === 401) {
+          setUser(null); // User is not authenticated
+        } else {
+          console.log(err);
+        }
       }
-    }
-    getUser()
-  }, [])
+    };
+    getUser();
+  }, []);
+  
 
   return (
     <BrowserRouter>

@@ -1,14 +1,14 @@
-import React, { useEffect, useRef, useState } from "react";
-import Codemirror from "codemirror";
-import "codemirror/lib/codemirror.css";
-import "codemirror/theme/dracula.css";
-import "codemirror/mode/javascript/javascript";
-import "codemirror/addon/edit/closetag";
-import "codemirror/addon/edit/closebrackets";
-import ACTIONS from "../Actions";
+import React, { useEffect,useRef,useState } from 'react'
+import Codemirror from 'codemirror'
+import 'codemirror/lib/codemirror.css'
+import 'codemirror/theme/dracula.css'
+import 'codemirror/mode/javascript/javascript'
+import 'codemirror/addon/edit/closetag'
+import 'codemirror/addon/edit/closebrackets'
+import ACTIONS from '../Actions'
 
 const Editor = ({
-  handleDownloadFile,
+  //handleDownloadFile
   socketRef,
   roomId,
   editorRef,
@@ -33,23 +33,33 @@ const Editor = ({
   //   setFileContent(window.localStorage.getItem("fileContent"))
   //   setContentChanged(window.localStorage.getItem("contentChanged"))
   // }, [])
-  let editorChanged = false;
+  let editorChanged = false
+  const [UserName,setUserName] = useState();
+  // const [cursorPositions, setCursorPositions] = useState({})
   window.localStorage.setItem("roomid", roomId);
+  useEffect(() => {
+    // Retrieve user data from local storage
+    const storedUserData = window.localStorage.getItem("userData");
+    if (storedUserData) {
+      const userData = JSON.parse(storedUserData);
+      setUserName(userData.name);
+    }
+  }, []);
 
-  const renderAllCursors = (cursorPosition, currentUserId) => {
+
+  const renderAllCursors = (cursorPosition,currentUserId) => {
     console.log("Cursor position type:", typeof cursorPosition);
-    console.log("hi");
+    console.log("hi")
     // console.log(userId)
-    console.log(currentUserId);
-    Object.entries(cursorPosition).forEach(([userId, cursorData]) => {
-      console.log(userId);
-      console.log(currentUserId);
-      if (userId !== currentUserId) {
-        renderCursors(cursorData);
+    console.log(currentUserId)
+    Object.entries(cursorPosition).forEach(([userId,cursorData]) => {
+      console.log(userId)
+      console.log(currentUserId)
+      if(userId!==currentUserId){
+        renderCursors(cursorData)
       }
-    });
-  };
-
+    })
+  }
   useEffect(() => {
     // Create style element
     const style = document.createElement("style");
@@ -91,7 +101,7 @@ const Editor = ({
       socketRef.current.emit(ACTIONS.CODE_CHANGE, {
         roomId,
         code,
-      });
+      })
     }
   }, [fileContent, contentChanged]);
   useEffect(() => {
@@ -104,6 +114,7 @@ const Editor = ({
           autoCloseTags: true,
           autoCloseBrackets: true,
           lineNumbers: true,
+          readOnly: false,
         }
       );
 
@@ -117,24 +128,24 @@ const Editor = ({
 
       editorRef.current.on("change", (instance, changes) => {
         // console.log(changes)
-        editorChanged = true;
-        const { origin } = changes;
-        const code = instance.getValue();
-        if (origin !== "setValue") {
+        editorChanged = true
+        const { origin } = changes
+        const code = instance.getValue()
+        if (origin !== 'setValue') {
           const cursor = instance.getCursor();
           const userData = JSON.parse(localStorage.getItem("userData"));
           const cursorData = {
             cursor: { line: cursor.line, ch: cursor.ch },
-            user: { email: userData.email, name: userData.name },
+            user: {email: userData.email, name: userData.name },
             tab: null,
-          };
-          const socketid = socketRef.current.id;
+          }
+          const socketid = socketRef.current.id
           socketRef.current.emit(ACTIONS.CODE_CHANGE, {
             roomId,
             code,
             cursorData,
-            socketid,
-          });
+            socketid
+          })
         }
       });
     }
@@ -144,6 +155,13 @@ const Editor = ({
   useEffect(() => {
     editorRef.current.on("cursorActivity", (instance) => {
       const cursor = instance.getCursor();
+      // if (cursor.line !== prevCursor.current.line || cursor.ch !== prevCursor.current.ch){
+        // console.log("!")
+        // console.log(prevCursor.current.line)
+        // console.log(prevCursor.current.ch)
+        // console.log(cursor.line)
+        // console.log(cursor.ch)
+        // console.log("!")
       const userData = JSON.parse(localStorage.getItem("userData"));
       const cursorData = {
         cursor: { line: cursor.line, ch: cursor.ch },
@@ -155,14 +173,15 @@ const Editor = ({
         socketRef.current.emit(ACTIONS.CURSOR_CHANGE, {
           roomId,
           cursorData,
-        });
+        })
       }
-      editorChanged = false;
-    });
-  }, [editorRef]);
+      editorChanged = false
+      }
+    )
+  },[editorRef])
   useEffect(() => {
     if (socketRef.current) {
-      socketRef.current.on(ACTIONS.CODE_CHANGE, ({ code, cursorPosition }) => {
+      socketRef.current.on(ACTIONS.CODE_CHANGE, ({ code , cursorPosition}) => {
         // console.log("hi");
         if (code !== null) {
           editorRef.current.setValue(code);
@@ -247,6 +266,7 @@ const Editor = ({
   // Function to render cursors
   const renderCursors = (cursorInfoList) => {
     if (cursorInfoList) {
+
       const { cursor, tab, user } = cursorInfoList;
       const { ch, line } = cursor;
       // const cursorMarkerId = `cursor-marker-${user.email}`;
@@ -254,6 +274,7 @@ const Editor = ({
       // Create a cursor marker element if not present
       // if (!cursorMarker){
       // Get the total width of the screen
+      if (!connectedClients.current.includes(user.name) || user.name===UserName) return
       const totalScreenWidth = window.innerWidth;
       const sidebarWidth = (2 / 10) * totalScreenWidth;
       const cursorPosition = editorRef.current.charCoords({ line, ch });
@@ -281,9 +302,8 @@ const Editor = ({
       //   editorRef.current.charCoords({ line, ch }).left
       // -324}px`;
       cursorMarker.style.left = `${leftPosition}px`;
-      cursorMarker.style.top = `${
-        editorRef.current.charCoords({ line, ch }).top
-      }px`;
+      cursorMarker.style.top = `${editorRef.current.charCoords({ line, ch }).top
+        }px`;
       // console.log(editorRef.current.charCoords({ line, ch }).top);
       // Define CSS keyframes for blinking effect
     }

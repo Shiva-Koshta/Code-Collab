@@ -4,11 +4,15 @@ import './index.css'
 import App from './App'
 import reportWebVitals from './reportWebVitals'
 
+
+export function renderApp() {
+  const root = ReactDOM.createRoot(document.getElementById('root'));
+  root.render(<App />);
+}
+
 window.addEventListener("DOMContentLoaded", function (e) {
-  const root = ReactDOM.createRoot(document.getElementById('root'))
-  root.render(
-    <App />
-  )
+  renderApp();
 });
 
-reportWebVitals()
+reportWebVitals();
+

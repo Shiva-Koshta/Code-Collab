@@ -6,21 +6,25 @@ import {
   useParams,
 } from "react-router-dom";
 // import "./Editor.css";
+
 import ACTIONS from "../Actions";
 import toast, { Toaster } from "react-hot-toast";
 import Editor from "../components/Editor";
-import FileView from "../components/FileView";
 import { initSocket } from "../socket";
 import "../styles/EditorPage.css";
 import "../styles/Chat.css";
-import logo from "../images/Logo.png";
+import ChatIcon from "@mui/icons-material/Chat";
 import Chat from "../components/Chat";
 import { ChevronLeft, ChevronRight } from "@mui/icons-material";
 import { ToastContainer, toast as reactToastify } from "react-toastify";
-import ChatIcon from "@mui/icons-material/Chat";
 import "react-toastify/dist/ReactToastify.css";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import ArrowDropUpIcon from "@mui/icons-material/ArrowDropUp";
+import Sidebar from "../components/Sidebar";
+import MoreVertSharpIcon from '@mui/icons-material/MoreVertSharp';
+import { MenuItem, Menu, IconButton } from '@mui/material';
+
+
 
 const EditorPage = () => {
   const editorRef = useRef(null);
@@ -32,9 +36,11 @@ const EditorPage = () => {
   const reactNavigator = useNavigate();
   const [clients, setClients] = useState([]);
   const [connectedUsernames, setConnectedUsernames] = useState([]);
-  const [storedUserData, setStoredUserData] = useState([]);
-  const [host, setHost] = useState("");
-  const [connectedUserroles, setConnectedUserroles] = useState([]);
+  // const [storedUserData, setStoredUserData] = useState([]);
+  // const [host, setHost] = useState("");
+  const storedUserData = useRef([]);
+  const host = useRef("");
+  const [connectedUserRoles, setConnectedUserRoles] = useState([]);
   const connectedUsernamesRef = useRef([]);
   // const [connectedUsernames, setConnectedUsernames] = useState([])
   const [connectedUsers, setConnectedUsers] = useState([]);
@@ -46,37 +52,129 @@ const EditorPage = () => {
   });
   const CHAT_LIMIT = 15; // Global variable for chat limit
 
-  const [inputText, setInputText] = useState("");
+  // const [inputText, setInputText] = useState("");
 
   // const fileRef=useRef(null);
   // const [isOpen, setIsOpen] = useState(true);
-  const [isConnectedComponentOpen, setIsConnectedComponentOpen] =
-    useState(false);
+  // const [isConnectedComponentOpen, setIsConnectedComponentOpen] = useState(false);
   const [isChatOpen, setIsChatOpen] = useState(false); // State to control chat window
 
+  // const downloadFileExtension = "";
+  // const downloadFileName = "";
   const [unreadMessages, setUnreadMessages] = useState(-1);
-  const downloadFileExtension = "";
-  const downloadFileName = "";
   const [isLeftDivOpen, setIsLeftDivOpen] = useState(true);
   const leftIcon = isLeftDivOpen ? <ChevronLeft /> : <ChevronRight />;
+  // const [menuOpen, setMenuOpen] = useState({})
 
   const toggleLeftDiv = () => {
-    setIsLeftDivOpen((prevState) => !prevState);
-  };
+    setIsLeftDivOpen(prevState => !prevState)
+  }
 
-  const handleMessageSend = () => {
-    console.log(storedUserData);
-    if (inputText.trim() !== "") {
-      const message = { text: inputText };
-      socketRef.current.emit(ACTIONS.MESSAGE_SEND, {
-        roomId,
-        message,
-        sender: storedUserData.sub,
-        sendname: storedUserData.name,
-      });
-      setInputText("");
-    }
-  };
+  // const handleUserMenuToggle = (username) => {
+  //   setMenuOpen(prevMenuOpen => ({
+  //     ...prevMenuOpen,
+  //     [username]: !prevMenuOpen[username]
+  //   }));
+  // };
+
+  // const handleUserMenuToggle = (username) => {
+  //   setMenuOpen(prevMenuOpen => ({
+  //     ...prevMenuOpen,
+  //     [username]: !prevMenuOpen[username]
+  //   }));
+  // };
+  // const handleChangeRole = (username) => {
+  //   const user = connectedUserRoles.find(user => user.name === username)
+  //   if(!user)
+  //   {
+  //     console.error(`User with id ${username} not found.`)
+  //     return
+  //   }
+  //   const newRole = user.role === 'viewer' ? 'editor' : 'viewer'
+
+  //   setConnectedUserRoles(prevRoles => prevRoles.map(prevUser => {
+  //     if(prevUser.name === username)
+  //     {
+  //       return {...prevUser, role:newRole}
+  //     }
+  //     return prevUser
+  //   }))
+
+  //   socketRef.current.emit(ACTIONS.ROLE_CHANGE, {
+  //     roomId,
+  //     username,
+  //     newRole,
+  //   })
+
+  // }
+
+  // const handleMessageSend = () => {
+  //   console.log(storedUserData);
+  //   if (inputText.trim() !== "") {
+  //     const message = { text: inputText };
+  //     socketRef.current.emit(ACTIONS.MESSAGE_SEND, {
+  //       roomId,
+  //       message,
+  //       sender: storedUserData.sub,
+  //       sendname: storedUserData.name,
+  //     });
+  //     setInputText("");
+  //   }
+  // };
+
+  // const handleToggle = () => {
+  //   setIsConnectedComponentOpen(!isConnectedComponentOpen);
+  // };
+  // const leaveRoom = async () => {
+  //   try {
+  //     const userData = JSON.parse(localStorage.getItem("userData"));
+  //     const response = await fetch("http://localhost:8080/delete-entry", {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: JSON.stringify({ roomId, username: userData.name }), // Include roomId and username in the request body
+  //     });
+  //     if (response.ok) {
+  //       const data = await response.json();
+  //       console.log(data); // log the response if needed
+  //       reactNavigator("/", { roomId }); // Navigate to the home page after leaving the room
+  //     } else {
+  //       reactNavigator("/", { roomId });
+  //     }
+  //   } catch (error) {
+  //     console.error("Error leaving room:", error);
+  //     // Handle errors as needed
+  //   }
+  // };
+
+  // async function copyRoomId() {
+  //   try {
+  //     await navigator.clipboard.writeText(roomId);
+  //     toast.success("Room ID has been copied to your clipboard");
+  //   } catch (err) {
+  //     toast.error("Could not copy the Room ID");
+  //     console.error(err);
+  //   }
+  // }
+
+  // const handleKeyPress = (e) => {
+  //   if (e.key === "Enter") {
+  //     handleMessageSend();
+  //   }
+  // };
+
+  // const handleDownloadFile = () => {
+  //   const myContent = editorRef.current.getValue();
+  //   const element = document.createElement("a");
+  //   const file = new Blob([myContent], { type: "text/plain" });
+  //   element.href = URL.createObjectURL(file);
+  //   element.download = `${downloadFileName}.${downloadFileExtension}`;
+  //   document.body.appendChild(element);
+  //   element.click();
+  //   document.body.removeChild(element);
+  // };
+
 
   const toggleChat = () => {
     setIsChatOpen((prevState) => !prevState); // Toggle chat window
@@ -87,10 +185,6 @@ const EditorPage = () => {
       setUnreadMessages((prevCount) => prevCount + 1);
     }
   }, [messages, isChatOpen]);
-
-  const handleToggle = () => {
-    setIsConnectedComponentOpen(!isConnectedComponentOpen);
-  };
 
   useEffect(() => {
     const lastMessage = messages[messages.length - 1];
@@ -130,7 +224,8 @@ const EditorPage = () => {
       const userData = window.localStorage.getItem("userData");
       if (userData) {
         console.log(JSON.parse(userData).name);
-        setStoredUserData(JSON.parse(userData));
+        // setStoredUserData(JSON.parse(userData));
+        storedUserData.current = JSON.parse(userData)
         socketRef.current.emit(ACTIONS.JOIN, {
           roomId,
           username: JSON.parse(userData).name,
@@ -164,6 +259,10 @@ const EditorPage = () => {
           }));
           setConnectedUsers(updatedUsers);
           setConnectedUsernames(clients.map((client) => client.username));
+
+          setConnectedUserRoles(prevRoles => [...prevRoles, { id: socketId, name: username, role: 'editor' }])
+
+          console.log(host.current)
         }
       );
 
@@ -199,6 +298,7 @@ const EditorPage = () => {
           );
           return updatedClients;
         });
+        setConnectedUserRoles(prevRoles => prevRoles.filter(user => user.username !== username))
       });
       socketRef.current.on(
         ACTIONS.MESSAGE_RECEIVE,
@@ -220,11 +320,75 @@ const EditorPage = () => {
             return updatedMessages;
           });
         }
-      );
-      socketRef.current.on(ACTIONS.HOST_CHANGE, ({ }) => {
-        console.log("host changed");
-      });
+
+      )
+
+      socketRef.current.on(ACTIONS.ROLE_CHANGE, ({ username, newRole }) => {
+        // console.log("yes")
+        console.log(username)
+        console.log(newRole)
+
+        // console.log(storedUserData.name)
+        setConnectedUserRoles(prevRoles => prevRoles.map(prevUser => {
+          if (prevUser.name === username) {
+            return { ...prevUser, role: newRole }
+          }
+          return prevUser
+        }))
+        console.log(connectedUserRoles)
+        console.log(connectedUsers)
+
+        if (username === storedUserData.current.name && newRole == 'viewer') {
+
+          console.log("yes")
+          editorRef.current.setOption('readOnly', true)
+          // editor.setOption('readOnly', true)
+          // editor.readOnly.of(true)
+        }
+        if (username === storedUserData.current.name && newRole === 'editor') {
+          editorRef.current.setOption('readOnly', false)
+          // const editor = editorRef.current.getCodeMirror()
+          // editor.setOption('readOnly', false)
+        }
+      })
+
+      socketRef.current.on(ACTIONS.HOST_CHANGE, ({ username }) => {
+
+        console.log(username)
+        // setHost(username)
+        host.current = username
+        const fetchUserDetails = async () => {
+          try {
+            const response = await fetch("http://localhost:8080/getdetails", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+
+              body: JSON.stringify({ roomId }), // Include roomId in the request body
+            });
+            if (response.ok) {
+              const data = await response.json();
+              console.log(data);
+              setConnectedUserRoles(
+                data.users.map((user) => ({ name: user.name, role: user.role }))
+              );
+              // setHost(data.host);
+              host.current = data.host;
+            } else {
+              throw new Error("Failed to fetch user details");
+            }
+          } catch (error) {
+            console.error("Error fetching user details:", error);
+          }
+        };
+
+
+        fetchUserDetails();
+        // fetchUserDetails();
+      })
     };
+
 
     init();
 
@@ -248,10 +412,11 @@ const EditorPage = () => {
         if (response.ok) {
           const data = await response.json();
           console.log(data);
-          setConnectedUserroles(
+          setConnectedUserRoles(
             data.users.map((user) => ({ name: user.name, role: user.role }))
           );
-          setHost(data.host);
+          // setHost(data.host);
+          host.current = data.host;
         } else {
           throw new Error("Failed to fetch user details");
         }
@@ -266,110 +431,7 @@ const EditorPage = () => {
   if (!location.state) {
     return <Navigate to="/" />;
   }
-  const leaveRoom = async () => {
-    try {
-      const userData = JSON.parse(localStorage.getItem("userData"));
-      const userCountResponse = await fetch("http://localhost:8080/rooms/numUsersInRoom", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ roomId }),
-      });
-      if (userCountResponse.ok) {
-        const { numUsers } = await userCountResponse.json();
-        if (numUsers === 1) {
-          const confirmDownload = window.confirm(
-            "You are the last user in the room. Once leaving the room the data will be deleted permanently. Do you want to download the content of the room before leaving ?"
-          );
-          if (confirmDownload) {
-            handleDownloadFile();
-            setTimeout(async () => {
-              const leaveResponse = await fetch("http://localhost:8080/delete-entry", {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ roomId, username: userData.name }),
-              });
 
-              if (leaveResponse.ok) {
-                const data = await leaveResponse.json();
-                console.log(data);
-                reactNavigator("/", { roomId });
-              } else {
-                reactNavigator("/", { roomId });
-              }
-            }, 2000);
-          } else {
-            const leaveResponse = await fetch("http://localhost:8080/delete-entry", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({ roomId, username: userData.name }),
-            });
-
-            if (leaveResponse.ok) {
-              const data = await leaveResponse.json();
-              console.log(data);
-              reactNavigator("/", { roomId });
-            } else {
-              reactNavigator("/", { roomId });
-            }
-          }
-        } else {
-          const leaveResponse = await fetch("http://localhost:8080/delete-entry", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ roomId, username: userData.name }),
-          });
-
-          if (leaveResponse.ok) {
-            const data = await leaveResponse.json();
-            console.log(data);
-            reactNavigator("/", { roomId });
-          } else {
-            reactNavigator("/", { roomId });
-          }
-        }
-      } else {
-        throw new Error("Failed to fetch user count from the server");
-      }
-    } catch (error) {
-      console.error("Error leaving room:", error);
-    }
-  };
-
-
-  async function copyRoomId() {
-    try {
-      await navigator.clipboard.writeText(roomId);
-      toast.success("Room ID has been copied to your clipboard");
-    } catch (err) {
-      toast.error("Could not copy the Room ID");
-      console.error(err);
-    }
-  }
-
-  const handleKeyPress = (e) => {
-    if (e.key === "Enter") {
-      handleMessageSend();
-    }
-  };
-
-  const handleDownloadFile = () => {
-    const myContent = editorRef.current.getValue();
-    const element = document.createElement("a");
-    const file = new Blob([myContent], { type: "text/plain" });
-    element.href = URL.createObjectURL(file);
-    element.download = `${downloadFileName}.${downloadFileExtension}`;
-    document.body.appendChild(element);
-    element.click();
-    document.body.removeChild(element);
-  };
 
   return (
     <div className="flex flex-col justify-center">
@@ -378,107 +440,37 @@ const EditorPage = () => {
 
         {/* {isLeftDivOpen && ( */}
 
-        <div
-          className={`flex flex-col justify-between h-screen text-white px-4 relative transition-all duration-500 ease-in-out transform ${isLeftDivOpen ? "col-span-2 " : "-translate-x-full"
-            }`}
-          style={{ backgroundColor: "#1c1e29" }}
-        >
-          <div className="logo flex items-center">
-            <img className="h-20" src={logo} alt="logo" />
-            <div className="flex flex-col w-full">
-              <p className="text-4xl md:text-2xl text-center lg:text-3xl xl:text-4xl madimi-one-regular whitespace-nowrap">
-                Code Collab
-              </p>
-            </div>
-          </div>
-          {/* <UploadFilesFolders />           */}
-          <FileView
-            contentChanged={contentChanged}
-            setContentChanged={setContentChanged}
-            fileContent={fileContent}
-            setFileContent={setFileContent}
-            editorRef={editorRef}
-          />
-          <div className="Users z-10">
-            <div
-              className="flex justify-between items-center"
-              onClick={handleToggle}
-            >
-              <p className="my-3 font-bold text-lg">Connected Users here</p>
-              {isConnectedComponentOpen && <ArrowDropUpIcon />}
-              {!isConnectedComponentOpen && <ArrowDropDownIcon />}
-            </div>
-            <div className="UserListContainer">
-              <div className="UserListContainer">
-                {isConnectedComponentOpen &&
-                  connectedUsers.map((user) => (
-                    <div className="UserListItem" key={user.username}>
-                      <img
-                        src={user.profileImage}
-                        alt={user.username}
-                        className="img"
-                      />
-                      <div className="username">
-                        {user.username.split(" ")[0]}
-                      </div>
-                    </div>
-                  ))}
-              </div>
-            </div>
-          </div>
-          <div className="p-4">
-            <div className="flex gap-2">
-              <button
-                className="btn chat-btn"
-                onClick={toggleChat}
-                style={{ position: "relative" }}
-              >
-                Chat{" "}
-                {unreadMessages > 0 && (
-                  <span
-                    className="unread-messages"
-                    style={{
-                      position: "absolute",
-                      top: "-5px", // Adjust the positioning to align properly
-                      right: "-5px", // Adjust the positioning to align properly
-                      color: "black",
-                      borderRadius: "50%",
-                      width: "30px",
-                      height: "30px",
-                      display: "inline-flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      textAlign: "center",
-                      fontSize: "14px",
-                      fontWeight: "bold",
-                      border: "2px solid black",
-                      background: "white",
-                    }}
-                  >
-                    {unreadMessages}
-                  </span>
-                )}
-              </button>
-              <button className="btn-edit copyBtn" onClick={copyRoomId}>
-                Copy ROOM ID
-              </button>
-            </div>
-            <button className="btn-edit leaveBtn" onClick={leaveRoom}>
-              Leave
-            </button>
-          </div>
+        <Sidebar
+          contentChanged={contentChanged}
+          setContentChanged={setContentChanged}
+          fileContent={fileContent}
+          setFileContent={setFileContent}
+          editorRef={editorRef}
+          // isConnectedComponentOpen={isConnectedComponentOpen}
+          // handleToggle={handleToggle}
+          connectedUsers={connectedUsers}
+          toggleChat={toggleChat}
+          unreadMessages={unreadMessages}
+          // copyRoomId={copyRoomId}
+          // leaveRoom={leaveRoom}
+          roomId={roomId}
+          isLeftDivOpen={isLeftDivOpen}
+          toggleLeftDiv={toggleLeftDiv}
+          leftIcon={leftIcon}
+          storedUserData={storedUserData}
+          host={host}
+          connectedUserRoles={connectedUserRoles}
+          setConnectedUserRoles={setConnectedUserRoles}
+          socketRef={socketRef}
+        />
 
-          <div className="absolute right-0 top-1/2 transform transition duration-500 hover:animate-bounce-left">
-            <button onClick={toggleLeftDiv}>{leftIcon}</button>
-          </div>
-        </div>
         <div
           className={`${isLeftDivOpen ? "col-span-8" : "w-full absolute top-0 left-0 "
             }  overflow-y-auto transition-all duration-500 ease-in-out`}
           style={{ width: isChatOpen ? `calc(100% - 300px)` : "100%" }}
         >
           <Editor
-            handleDownloadFile={handleDownloadFile}
+            // handleDownloadFile={handleDownloadFile}
             socketRef={socketRef}
             roomId={roomId}
             fileContent={fileContent}
@@ -512,11 +504,14 @@ const EditorPage = () => {
             <Chat
               setIsChatOpen={setIsChatOpen}
               messages={messages}
-              CHAT_LIMIT={CHAT_LIMIT}
-              inputText={inputText}
-              setInputText={setInputText}
-              handleKeyPress={handleKeyPress}
-              handleMessageSend={handleMessageSend}
+              // CHAT_LIMIT={CHAT_LIMIT}
+              // inputText={inputText}
+              // setInputText={setInputText}
+              // handleKeyPress={handleKeyPress}
+              // handleMessageSend={handleMessageSend}
+              roomId={roomId}
+              socketRef={socketRef}
+              storedUserData={storedUserData}
             />
           </div>
         )}
