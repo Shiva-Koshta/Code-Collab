@@ -68,6 +68,7 @@ const EditorPage = () => {
 
   const toggleLeftDiv = () => {
     setIsLeftDivOpen(prevState => !prevState)
+    console.log(isLeftDivOpen);
   }
 
   // const handleUserMenuToggle = (username) => {
@@ -439,7 +440,7 @@ const EditorPage = () => {
         {<Toaster position="top-center" reverseOrder={false} />}
 
         {/* {isLeftDivOpen && ( */}
-
+        <div style={{width: "300px", position:"fixed", left:"0", top:"0"}}>
         <Sidebar
           contentChanged={contentChanged}
           setContentChanged={setContentChanged}
@@ -464,10 +465,11 @@ const EditorPage = () => {
           socketRef={socketRef}
         />
 
+        </div>
+        
         <div
-          className={`${isLeftDivOpen ? "col-span-8" : "w-full absolute top-0 left-0 "
-            }  overflow-y-auto transition-all duration-500 ease-in-out`}
-          style={{ width: isChatOpen ? `calc(100% - 300px)` : "100%" }}
+          className={`overflow-y-scroll overflow-x-scroll transition-all duration-500 ease-in-out absolute top-0 `}
+          style={{ width: isChatOpen ? (isLeftDivOpen ? `calc(100% - 592px)` : `calc(100% - 320px)`) : (isLeftDivOpen ? `calc(100% - 300px)` : `calc(100%)`),  left: isLeftDivOpen ?"300px": "0px", overflowX: "scroll", position:"fixed" }}
         >
           <Editor
             // handleDownloadFile={handleDownloadFile}
@@ -480,7 +482,7 @@ const EditorPage = () => {
             connectedClients={connectedUsernamesRef}
           />
           {!isLeftDivOpen && (
-            <div className="absolute left-0 top-1/2 transform transition duration-500 hover:animate-bounce-right">
+            <div style={{zIndex: "9999"}} className="absolute left-0 top-1/2 transform transition duration-500 hover:animate-bounce-right">
               <button className="text-white" onClick={toggleLeftDiv}>
                 {leftIcon}
               </button>
@@ -500,7 +502,7 @@ const EditorPage = () => {
         />
 
         {isChatOpen && (
-          <div>
+          <div style={{backgroundColor: "#1c1e29"}}>
             <Chat
               setIsChatOpen={setIsChatOpen}
               messages={messages}
