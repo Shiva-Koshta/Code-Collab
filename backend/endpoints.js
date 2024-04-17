@@ -85,18 +85,40 @@ router.post("/delete-entry", async (req, res) => {
     }
 
     // Remove the disconnected user from the room's user list
-    const index = room.users.findIndex(user => user.username === username);
-    const updatedUsers = index !== -1 ? [...room.users.slice(0, index), ...room.users.slice(index + 1)] : room.users;
-
+    const index = room.users.findIndex((user) => user.username === username);
+    const updatedUsers =
+      index !== -1
+        ? [...room.users.slice(0, index), ...room.users.slice(index + 1)]
+        : room.users;
 
     // Check if the removed user was the host
     let newHost = null;
     if (room.hostname === username) {
       // If the removed user was the host, find a new host among the remaining users
-      newHost = updatedUsers.length > 0 ? updatedUsers[0].username : null;
+      const editor = updatedUsers.find((user) => user.role === "editor");
+      if (editor) {
+        // If an editor is available, make them the new host
+        newHost = editor.username;
+      } else {
+        // If no editor is available, promote a viewer to an editor and make them the host
+        const viewerIndex = updatedUsers.findIndex(
+          (user) => user.role === "viewer"
+        );
+        if (viewerIndex !== -1) {
+          // Promote the viewer to an editor
+          updatedUsers[viewerIndex].role = "editor";
+          // Set the new host
+          newHost = updatedUsers[viewerIndex].username;
+        }
+      }
     }
+    let flag = 0;
 
     // Update RoomUserCount model with updated users and possibly a new host
+    if (newHost === null) {
+      flag = 1;
+      newHost = room.hostname;
+    }
     await RoomUserCount.findOneAndUpdate(
       { roomId },
       { users: updatedUsers, hostname: newHost },
@@ -104,7 +126,7 @@ router.post("/delete-entry", async (req, res) => {
     );
 
     // If a new host is assigned, emit a socket action for host change
-    if (newHost) {
+    if (flag == 0) {
       console.log(`Host for room ${roomId} changed to ${newHost}.`);
       io.to(roomId).emit(ACTIONS.HOST_CHANGE, { newHost });
     }
@@ -156,7 +178,7 @@ router.post("/initialize", async (req, res) => {
     );
     if (!existingUser) {
       // If the user is not already present, add the user to the room as an editor
-      existingRoom.users.push({ username, role: "editor" });
+      existingRoom.users.push({ username, role: "viewer" });
       existingRoom.userCount++; // Increment user count by 1
       await existingRoom.save();
     }

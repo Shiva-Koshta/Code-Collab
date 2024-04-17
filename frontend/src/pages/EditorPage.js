@@ -21,10 +21,8 @@ import "react-toastify/dist/ReactToastify.css";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import ArrowDropUpIcon from "@mui/icons-material/ArrowDropUp";
 import Sidebar from "../components/Sidebar";
-import MoreVertSharpIcon from '@mui/icons-material/MoreVertSharp';
-import { MenuItem, Menu, IconButton } from '@mui/material';
-
-
+import MoreVertSharpIcon from "@mui/icons-material/MoreVertSharp";
+import { MenuItem, Menu, IconButton } from "@mui/material";
 
 const EditorPage = () => {
   const editorRef = useRef(null);
@@ -67,8 +65,8 @@ const EditorPage = () => {
   // const [menuOpen, setMenuOpen] = useState({})
 
   const toggleLeftDiv = () => {
-    setIsLeftDivOpen(prevState => !prevState)
-  }
+    setIsLeftDivOpen((prevState) => !prevState);
+  };
 
   // const handleUserMenuToggle = (username) => {
   //   setMenuOpen(prevMenuOpen => ({
@@ -175,7 +173,6 @@ const EditorPage = () => {
   //   document.body.removeChild(element);
   // };
 
-
   const toggleChat = () => {
     setIsChatOpen((prevState) => !prevState); // Toggle chat window
     setUnreadMessages(-1);
@@ -225,7 +222,7 @@ const EditorPage = () => {
       if (userData) {
         console.log(JSON.parse(userData).name);
         // setStoredUserData(JSON.parse(userData));
-        storedUserData.current = JSON.parse(userData)
+        storedUserData.current = JSON.parse(userData);
         socketRef.current.emit(ACTIONS.JOIN, {
           roomId,
           username: JSON.parse(userData).name,
@@ -260,9 +257,52 @@ const EditorPage = () => {
           setConnectedUsers(updatedUsers);
           setConnectedUsernames(clients.map((client) => client.username));
 
-          setConnectedUserRoles(prevRoles => [...prevRoles, { id: socketId, name: username, role: 'editor' }])
+          // setConnectedUserRoles((prevRoles) => [
+          //   ...prevRoles,
+          //   { id: socketId, name: username, role: "editor" },
+          // ]);
+          const fetchUserDetails = async () => {
+            try {
+              const response = await fetch("http://localhost:8080/getdetails", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
 
-          console.log(host.current)
+                body: JSON.stringify({ roomId }), // Include roomId in the request body
+              });
+              if (response.ok) {
+                const data = await response.json();
+                console.log(data);
+                setConnectedUserRoles(
+                  data.users.map((user) => ({
+                    name: user.name,
+                    role: user.role,
+                  }))
+                );
+                const currentUserRole = data.users.find(
+                  (user) => user.name === storedUserData.current.name
+                )?.role;
+                if (currentUserRole === "viewer") {
+                  editorRef.current.setOption("readOnly", true);
+                }
+                if (currentUserRole === "editor") {
+                  editorRef.current.setOption("readOnly", false);
+                }
+
+                // setHost(data.host);
+                host.current = data.host;
+              } else {
+                throw new Error("Failed to fetch user details");
+              }
+            } catch (error) {
+              console.error("Error fetching user details:", error);
+            }
+          };
+
+          fetchUserDetails();
+
+          console.log(host.current);
         }
       );
 
@@ -298,7 +338,9 @@ const EditorPage = () => {
           );
           return updatedClients;
         });
-        setConnectedUserRoles(prevRoles => prevRoles.filter(user => user.username !== username))
+        setConnectedUserRoles((prevRoles) =>
+          prevRoles.filter((user) => user.username !== username)
+        );
       });
       socketRef.current.on(
         ACTIONS.MESSAGE_RECEIVE,
@@ -320,43 +362,42 @@ const EditorPage = () => {
             return updatedMessages;
           });
         }
-
-      )
+      );
 
       socketRef.current.on(ACTIONS.ROLE_CHANGE, ({ username, newRole }) => {
         // console.log("yes")
-        console.log(username)
-        console.log(newRole)
+        console.log(username);
+        console.log(newRole);
 
         // console.log(storedUserData.name)
-        setConnectedUserRoles(prevRoles => prevRoles.map(prevUser => {
-          if (prevUser.name === username) {
-            return { ...prevUser, role: newRole }
-          }
-          return prevUser
-        }))
-        console.log(connectedUserRoles)
-        console.log(connectedUsers)
+        setConnectedUserRoles((prevRoles) =>
+          prevRoles.map((prevUser) => {
+            if (prevUser.name === username) {
+              return { ...prevUser, role: newRole };
+            }
+            return prevUser;
+          })
+        );
+        console.log(connectedUserRoles);
+        console.log(connectedUsers);
 
-        if (username === storedUserData.current.name && newRole == 'viewer') {
-
-          console.log("yes")
-          editorRef.current.setOption('readOnly', true)
+        if (username === storedUserData.current.name && newRole == "viewer") {
+          console.log("yes");
+          editorRef.current.setOption("readOnly", true);
           // editor.setOption('readOnly', true)
           // editor.readOnly.of(true)
         }
-        if (username === storedUserData.current.name && newRole === 'editor') {
-          editorRef.current.setOption('readOnly', false)
+        if (username === storedUserData.current.name && newRole === "editor") {
+          editorRef.current.setOption("readOnly", false);
           // const editor = editorRef.current.getCodeMirror()
           // editor.setOption('readOnly', false)
         }
-      })
+      });
 
       socketRef.current.on(ACTIONS.HOST_CHANGE, ({ username }) => {
-
-        console.log(username)
+        console.log(username);
         // setHost(username)
-        host.current = username
+        host.current = username;
         const fetchUserDetails = async () => {
           try {
             const response = await fetch("http://localhost:8080/getdetails", {
@@ -373,6 +414,16 @@ const EditorPage = () => {
               setConnectedUserRoles(
                 data.users.map((user) => ({ name: user.name, role: user.role }))
               );
+              const currentUserRole = data.users.find(
+                (user) => user.name === storedUserData.current.name
+              )?.role;
+              if (currentUserRole === "viewer") {
+                editorRef.current.setOption("readOnly", true);
+              }
+              if (currentUserRole === "editor") {
+                editorRef.current.setOption("readOnly", false);
+              }
+
               // setHost(data.host);
               host.current = data.host;
             } else {
@@ -383,12 +434,10 @@ const EditorPage = () => {
           }
         };
 
-
         fetchUserDetails();
         // fetchUserDetails();
-      })
+      });
     };
-
 
     init();
 
@@ -415,6 +464,15 @@ const EditorPage = () => {
           setConnectedUserRoles(
             data.users.map((user) => ({ name: user.name, role: user.role }))
           );
+          const currentUserRole = data.users.find(
+            (user) => user.name === storedUserData.current.name
+          )?.role;
+          if (currentUserRole === "viewer") {
+            editorRef.current.setOption("readOnly", true);
+          }
+          if (currentUserRole === "editor") {
+            editorRef.current.setOption("readOnly", false);
+          }
           // setHost(data.host);
           host.current = data.host;
         } else {
@@ -431,7 +489,6 @@ const EditorPage = () => {
   if (!location.state) {
     return <Navigate to="/" />;
   }
-
 
   return (
     <div className="flex flex-col justify-center">
@@ -465,8 +522,9 @@ const EditorPage = () => {
         />
 
         <div
-          className={`${isLeftDivOpen ? "col-span-8" : "w-full absolute top-0 left-0 "
-            }  overflow-y-auto transition-all duration-500 ease-in-out`}
+          className={`${
+            isLeftDivOpen ? "col-span-8" : "w-full absolute top-0 left-0 "
+          }  overflow-y-auto transition-all duration-500 ease-in-out`}
           style={{ width: isChatOpen ? `calc(100% - 300px)` : "100%" }}
         >
           <Editor
