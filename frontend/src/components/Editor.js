@@ -316,7 +316,11 @@ const Editor = ({
         .forEach((node) => node.remove());
     };
   }, []);
-  return <textarea id="realEditor" />;
+  return (
+    <div className="editor-container" style={{ overflow: 'auto'}}>
+      <textarea id="realEditor" style={{}} />
+    </div>
+  )
 };
 
 export default Editor;
