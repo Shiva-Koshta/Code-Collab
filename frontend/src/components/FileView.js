@@ -31,6 +31,7 @@ import pythonIcon from '../icons/python.png'
 import textIcon from '../icons/text.png'
 import videoIcon from '../icons/video.png'
 import { toast } from 'react-hot-toast'
+import ACTIONS from '../Actions'
 
 const FileView = ({
   fileContent,
@@ -38,9 +39,11 @@ const FileView = ({
   editorRef,
   contentChanged,
   setContentChanged,
+  socketRef
 }) => {
   const { roomId } = useParams()
   const [isDownloadTrue, setIsDownloadTrue] = useState(false)
+  const [currentFile, setCurrentFile] = useState(null)//id of the currently opened file, null if no file is opened
   const [downloadFileExtension, setFileExtension] = useState('')
   const [downloadFileName, setFileName] = useState('')
   const parentRef = useRef(null)
@@ -65,7 +68,7 @@ const FileView = ({
   useEffect(() => {
     const handleCtrlS = (event) => {
       if (event.ctrlKey && event.key === 's') {
-        handleSaveFile(selectedFileFolder._id)
+        handleSaveFile(currentFile)
         event.preventDefault()
       }
     }
@@ -73,9 +76,15 @@ const FileView = ({
     return () => {
       document.removeEventListener('keydown', handleCtrlS)
     }
-  }, [selectedFileFolder._id])
+  }, [currentFile])
+
   const handleSaveFile = (fileId) => {
-    toast.success(`File saved! file id:-  ${fileId}`)
+    if(!fileId) {
+      return
+    }
+    //For file saving , socket action is: SAVE_FILE
+    socketRef.current.emit(ACTIONS.SAVE_FILE, { roomId, fileId, code: editorRef.current.getValue() }) 
+    toast.success(`File saved`)
   }
 
   useEffect(() => {
@@ -171,6 +180,7 @@ const FileView = ({
         nodeId: fileId
       });
       console.log(response.data.file.content);
+      setCurrentFile(fileId)
       setFileContent(response.data.file.content);
 
     } catch (error) {
