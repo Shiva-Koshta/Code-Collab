@@ -8,6 +8,11 @@ import { useNavigate, useParams } from "react-router-dom";
 import MoreVertSharpIcon from '@mui/icons-material/MoreVertSharp';
 import { MenuItem, Menu, IconButton } from '@mui/material';
 import ACTIONS from "../Actions";
+import { Tooltip  } from "@mui/material"; // Import IconButton component from Material-UI
+import ChatIcon from "@mui/icons-material/Chat"; // Import ChatIcon from Material-UI
+import FileCopyIcon from "@mui/icons-material/FileCopy"; // Import FileCopyIcon from Material-UI
+import ExitToAppIcon from "@mui/icons-material/ExitToApp"; // Import ExitToAppIcon from Material-UI
+
 
 const Sidebar = ({
     contentChanged,
@@ -226,49 +231,69 @@ const Sidebar = ({
 
             {/* Chat and Room ID buttons */}
             <div className="p-4">
-                <div className="flex gap-2">
-                    <button
-                        className="btn chat-btn"
-                        onClick={toggleChat}
-                        style={{ position: "relative" }}
-                    >
-                        Chat{" "}
-                        {unreadMessages > 0 && (
-                            <span
-                                className="unread-messages"
-                                style={{
-                                    position: "absolute",
-                                    top: "-5px", // Adjust the positioning to align properly
-                                    right: "-5px", // Adjust the positioning to align properly
-                                    color: "black",
-                                    borderRadius: "50%",
-                                    width: "30px",
-                                    height: "30px",
-                                    display: "inline-flex",
-                                    alignItems: "center",
-                                    justifyContent: "center",
-                                    textAlign: "center",
-                                    fontSize: "14px",
-                                    fontWeight: "bold",
-                                    border: "2px solid black",
-                                    background: "white",
-                                }}
-                            >
-                                {unreadMessages}
-                            </span>
-                        )}
-                    </button>
-                    <button className="btn-edit copyBtn" onClick={copyRoomId}>
-                        Copy ROOM ID
-                    </button>
-                </div>
-                <button className="btn-edit leaveBtn" onClick={leaveRoom}>
-                    Leave
-                </button>
-            </div>
-            <div className="absolute right-0 top-1/2 transform transition duration-500 hover:animate-bounce-left">
-                <button onClick={toggleLeftDiv}>{leftIcon}</button>
-            </div>
+  <div className="flex gap-2" style={{display: "flex", justifyContent: "right"}}>
+    <Tooltip title="Chat">
+      <IconButton
+        // className="btn chat-btn"
+        onClick={toggleChat}
+        style={{ color: "white" }}
+      >
+        <ChatIcon />
+        {unreadMessages > 0 && (
+          <span
+            className="unread-messages"
+            style={{
+              position: "absolute",
+              top: "-5px",
+              right: "-5px",
+              color: "black",
+              borderRadius: "50%",
+              width: "30px",
+              height: "30px",
+              display: "inline-flex",
+              alignItems: "center",
+              justifyContent: "center",
+              textAlign: "center",
+              fontSize: "14px",
+              fontWeight: "bold",
+              border: "2px solid black",
+              background: "white",
+            }}
+          >
+            {unreadMessages}
+          </span>
+        )}
+      </IconButton>
+    </Tooltip>
+    <Tooltip title="Copy ROOM ID">
+      <IconButton
+        // className="btn-edit copyBtn"
+        onClick={copyRoomId}
+        style={{ color: "white" }}
+      >
+        <FileCopyIcon />
+      </IconButton>
+    </Tooltip>
+    <Tooltip title="Leave">
+    <IconButton
+    //   className="btn-edit leaveBtn"
+      onClick={leaveRoom}
+      style={{ color: "white" }}
+    >
+      <ExitToAppIcon />
+    </IconButton>
+  </Tooltip>
+  </div>
+  
+</div>
+<div className="absolute right-0 top-1/2 transform transition duration-500 hover:animate-bounce-left">
+  <Tooltip title="Toggle Left Div">
+    <IconButton onClick={toggleLeftDiv} style={{ color: "white" }}>
+      {leftIcon}
+    </IconButton>
+  </Tooltip>
+</div>
+
         </div>
     );
 };

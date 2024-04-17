@@ -31,7 +31,7 @@ import pythonIcon from '../icons/python.png'
 import textIcon from '../icons/text.png'
 import videoIcon from '../icons/video.png'
 import { toast } from 'react-hot-toast'
-
+import Tooltip from "@mui/material/Tooltip";
 const FileView = ({
   fileContent,
   setFileContent,
@@ -386,92 +386,114 @@ const FileView = ({
   }
 
   const renderFolder = (folder, depth = 0, parentFolder = null) => {
-    const sortedChildren = sortAlphabetically(folder.children)
+    const sortedChildren = sortAlphabetically(folder.children);
     return (
       <div
         key={folder._id}
-        className='flex flex-col mb-1 h-fit'
+        className="flex flex-col mb-1 h-fit"
         style={{
           marginLeft: `${depth === 0 ? 0 : 10}px`,
-          maxWidth: `${depth === 0 ? `${parentWidth}px` : `${parentWidth - depth * 10}px`
-            }`,
+          maxWidth: `${depth === 0 ? `${parentWidth}px` : `${parentWidth - depth * 10}px`}`,
         }}
       >
         <div
-          className={`flex items-center p-px  overflow-hidden ${selectedFileFolder && selectedFileFolder._id === folder._id
-              ? 'Selected-file-folder'
-              : ''
-            } rounded-md`}
+          className={`flex items-center p-px  ${
+            selectedFileFolder && selectedFileFolder._id === folder._id
+              ? "Selected-file-folder"
+              : ""
+          } rounded-md`}
         >
-          <div className='grow flex relative overflow-hidden'>
-            {folder.type === 'root' && (
-              <div
-                onClick={() => {
-                  toggleFolder(folder)
-                  setSelectedFileFolder(folder)
-                }}
-                style={{
-                  maxWidth: `${depth === 0 ? '328px' : `${328 - depth}px`}`,
-                }}
-                className='cursor-pointer mr-2 grow flex overflow-hidden'
-              >
-                {isFolderOpen[folder._id] ? (
-                  <ArrowDropDownIcon />
-                ) : (
-                  <ArrowRightIcon />
-                )}
-                {isFolderOpen[folder._id] ? (
-                  <FolderIcon className='mr-2' style={{ fontSize: 20 }} />
-                ) : (
-                  <FolderOpenIcon className='mr-2' style={{ fontSize: 20 }} />
-                )}
-
-                <div className='truncate'>{folder.name}</div>
-              </div>
+          <div className="grow flex relative ">
+            {folder.type === "root" && (
+              <Tooltip title={folder.name} arrow={false} placement="bottom-start">
+                <div
+                  onClick={() => {
+                    toggleFolder(folder);
+                    setSelectedFileFolder(folder);
+                  }}
+                  style={{
+                    maxWidth: `${
+                      depth === 0 ? "300px" : `${300 - depth}px`
+                    }`,
+                  }}
+                  className="cursor-pointer mr-2 grow flex "
+                >
+                  {isFolderOpen[folder._id] ? (
+                    <ArrowDropDownIcon />
+                  ) : (
+                    <ArrowRightIcon />
+                  )}
+                  {isFolderOpen[folder._id] ? (
+                    <FolderIcon
+                      className="mr-2"
+                      style={{ fontSize: 20 }}
+                    />
+                  ) : (
+                    <FolderOpenIcon
+                      className="mr-2"
+                      style={{ fontSize: 20 }}
+                    />
+                  )}
+  
+                  <div className="krunkate">{folder.name}</div>
+                </div>
+              </Tooltip>
             )}
-            {folder.type === 'directory' && (
-              <div
-                onClick={() => {
-                  toggleFolder(folder)
-                  setSelectedFileFolder(folder)
-                  setSelectedFileFolderParent(parentFolder)
-                }}
-                style={{
-                  maxWidth: `${depth === 0 ? '328px' : `${328 - depth}px`}`,
-                }}
-                className='cursor-pointer mr-2 grow flex overflow-hidden'
-              >
-                {isFolderOpen[folder._id] ? (
-                  <ArrowDropDownIcon />
-                ) : (
-                  <ArrowRightIcon />
-                )}
-                {isFolderOpen[folder._id] ? (
-                  <FolderIcon className='mr-2' style={{ fontSize: 20 }} />
-                ) : (
-                  <FolderOpenIcon className='mr-2' style={{ fontSize: 20 }} />
-                )}
-                <div className='truncate'>{folder.name}</div>
-              </div>
+            {folder.type === "directory" && (
+              <Tooltip title={folder.name} arrow={false} placement="bottom-start">
+                <div
+                  onClick={() => {
+                    toggleFolder(folder);
+                    setSelectedFileFolder(folder);
+                    setSelectedFileFolderParent(parentFolder);
+                  }}
+                  style={{
+                    maxWidth: `${
+                      depth === 0 ? "300px" : `${300 - depth}px`
+                    }`,
+                  }}
+                  className="cursor-pointer mr-2 grow flex "
+                >
+                  {isFolderOpen[folder._id] ? (
+                    <ArrowDropDownIcon />
+                  ) : (
+                    <ArrowRightIcon />
+                  )}
+                  {isFolderOpen[folder._id] ? (
+                    <FolderIcon
+                      className="mr-2"
+                      style={{ fontSize: 20 }}
+                    />
+                  ) : (
+                    <FolderOpenIcon
+                      className="mr-2"
+                      style={{ fontSize: 20 }}
+                    />
+                  )}
+                  <div className="krunkate">{folder.name}</div>
+                </div>
+              </Tooltip>
             )}
-            {folder.type === 'file' && (
-              <div
-                style={{
-                  maxWidth: `${depth === 0 ? '328px' : `${328 - depth}px`}`,
-                }}
-                className='grow cursor-pointer mr-2 flex overflow-hidden'
-                onClick={() => {
-                  setSelectedFileFolder(folder)
-                  setSelectedFileFolderParent(parentFolder)
-
-                  handleFileClick(folder._id)
-                  // console.log(findNodeById(folder._id));
-                }}>
-
-                {/* <TextFileIcon className='mr-2 pb-0.5' style={{ fontSize: 20 }} /> */}
-                {renderFileIcon(folder)}
-                <div className='truncate'>{folder.name}</div>
-              </div>
+            {folder.type === "file" && (
+              <Tooltip title={folder.name} arrow={false} placement="bottom-start">
+                <div
+                  style={{
+                    maxWidth: `${
+                      depth === 0 ? "328px" : `${328 - depth}px`
+                    }`,
+                  }}
+                  className="grow cursor-pointer mr-2 flex"
+                  onClick={() => {
+                    setSelectedFileFolder(folder);
+                    setSelectedFileFolderParent(parentFolder);
+  
+                    handleFileClick(folder._id);
+                  }}
+                >
+                  {renderFileIcon(folder)}
+                  <div className="krunkate">{folder.name}</div>
+                </div>
+              </Tooltip>
             )}
           </div>
         </div>
@@ -480,8 +502,8 @@ const FileView = ({
             renderFolder(child, depth + 1, folder)
           )}
       </div>
-    )
-  }
+    );
+  };
 
   const fileIconMap = {
     mp3: audioIcon,
@@ -579,9 +601,9 @@ const FileView = ({
   return (
     <div className='flex flex-col justify-between h-full'>
       <div className='flex justify-between mx-1 relative h-fit grow'>
-        <div className='flex flex-col grow overflow-hidden'>
+        <div className='flex flex-col grow '>
           <div
-            className={`text-lg font-bold flex justify-between items-center my-3 ${isSmallScreen ? 'flex-col' : 'flex-row'
+            className={`text-lg font-bold flex justify-between items-center my-3 
               }`}
           >
             <p>File Explorer</p>
@@ -738,8 +760,8 @@ const FileView = ({
               </div>
             )}
           </div>
-          <div className='flex justify-between grow'>
-            <div className='grow relative overflow-y-scroll' ref={parentRef}>
+          <div className='flex justify-between grow' style={{maxHeight:"380px", maxWidth:"255px"}}>
+            <div className='grow relative overflow-y-scroll overflow-x-scroll' ref={parentRef}>
               {folders.map((folder) => renderFolder(folder))}
             </div>
           </div>
