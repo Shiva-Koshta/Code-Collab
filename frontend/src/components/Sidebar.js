@@ -189,6 +189,7 @@ const Sidebar = ({
                 fileContent={fileContent}
                 setFileContent={setFileContent}
                 editorRef={editorRef}
+                socketRef={socketRef}
             />
             <div className="Users z-10">
                 <div

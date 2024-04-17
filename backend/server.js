@@ -6,7 +6,7 @@ const http = require("http");
 const mongoose = require("mongoose");
 const { Server } = require("socket.io");
 const filesysrouter = require("./routes/filesystem.routes");
-
+const FileSystemService = require("./services/filesystem.services");
 const middleware = require("./middleware");
 const RoomCodeMap = require("./models/RoomCodeMap");
 const RoomUserCount = require("./models/RoomUserCount");
@@ -71,21 +71,41 @@ io.on("connection", (socket) => {
   });
   socket.on(ACTIONS.CODE_CHANGE, ({ roomId, code, cursorData, socketid }) => {
     // Save or update the code in the database
-    RoomCodeMap.findOneAndUpdate(
-      { roomId },
-      { code },
-      { new: true, upsert: true }
-    )
-      .then((updatedMap) => {
-        // console.log("Code updated in database:");
-      })
-      .catch((error) => {
-        console.error("Error retrieving code from database:", error);
-      });
+    // RoomCodeMap.findOneAndUpdate(
+    //   { roomId },
+    //   { code },
+    //   { new: true, upsert: true }
+    // )
+    //   .then((updatedMap) => {
+    //     // console.log("Code updated in database:");
+    //   })
+    //   .catch((error) => {
+    //     console.error("Error retrieving code from database:", error);
+    //   });
     cursorPosition[socketid] = cursorData;
     // Emit the code change to other sockets in the room
     socket.in(roomId).emit(ACTIONS.CODE_CHANGE, { code, cursorPosition });
   });
+
+  socket.on(ACTIONS.SAVE_FILE, async ({ code , fileId }) => {
+    // console.log("fileId", fileId);
+    // console.log("code", code);
+    if(fileId === null || fileId === undefined || fileId === ""){
+      // console.log("fileId is null");
+      return;
+    }
+    else {
+      try{
+        await FileSystemService.saveFile(fileId, code);
+      } catch(error){
+        // console.error("Error in saving file", error);
+
+      }
+    }
+  }
+  );
+
+
   socket.on(ACTIONS.CURSOR_CHANGE, ({ roomId, cursorData }) => {
     socket.in(roomId).emit(ACTIONS.CURSOR_CHANGE, { cursorData });
   });
