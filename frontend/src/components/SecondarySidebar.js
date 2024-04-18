@@ -21,6 +21,7 @@ const SecondarySidebar = ({
 		setIsChatOpen((prevState) => !prevState) // Toggle chat window
 		setUnreadMessages(-1)
 	}
+    const [isVisible, setIsVisible] = useState([false, false, false]);
 
     useEffect(() => {
 		if (!isChatOpen) {
@@ -34,13 +35,7 @@ const SecondarySidebar = ({
 				className={`z-10 w-full flex justify-center h-10 ${
 					isLeftDivOpen ? 'border-l-2' : 'border-l-0'
 				}`}>
-				{/* <button
-                        className={`${currTheme === 'neat' || currTheme === 'eclipse' || currTheme === 'yeti' ? 'text-black hover:text-gray-600' : 'text-gray-400 hover:text-gray-200'}`}
-                        onClick={toggleLeftDiv}
-                    >
-                        <FolderOpenIcon />
-                    </button> */}
-				<Tooltip text='Open File Tree'>
+				<Tooltip isVisible={isVisible} setIsVisible={setIsVisible} i={0} text='Open File Tree'>
 					<button
 						className={`${
 							currTheme === 'neat' ||
@@ -58,20 +53,7 @@ const SecondarySidebar = ({
 				className={`z-10 relative w-full flex justify-center h-10 ${
 					isChatOpen ? 'border-l-2' : 'border-l-0'
 				}`}>
-				{/* <button
-						className={`relative ${currTheme === 'neat' || currTheme === 'eclipse' || currTheme === 'yeti' ? 'text-black hover:text-gray-600' : 'text-gray-400 hover:text-gray-200'}`}
-						onClick={toggleChat}
-					>
-	                    <ChatIcon />
-	                    {unreadMessages > 0 && (
-	                        <span
-	                            className='absolute top-[-5px] right-[-5px] text-black rounded-full w-[30px] h-[30px] inline-flex items-center justify-center text-center text-[14px] font-bold border-2 border-black bg-white'
-	                        >
-	                            {unreadMessages}
-	                        </span>
-	                    )}
-	                </button> */}
-				<Tooltip text='Chat Button'>
+				<Tooltip isVisible={isVisible} setIsVisible={setIsVisible} i={1} text='Chat Button'>
 					<button
 						className={`relative ${
 							currTheme === 'neat' ||
@@ -83,7 +65,7 @@ const SecondarySidebar = ({
 						onClick={toggleChat}>
 						<ChatIcon />
 						{unreadMessages > 0 && (
-							<span className='absolute top-[-5px] right-[-5px] text-black rounded-full w-[30px] h-[30px] inline-flex items-center justify-center text-center text-[14px] font-bold border-2 border-black bg-white'>
+							<span className='absolute top-[-5px] right-[-5px] text-black rounded-full w-[20px] h-[20px] inline-flex items-center justify-center text-center text-[8px] font-bold border-2 border-black bg-white'>
 								{unreadMessages}
 							</span>
 						)}
@@ -91,12 +73,9 @@ const SecondarySidebar = ({
 				</Tooltip>
 			</div>
 			<div className='relative h-10 w-full flex justify-center'>
-				{/* <SettingsMenu currTheme={currTheme} setCurrTheme={setCurrTheme}/> */}
-				<Tooltip text='Settings Menu'>
-					<div>
-						<SettingsMenu currTheme={currTheme} setCurrTheme={setCurrTheme} />
-					</div>
-				</Tooltip>
+                <Tooltip isVisible={isVisible} setIsVisible={setIsVisible} i={2} text='Settings Menu'>
+                    <SettingsMenu setIsVisible={setIsVisible} currTheme={currTheme} setCurrTheme={setCurrTheme} />
+                </Tooltip>
 			</div>
 		</>
 	)

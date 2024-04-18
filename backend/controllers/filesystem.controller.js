@@ -112,7 +112,7 @@ fetchfile = async(req, res) => {
                 content: file.content.toString()
             } 
         }    
-        console.log(file.content.toString());
+        // console.log(file.content.toString());
         res.status(200).json(responseJSON);
     } catch (error) {
         console.log(error)

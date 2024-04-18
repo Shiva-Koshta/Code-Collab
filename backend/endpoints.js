@@ -111,7 +111,6 @@ router.post("/delete-entry", async (req, res) => {
 
     // If userCount becomes 0, delete the room code map entry
     if (room.userCount === 0) {
-      console.log("hi");
       const deletedRoomCodeMap = await RoomCodeMap.findOneAndDelete({ roomId });
 
       if (!deletedRoomCodeMap) {

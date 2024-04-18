@@ -5,6 +5,24 @@ import { useNavigate } from "react-router-dom";
 import "../index";
 import axios from "axios";
 const MAXUSERS = 10;
+
+export async function getRoomUsersCount(roomId) {
+  const apiurl = `${process.env.REACT_APP_API_URL}/rooms/numUsersInRoom`;
+  const requestBody = {
+    roomId: roomId
+  };
+
+  try {
+      const response = await axios.post(apiurl, requestBody);
+      if (response.status !== 200) {
+        return -1;
+      }
+      return response.data.numUsers;
+  } catch (error) {
+      return -1;
+  }
+}
+
 const RoomCreation = () => {
   const navigate = useNavigate();
 
@@ -86,29 +104,11 @@ const RoomCreation = () => {
           },
         });
       } catch (error) {
-        console.error("Error:", error);
+        //console.error("Error:", error);
       }
     };
     postData();
 
-  }
-  async function getRoomUsersCount() {
-    const apiurl = `${process.env.REACT_APP_API_URL}/rooms/numUsersInRoom`;
-    const requestBody = {
-      roomId: roomId
-    };
-    const postData = async () => {
-      try {
-        const response = await axios.post(apiurl, requestBody);
-        if (response.status !== 200) {
-          return -1;
-        }
-        return response.data.numUsers;
-      } catch (error) {
-        return -1;
-      }
-    };
-    return await postData();
   }
 
   // this function is used to join a room
@@ -120,7 +120,7 @@ const RoomCreation = () => {
       return;
     }
 
-    let numUsers = await getRoomUsersCount();
+    let numUsers = await getRoomUsersCount(roomId);
     console.log('numUsers:', numUsers);
     if (numUsers === -1) {
       toast.error('Error joining room');
@@ -147,7 +147,7 @@ const RoomCreation = () => {
         },
       });
     } catch (error) {
-      console.error("Failed to call initialize endpoint:", error.message);
+      //console.error("Failed to call initialize endpoint:", error.message);
     }
   };
 

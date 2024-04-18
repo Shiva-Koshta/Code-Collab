@@ -12,6 +12,8 @@ import ACTIONS from '../Actions'
 import toast, { Toaster } from 'react-hot-toast'
 import { initSocket } from '../socket'
 
+import logo from '../images/Logo.png'
+
 // import './Editor.css'
 import '../styles/EditorPage.css'
 import '../styles/Chat.css'
@@ -22,6 +24,7 @@ import Sidebar from '../components/Sidebar'
 import SecondarySidebar from '../components/SecondarySidebar'
 
 import axios from 'axios'
+import { protocol } from 'socket.io-client'
 
 
 const EditorPage = () => {
@@ -40,9 +43,7 @@ const EditorPage = () => {
 	const host = useRef('')
 	const [connectedUserRoles, setConnectedUserRoles] = useState([])
 	const connectedUsernamesRef = useRef([])
-	// const [connectedUsernames, setConnectedUsernames] = useState([])
 	const [connectedUsers, setConnectedUsers] = useState([])
-	// const [messages, setMessages] = useState([])
 
 	const [messages, setMessages] = useState(() => {
 		const storedMessages = window.localStorage.getItem(`messages_${roomId}`)
@@ -52,137 +53,45 @@ const EditorPage = () => {
 
 	const CHAT_LIMIT = 15 // Global variable for chat limit
 
-	// const [inputText, setInputText] = useState('')
-
-	// const fileRef=useRef(null)
-	// const [isOpen, setIsOpen] = useState(true)
-	// const [isConnectedComponentOpen, setIsConnectedComponentOpen] = useState(false)
+	const [inputText, setInputText] = useState('')
 	const [isChatOpen, setIsChatOpen] = useState(false) // State to control chat window
 
-	// const downloadFileExtension = ''
-	// const downloadFileName = ''
+	const downloadFileExtension = ''
+	const downloadFileName = ''
 	const [isLeftDivOpen, setIsLeftDivOpen] = useState(true)
-	
-	// const [menuOpen, setMenuOpen] = useState({})
 
-	// const handleUserMenuToggle = (username) => {
-	//   setMenuOpen(prevMenuOpen => ({
-	//     ...prevMenuOpen,
-	//     [username]: !prevMenuOpen[username]
-	//   }))
-	// }
+	const getRoot = async () => {
+		const rootFolder = await axios.get(`${process.env.REACT_APP_API_URL}/filesystem/fetchroot`, {
+            params: {
+				roomId, // Send the roomId as a query parameter
+			  },
+          });
 
-	// const handleUserMenuToggle = (username) => {
-	//   setMenuOpen(prevMenuOpen => ({
-	//     ...prevMenuOpen,
-	//     [username]: !prevMenuOpen[username]
-	//   }))
-	// }
-	// const handleChangeRole = (username) => {
-	//   const user = connectedUserRoles.find(user => user.name === username)
-	//   if(!user)
-	//   {
-	//     console.error(`User with id ${username} not found.`)
-	//     return
-	//   }
-	//   const newRole = user.role === 'viewer' ? 'editor' : 'viewer'
-
-	//   setConnectedUserRoles(prevRoles => prevRoles.map(prevUser => {
-	//     if(prevUser.name === username)
-	//     {
-	//       return {...prevUser, role:newRole}
-	//     }
-	//     return prevUser
-	//   }))
-
-	//   socketRef.current.emit(ACTIONS.ROLE_CHANGE, {
-	//     roomId,
-	//     username,
-	//     newRole,
-	//   })
-
-	// }
-
-	// const handleMessageSend = () => {
-	//   console.log(storedUserData)
-	//   if (inputText.trim() !== '') {
-	//     const message = { text: inputText }
-	//     socketRef.current.emit(ACTIONS.MESSAGE_SEND, {
-	//       roomId,
-	//       message,
-	//       sender: storedUserData.sub,
-	//       sendname: storedUserData.name,
-	//     })
-	//     setInputText('')
-	//   }
-	// }
-
-	// const handleToggle = () => {
-	//   setIsConnectedComponentOpen(!isConnectedComponentOpen)
-	// }
-	// const leaveRoom = async () => {
-	//   try {
-	//     const userData = JSON.parse(localStorage.getItem('userData'))
-	//     const response = await fetch('http://localhost:8080/delete-entry', {
-	//       method: 'POST',
-	//       headers: {
-	//         'Content-Type': 'application/json',
-	//       },
-	//       body: JSON.stringify({ roomId, username: userData.name }), // Include roomId and username in the request body
-	//     })
-	//     if (response.ok) {
-	//       const data = await response.json()
-	//       console.log(data) // log the response if needed
-	//       reactNavigator('/', { roomId }) // Navigate to the home page after leaving the room
-	//     } else {
-	//       reactNavigator('/', { roomId })
-	//     }
-	//   } catch (error) {
-	//     console.error('Error leaving room:', error)
-	//     // Handle errors as needed
-	//   }
-	// }
-
-	// async function copyRoomId() {
-	//   try {
-	//     await navigator.clipboard.writeText(roomId)
-	//     toast.success('Room ID has been copied to your clipboard')
-	//   } catch (err) {
-	//     toast.error('Could not copy the Room ID')
-	//     console.error(err)
-	//   }
-	// }
-
-	// const handleKeyPress = (e) => {
-	//   if (e.key === 'Enter') {
-	//     handleMessageSend()
-	//   }
-	// }
-
-	// const handleDownloadFile = () => {
-	//   const myContent = editorRef.current.getValue()
-	//   const element = document.createElement('a')
-	//   const file = new Blob([myContent], { type: 'text/plain' })
-	//   element.href = URL.createObjectURL(file)
-	//   element.download = `${downloadFileName}.${downloadFileExtension}`
-	//   document.body.appendChild(element)
-	//   element.click()
-	//   document.body.removeChild(element)
-	// }
-
-	const getRootFolder = async () => {
-		const rootFolder = await axios.get(
-			`${process.env.REACT_APP_API_URL}/filesystem/fetchroot`,
-			{
-				params: {
-					roomId: roomId,
-				},
-			}
-		)
 		return rootFolder
 	}
-	const [selectedFileFolder, setSelectedFileFolder] = useState(getRootFolder())
 
+	const [selectedFileFolder, setSelectedFileFolder] = useState(getRoot)
+		
+	// const [menuOpen, setMenuOpen] = useState({})
+
+	const handleMessageSend = () => {
+		console.log(storedUserData)
+		if (inputText.trim() !== '') {
+		const message = { text: inputText }
+		socketRef.current.emit(ACTIONS.MESSAGE_SEND, {
+			roomId,
+			message,
+			sender: storedUserData.sub,
+			sendname: storedUserData.name
+		})
+		setInputText('')
+		}
+	}
+	const handleKeyPress = (e) => {
+		if (e.key === "Enter") {
+		handleMessageSend();
+		}
+	};
 	useEffect(() => {
 		const lastMessage = messages[messages.length - 1]
 		if (lastMessage && !isChatOpen) {
@@ -199,9 +108,9 @@ const EditorPage = () => {
 					backgroundColor: '#1c1e29', // Change this to your desired color
 				},
 			})
-			// reactToastify.info(`${lastMessage.sendname} : ${lastMessage.text}`)
 		}
 	}, [messages])
+
 	useEffect(() => {
 		connectedUsernamesRef.current = connectedUsernames
 		console.log(connectedUsernamesRef.current.length)
@@ -535,11 +444,11 @@ const EditorPage = () => {
 					<Chat
 						setIsChatOpen={setIsChatOpen}
 						messages={messages}
-						// CHAT_LIMIT={CHAT_LIMIT}
-						// inputText={inputText}
-						// setInputText={setInputText}
-						// handleKeyPress={handleKeyPress}
-						// handleMessageSend={handleMessageSend}
+						CHAT_LIMIT={CHAT_LIMIT}
+						inputText={inputText}
+						setInputText={setInputText}
+						handleKeyPress={handleKeyPress}
+						handleMessageSend={handleMessageSend}
 						roomId={roomId}
 						socketRef={socketRef}
 						storedUserData={storedUserData}

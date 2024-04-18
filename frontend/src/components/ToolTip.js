@@ -1,14 +1,15 @@
 import React, { useState } from 'react'
 
-const Tooltip = ({ children, text }) => {
-    const [isVisible, setIsVisible] = useState(false);
-  
+const Tooltip = ({ children, text, isVisible, setIsVisible, i}) => {
+
     const handleMouseEnter = () => {
-      setIsVisible(true);
+        let updateIsVisible = [false, false, false]
+        updateIsVisible[i] = true
+        setIsVisible(updateIsVisible)
     };
   
     const handleMouseLeave = () => {
-      setIsVisible(false);
+        setIsVisible([false, false, false])
     };
   
     return (
@@ -18,7 +19,7 @@ const Tooltip = ({ children, text }) => {
             onMouseLeave={handleMouseLeave}
         >
             {children}
-            {isVisible && (
+            {isVisible[i] && (
                 <div 
                     className="absolute left-full top-3/4 transform delay-200 bg-gray-800 text-white px-2 py-1 rounded text-sm whitespace-nowrap"
                     style={{zIndex: '60'}}

@@ -129,7 +129,7 @@ async function fetchFile(nodeId) {
     if (!fileNode || fileNode.type !== 'file') {
         throw new Error('Node not found or is not a file.');
     }
-    return fileNode;
+    return fileNode.content;
 }
 
 async function fetchRoot(roomId) {
@@ -140,6 +140,37 @@ async function fetchRoot(roomId) {
     return rootNode;
 }
 
+async function fetchRoot(roomId) {
+    const rootNode = await FileNode.findOne({roomId: roomId, type: 'root'});
+    if (!rootNode || rootNode.type !== 'root') {
+        throw new Error('Root not found or room does not exist.');
+    }
+    return rootNode;
+}
+
+async function fetchRoot(roomId) {
+    const rootNode = await FileNode.findOne({roomId: roomId, type: 'root'});
+    if (!rootNode || rootNode.type !== 'root') {
+        throw new Error('Root not found or room does not exist.');
+    }
+    return rootNode;
+}
+
+async function saveFile(nodeId, content)
+{
+    try {
+        // Find the file node by ID and update its content
+        const updatedNode = await FileNode.findByIdAndUpdate( nodeId, { content }, { new: true } );
+        // Check if the file node exists
+        if (!updatedNode) {
+            throw new Error('File node not found.');
+        }
+        return { success: true, message: 'File saved successfully.'};
+    } catch (error) {
+        console.error('Error saving file:', error.message);
+        return { success: false, message: 'Failed to save file.' };
+    }
+}
 // Add a function to create a root directory for a room
 async function createRootDirectory(roomId) {
     // Check if the root directory already exists for the room
