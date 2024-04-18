@@ -18,14 +18,9 @@ const Sidebar = ({
 	// isConnectedComponentOpen,
 	// handleToggle,
 	connectedUsers,
-	toggleChat,
-	unreadMessages,
 	// copyRoomId,
 	// leaveRoom,
 	roomId,
-	isLeftDivOpen,
-	toggleLeftDiv,
-	leftIcon,
 	storedUserData,
 	host,
 	connectedUserRoles,
@@ -181,12 +176,7 @@ const Sidebar = ({
 		}
 	}
 	return (
-		<div
-			className={`flex flex-col justify-between h-screen text-white px-4 relative ${
-				isLeftDivOpen ? 'col-span-2' : ''
-			}`}
-			style={{ backgroundColor: '#1c1e29' }}
-        >
+		<>
 			{/* Sidebar content */}
 			<div className='logo flex items-center'>
 				<img className='h-20' src={logo} alt='logo' />
@@ -242,31 +232,17 @@ const Sidebar = ({
 	                ))}
                 </div>
 			</div>
-            <div className='p-4'>
+            <div className='p-4 mb-2'>
 	            <div className='flex gap-2'>
-	                <button
-	                    className='btn chat-btn'
-	                    onClick={toggleChat}
-	                    style={{ position: 'relative' }}
-	                >
-	                    Chat{' '}
-	                    {unreadMessages > 0 && (
-	                        <span
-	                            className='absolute top-[-5px] right-[-5px] text-black rounded-full w-[30px] h-[30px] inline-flex items-center justify-center text-center text-[14px] font-bold border-2 border-black bg-white'
-	                        >
-	                            {unreadMessages}
-	                        </span>
-	                    )}
+	                <button className='bg-green-500 p-3 rounded-lg w-full font-bold text-lg transition delay-150 hover:bg-green-700 hover:scale-x-[1.025]' onClick={copyRoomId}>
+	                    Copy Room Id
 	                </button>
-	                <button className='btn-edit copyBtn' onClick={copyRoomId}>
-	                    Copy ROOM ID
-	                </button>
+                    <button className=' bg-red-500 p-3 rounded-lg w-full font-bold text-lg transition delay-150 hover:bg-red-700 hover:scale-x-[1.025]' onClick={leaveRoom}>
+                        Leave
+                    </button>
 	            </div>
-	            <button className='btn-edit leaveBtn' onClick={leaveRoom}>
-	                Leave
-	            </button>
             </div>
-		</div>
+		</>
 	)
 }
 

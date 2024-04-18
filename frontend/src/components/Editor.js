@@ -339,7 +339,7 @@ const Editor = ({
     };
   }, []);
 
-  return <textarea id="realEditor" className='w-full'/>;
+  return <textarea id="realEditor"/>;
 };
 
 export default Editor;
