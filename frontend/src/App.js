@@ -1,7 +1,8 @@
 import './App.css'
 import Login from './pages/Login'
 import RoomCreation from './pages/RoomCreation'
-import EditorPage from './pages/EditorPage'
+// import EditorPage from './pages/EditorPage'
+import EditorPage from './pages/EditorPageTemp'
 import HelpPage from './pages/HelpPage'
 import About from './pages/About'
 

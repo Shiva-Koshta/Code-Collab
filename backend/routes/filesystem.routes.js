@@ -8,6 +8,7 @@ router.post('/uploaddirectory', filesystem.uploaddirectory);
 router.post('/createrootdirectory', filesystem.createrootdirectory);
 router.post('/generatetree', filesystem.generatetree);
 router.post('/fetchfile', filesystem.fetchfile);
+router.get('/fetchroot', filesystem.fetchroot);
 router.delete('/deletefile', filesystem.deletefile);
 router.delete('/deletedirectory', filesystem.deletedirectory);
 router.put('/renamefile', filesystem.renamefile);

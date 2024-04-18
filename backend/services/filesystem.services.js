@@ -132,6 +132,14 @@ async function fetchFile(nodeId) {
     return fileNode;
 }
 
+async function fetchRoot(roomId) {
+    const rootNode = await FileNode.findOne({roomId: roomId, type: 'root'});
+    if (!rootNode || rootNode.type !== 'root') {
+        throw new Error('Root not found or room does not exist.');
+    }
+    return rootNode;
+}
+
 // Add a function to create a root directory for a room
 async function createRootDirectory(roomId) {
     // Check if the root directory already exists for the room
@@ -270,5 +278,6 @@ module.exports = {
     deleteFile,
     deleteDirectory,
     renameFile,
-    renameDirectory
+    renameDirectory,
+    fetchRoot
 }

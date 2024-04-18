@@ -1,7 +1,28 @@
 import React, { useEffect,useRef,useState } from 'react'
 import Codemirror from 'codemirror'
 import 'codemirror/lib/codemirror.css'
-import 'codemirror/theme/dracula.css'
+//Themes
+import 'codemirror/theme/material.css';
+import 'codemirror/theme/material-darker.css';
+import 'codemirror/theme/material-palenight.css';
+import 'codemirror/theme/material-ocean.css';
+import 'codemirror/theme/monokai.css';
+import 'codemirror/theme/dracula.css';
+import 'codemirror/theme/nord.css';
+import 'codemirror/theme/neat.css';
+import 'codemirror/theme/mbo.css';
+import 'codemirror/theme/abcdef.css';
+import 'codemirror/theme/midnight.css';
+import 'codemirror/theme/twilight.css';
+import 'codemirror/theme/the-matrix.css';
+import 'codemirror/theme/rubyblue.css';
+import 'codemirror/theme/shadowfox.css';
+import 'codemirror/theme/eclipse.css';
+import 'codemirror/theme/seti.css';
+import 'codemirror/theme/yeti.css';
+import 'codemirror/theme/oceanic-next.css';
+import 'codemirror/theme/panda-syntax.css';
+//
 import 'codemirror/mode/javascript/javascript'
 import 'codemirror/addon/edit/closetag'
 import 'codemirror/addon/edit/closebrackets'
@@ -16,6 +37,8 @@ const Editor = ({
   setFileContent,
   contentChanged,
   connectedClients,
+  currTheme,
+  isLeftDivOpen
 }) => {
   // const [fileContent, setFileContent] = useState("")
   // const [contentChanged, setContentChanged] = useState(false)
@@ -49,7 +72,6 @@ const Editor = ({
 
   const renderAllCursors = (cursorPosition,currentUserId) => {
     console.log("Cursor position type:", typeof cursorPosition);
-    console.log("hi")
     // console.log(userId)
     console.log(currentUserId)
     Object.entries(cursorPosition).forEach(([userId,cursorData]) => {
@@ -96,7 +118,6 @@ const Editor = ({
   useEffect(() => {
     // console.log("file added");
     if (fileContent) {
-      console.log(fileContent);
       const code = fileContent;
       socketRef.current.emit(ACTIONS.CODE_CHANGE, {
         roomId,
@@ -110,7 +131,7 @@ const Editor = ({
         document.getElementById("realEditor"),
         {
           mode: { name: "javascript", json: true },
-          theme: "dracula",
+          theme: currTheme,
           autoCloseTags: true,
           autoCloseBrackets: true,
           lineNumbers: true,
@@ -150,7 +171,7 @@ const Editor = ({
       });
     }
     init();
-  }, []);
+  }, [currTheme]);
 
   useEffect(() => {
     editorRef.current.on("cursorActivity", (instance) => {
@@ -179,6 +200,7 @@ const Editor = ({
       }
     )
   },[editorRef])
+
   useEffect(() => {
     if (socketRef.current) {
       socketRef.current.on(ACTIONS.CODE_CHANGE, ({ code , cursorPosition}) => {
@@ -316,7 +338,8 @@ const Editor = ({
         .forEach((node) => node.remove());
     };
   }, []);
-  return <textarea id="realEditor" />;
+
+  return <textarea id="realEditor" className='w-full'/>;
 };
 
 export default Editor;

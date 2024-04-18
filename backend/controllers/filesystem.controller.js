@@ -1,5 +1,6 @@
 const { stringify } = require('uuid');
 const filesys = require('../services/filesystem.services');
+const { response } = require('express');
 
 
 createfile = async(req, res) => {
@@ -118,6 +119,27 @@ fetchfile = async(req, res) => {
         res.status(500).json({ message: 'Error fetching file' })
     }
 }
+fetchroot = async (req, res) => {
+    if(!req.query.roomId) {
+        return res.status(400).json({ message: 'Please provide room ID' })
+    }
+    try {
+        root = await filesys.fetchRoot(req.query.roomId);
+        responseJSON = {
+            message: 'Root Fetched',
+            root: {
+                _id: root._id,
+                name: root.name,
+                type: root.type,
+                parent: null,
+            }
+        }
+        res.status(200).json(responseJSON);
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: 'Error fetching root' })
+    }
+}
 generatetree = async(req, res) => {
     if (!req.body.roomId)
     return res.status(400).json({ message: 'Please provide all required fields' })
@@ -193,6 +215,7 @@ module.exports = {
     createrootdirectory,
     generatetree,
     fetchfile,
+    fetchroot,
     deletefile,
     deletedirectory,
     renamefile,

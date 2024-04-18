@@ -38,6 +38,8 @@ const FileView = ({
   editorRef,
   contentChanged,
   setContentChanged,
+  selectedFileFolder,
+  setSelectedFileFolder
 }) => {
   const { roomId } = useParams()
   const [isDownloadTrue, setIsDownloadTrue] = useState(false)
@@ -53,15 +55,10 @@ const FileView = ({
       children: [],
     },
   ])
-  const [selectedFileFolder, setSelectedFileFolder] = useState({
-    _id: '0',
-    name: 'Root',
-    type: 'root',
-    children: [],
-  })
   const [selectedFileFolderParent, setSelectedFileFolderParent] = useState({})
   const [isFolderOpen, setIsFolderOpen] = useState({ 0: false })
   const [isSmallScreen, setIsSmallScreen] = useState(false)
+
   useEffect(() => {
     const handleCtrlS = (event) => {
       if (event.ctrlKey && event.key === 's') {
@@ -576,6 +573,7 @@ const FileView = ({
       console.error('Error sending data to server:', error)
     }
   }
+
   return (
     <div className='flex flex-col justify-between h-full'>
       <div className='flex justify-between mx-1 relative h-fit grow'>
