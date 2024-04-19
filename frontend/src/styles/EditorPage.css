@@ -27,7 +27,7 @@
     /* grid-row: 1 / span 3;
     grid-column: 4 / span 1;
     background: #fff; */
-  background: #fff;
+  background: #1c1e29;
   height: 100vh; /* Make the chat container fill the entire height of the viewport */
   display: flex;
   flex-direction: column;
