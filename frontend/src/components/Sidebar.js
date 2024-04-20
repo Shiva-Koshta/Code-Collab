@@ -168,7 +168,7 @@ const Sidebar = ({
         <div
             className={`flex flex-col justify-between h-screen text-white px-4 relative transition-all duration-500 ease-in-out transform ${isLeftDivOpen ? "col-span-2 " : "-translate-x-full"
                 }`}
-            style={{ backgroundColor: "#1c1e29" }}
+            style={{ backgroundColor: "#1c1e29", minWidth: "80px" }}
         >
             <div className="logo flex items-center">
                 <img className="h-20" src={logo} alt="logo" />
@@ -184,6 +184,7 @@ const Sidebar = ({
                 fileContent={fileContent}
                 setFileContent={setFileContent}
                 editorRef={editorRef}
+                socketRef={socketRef}
             />
             <div className="Users z-10">
                 <div
