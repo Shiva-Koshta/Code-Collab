@@ -298,10 +298,10 @@ const Editor = ({
       cursorMarker.style.animation = "blinkCursor 1s infinite";
       // }
 
-      // cursorMarker.style.left = `${
-      //   editorRef.current.charCoords({ line, ch }).left
-      // -324}px`;
-      cursorMarker.style.left = `${leftPosition}px`;
+      cursorMarker.style.left = `${
+        editorRef.current.charCoords({ line, ch }).left
+      -300}px`;
+      // cursorMarker.style.left = `${leftPosition}px`;
       cursorMarker.style.top = `${editorRef.current.charCoords({ line, ch }).top
         }px`;
       // console.log(editorRef.current.charCoords({ line, ch }).top);
