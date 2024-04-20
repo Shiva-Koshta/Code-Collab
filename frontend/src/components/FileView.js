@@ -2,7 +2,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import UploadFileIcon from '@mui/icons-material/UploadFile'
-import { IconButton, sliderClasses } from '@mui/material'
+import { IconButton, duration, sliderClasses } from '@mui/material'
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined'
 import FolderIcon from '@mui/icons-material/Folder'
 import FolderOpenIcon from '@mui/icons-material/FolderOpen'
@@ -69,12 +69,6 @@ const FileView = ({
   const [isFolderOpen, setIsFolderOpen] = useState({ 0: false })
   const [isSmallScreen, setIsSmallScreen] = useState(false)
   const [loading, setLoading] = useState(false)
-  useEffect(() => {
-    setLoading(true)
-    setTimeout(() => {
-      setLoading(false)
-    }, 1000)
-  },[folders])
   useEffect(() => {
     if(currentFile==null)
     {
@@ -600,6 +594,7 @@ const FileView = ({
   const sendDataToServer = async (data) => {
     try {
       // console.log('Data to be sent to the server:', data)
+      setLoading(true)
       const response = await axios.post(
         `${process.env.REACT_APP_API_URL}/filesystem/uploaddirectory`,
         {
@@ -621,6 +616,9 @@ const FileView = ({
 
     } catch (error) {
       console.error('Error sending data to server:', error)
+      toast.error(error.request.statusText,{duration:2000})
+    } finally {
+      setLoading(false)
     }
   }
   return (
@@ -785,16 +783,11 @@ const FileView = ({
               </div>
             )}
           </div>
-          {/* {loading===false && (
-            <div className="flex justify-center items-center">
-              <CircularProgress /> 
+          {loading===true && (
+            <div className="flex justify-center items-center pb-2">
+              <CircularProgress color='inherit' size={30}/> 
             </div>
-            )} */
-            true && (
-              <div className="">
-              ddad
-            </div>
-            )}
+          )} 
           <div className='flex justify-between grow'>
             <div className='grow relative overflow-y-scroll' ref={parentRef}>
               {folders.map((folder) => renderFolder(folder))}
