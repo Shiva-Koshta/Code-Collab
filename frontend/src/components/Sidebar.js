@@ -185,6 +185,8 @@ const Sidebar = ({
                 setFileContent={setFileContent}
                 editorRef={editorRef}
                 socketRef={socketRef}
+                connectedUserRoles={connectedUserRoles}
+                storedUserData={storedUserData}
             />
             <div className="Users z-10">
                 <div
