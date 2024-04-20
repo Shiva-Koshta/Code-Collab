@@ -167,6 +167,7 @@ const FileView = ({
 
         (async () => {
           try {
+            setLoading(true)
             const response = await axios.post(
               `${process.env.REACT_APP_API_URL}/filesystem/uploadfile`,
               {
@@ -186,6 +187,8 @@ const FileView = ({
             setFolders([...folders])
           } catch (error) {
             console.log(error)
+          } finally {
+            setLoading(false)
           }
         })()
     }
@@ -229,6 +232,7 @@ const FileView = ({
     if (newName) {
       (async () => {
         try {
+          setLoading(true)
           const response = await axios.put(
             `${process.env.REACT_APP_API_URL}/filesystem/renamedirectory`,
             {
@@ -242,6 +246,8 @@ const FileView = ({
           setSelectedFileFolder(folder)
         } catch (error) {
           console.log('error in renaming directory', error)
+        } finally {
+          setLoading(false)
         }
       })()
     }
@@ -252,6 +258,7 @@ const FileView = ({
     if (newName) {
       (async () => {
         try {
+          setLoading(true)
           const response = await axios.put(
             `${process.env.REACT_APP_API_URL}/filesystem/renamefile`,
             {
@@ -264,6 +271,8 @@ const FileView = ({
           setFolders([...folders])
         } catch (error) {
           console.log('error in renaming file', error)
+        } finally {
+          setLoading(false)
         }
       })()
     }
@@ -312,6 +321,7 @@ const FileView = ({
       setCurrentFile(null)
     }
     try {
+      setLoading(true)
       const index = parentFolder.children.indexOf(fileId)
       const response = await axios.delete(
         `${process.env.REACT_APP_API_URL}/filesystem/deletefile`,
@@ -329,6 +339,8 @@ const FileView = ({
     } catch (error) {
       console.error('Error deleting file:', error.message)
       throw new Error('Failed to delete file.')
+    } finally {
+      setLoading(false)
     }
   }
   const sortAlphabetically = (array) => {
@@ -351,6 +363,7 @@ const FileView = ({
     if (newFileName) {
       (async () => {
         try {
+          setLoading(true)
           const response = await axios.post(
             `${process.env.REACT_APP_API_URL}/filesystem/createfile`,
             {
@@ -370,6 +383,8 @@ const FileView = ({
           setFolders([...folders])
         } catch (error) {
           console.log(error)
+        } finally {
+          setLoading(false)
         }
       })()
     }
@@ -381,6 +396,7 @@ const FileView = ({
     if (newFolderName) {
       (async () => {
         try {
+          setLoading(true)
           const response = await axios.post(
             `${process.env.REACT_APP_API_URL}/filesystem/createdirectory`,
             {
@@ -400,6 +416,8 @@ const FileView = ({
           setFolders([...folders])
         } catch (error) {
           console.log(error)
+        } finally {
+          setLoading(false)
         }
       })()
     }
