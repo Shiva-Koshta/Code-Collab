@@ -15,6 +15,7 @@ import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown'
 import ArrowRightIcon from '@mui/icons-material/ArrowRight'
 import { FolderCopy } from '@mui/icons-material'
 import DriveFolderUploadIcon from '@mui/icons-material/DriveFolderUpload'
+import {CircularProgress}  from "@mui/material";
 import axios from 'axios'
 import audioIcon from '../icons/audio.png'
 import cIcon from '../icons/c.png'
@@ -39,7 +40,9 @@ const FileView = ({
   editorRef,
   contentChanged,
   setContentChanged,
-  socketRef
+  socketRef,
+  connectedUserRoles,
+  storedUserData
 }) => {
   const { roomId } = useParams()
   const [isDownloadTrue, setIsDownloadTrue] = useState(false)
@@ -65,10 +68,34 @@ const FileView = ({
   const [selectedFileFolderParent, setSelectedFileFolderParent] = useState({})
   const [isFolderOpen, setIsFolderOpen] = useState({ 0: false })
   const [isSmallScreen, setIsSmallScreen] = useState(false)
+  const [loading, setLoading] = useState(false)
   useEffect(() => {
+    setLoading(true)
+    setTimeout(() => {
+      setLoading(false)
+    }, 1000)
+  },[folders])
+  useEffect(() => {
+    if(currentFile==null)
+    {
+      if(editorRef.current)
+      {editorRef.current.setOption('readOnly', true)}
+    }
+    else
+    {
+      const currentUserRole = connectedUserRoles.find(user => user.name === storedUserData.current.name)?.role;
+      if (currentUserRole === "viewer") 
+      {
+      editorRef.current.setOption('readOnly', true)
+      }
+      else
+      {
+        editorRef.current.setOption('readOnly', false)
+      }
+    }
     const handleCtrlS = (event) => {
       if (event.ctrlKey && event.key === 's') {
-        handleSaveFile(currentFile)
+        handleSaveFile(currentFile,true)
         event.preventDefault()
       }
     }
@@ -78,13 +105,14 @@ const FileView = ({
     }
   }, [currentFile])
 
-  const handleSaveFile = (fileId) => {
+  const handleSaveFile = (fileId,show) => {
     if(!fileId) {
       return
     }
     //For file saving , socket action is: SAVE_FILE
     socketRef.current.emit(ACTIONS.SAVE_FILE, { roomId, fileId, code: editorRef.current.getValue() }) 
-    toast.success(`File saved`)
+    if(show)
+    {toast.success(`File saved`)}
   }
 
   useEffect(() => {
@@ -175,6 +203,10 @@ const FileView = ({
   }
 
   const handleFileClick = async (fileId) => {
+    if(currentFile!=null)
+    {
+      handleSaveFile(currentFile,false)
+    }
     try {
       const response = await axios.post(`${process.env.REACT_APP_API_URL}/filesystem/fetchfile`, {
         nodeId: fileId
@@ -280,6 +312,11 @@ const FileView = ({
   }
 
   async function deleteFile(fileId, parentFolder) {
+    if(currentFile===fileId._id)
+    {
+      editorRef.current.setValue("")
+      setCurrentFile(null)
+    }
     try {
       const index = parentFolder.children.indexOf(fileId)
       const response = await axios.delete(
@@ -748,6 +785,16 @@ const FileView = ({
               </div>
             )}
           </div>
+          {/* {loading===false && (
+            <div className="flex justify-center items-center">
+              <CircularProgress /> 
+            </div>
+            )} */
+            true && (
+              <div className="">
+              ddad
+            </div>
+            )}
           <div className='flex justify-between grow'>
             <div className='grow relative overflow-y-scroll' ref={parentRef}>
               {folders.map((folder) => renderFolder(folder))}
