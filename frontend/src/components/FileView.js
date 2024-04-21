@@ -79,11 +79,11 @@ const FileView = ({
   }, [currentFile])
 
   const handleSaveFile = (fileId) => {
-    if(!fileId) {
+    if (!fileId) {
       return
     }
     //For file saving , socket action is: SAVE_FILE
-    socketRef.current.emit(ACTIONS.SAVE_FILE, { roomId, fileId, code: editorRef.current.getValue() }) 
+    socketRef.current.emit(ACTIONS.SAVE_FILE, { roomId, fileId, code: editorRef.current.getValue() })
     toast.success(`File saved`)
   }
 
@@ -137,35 +137,35 @@ const FileView = ({
     reader.onload = (e) => {
       const content = e.target.result;
 
-        // code before
-        // // setFileContent(content)
-        // window.localStorage.setItem('fileContent', JSON.stringify(fileContent))
-        // // console.log(content)
-        // // fileRef.current = content
+      // code before
+      // // setFileContent(content)
+      // window.localStorage.setItem('fileContent', JSON.stringify(fileContent))
+      // // console.log(content)
+      // // fileRef.current = content
 
-        (async () => {
-          try {
-            const response = await axios.post(
-              `${process.env.REACT_APP_API_URL}/filesystem/uploadfile`,
-              {
-                name: file.name,
-                parentId: parentFolder._id,
-                roomId: roomId,
-                content: content,
-              }
-            )
-            const newFile = {
-              _id: response.data.file._id,
-              name: response.data.file.name,
-              type: response.data.file.type,
+      (async () => {
+        try {
+          const response = await axios.post(
+            `${process.env.REACT_APP_API_URL}/filesystem/uploadfile`,
+            {
+              name: file.name,
+              parentId: parentFolder._id,
+              roomId: roomId,
+              content: content,
             }
-            parentFolder.children.push(newFile)
-            console.log('pushed')
-            setFolders([...folders])
-          } catch (error) {
-            console.log(error)
+          )
+          const newFile = {
+            _id: response.data.file._id,
+            name: response.data.file.name,
+            type: response.data.file.type,
           }
-        })()
+          parentFolder.children.push(newFile)
+          console.log('pushed')
+          setFolders([...folders])
+        } catch (error) {
+          console.log(error)
+        }
+      })()
     }
     if (file) {
       reader.readAsText(file)
@@ -176,13 +176,15 @@ const FileView = ({
 
   const handleFileClick = async (fileId) => {
     try {
+      if (currentFile ) {
+        handleSaveFile(currentFile);
+      }
       const response = await axios.post(`${process.env.REACT_APP_API_URL}/filesystem/fetchfile`, {
         nodeId: fileId
       });
       console.log(response.data.file.content);
       setCurrentFile(fileId)
       setFileContent(response.data.file.content);
-
     } catch (error) {
       console.error(error)
     }
@@ -409,8 +411,8 @@ const FileView = ({
       >
         <div
           className={`flex items-center p-px  overflow-hidden ${selectedFileFolder && selectedFileFolder._id === folder._id
-              ? 'Selected-file-folder'
-              : ''
+            ? 'Selected-file-folder'
+            : ''
             } rounded-md`}
         >
           <div className='grow flex relative overflow-hidden'>
