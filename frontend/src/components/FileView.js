@@ -2,7 +2,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import UploadFileIcon from '@mui/icons-material/UploadFile'
-import { IconButton, sliderClasses } from '@mui/material'
+import { IconButton, duration, sliderClasses } from '@mui/material'
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined'
 import FolderIcon from '@mui/icons-material/Folder'
 import FolderOpenIcon from '@mui/icons-material/FolderOpen'
@@ -15,6 +15,7 @@ import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown'
 import ArrowRightIcon from '@mui/icons-material/ArrowRight'
 import { FolderCopy } from '@mui/icons-material'
 import DriveFolderUploadIcon from '@mui/icons-material/DriveFolderUpload'
+import {CircularProgress}  from "@mui/material";
 import axios from 'axios'
 import audioIcon from '../icons/audio.png'
 import cIcon from '../icons/c.png'
@@ -39,7 +40,9 @@ const FileView = ({
   editorRef,
   contentChanged,
   setContentChanged,
-  socketRef
+  socketRef,
+  connectedUserRoles,
+  storedUserData
 }) => {
   const { roomId } = useParams()
   const [isDownloadTrue, setIsDownloadTrue] = useState(false)
@@ -65,10 +68,28 @@ const FileView = ({
   const [selectedFileFolderParent, setSelectedFileFolderParent] = useState({})
   const [isFolderOpen, setIsFolderOpen] = useState({ 0: false })
   const [isSmallScreen, setIsSmallScreen] = useState(false)
+  const [loading, setLoading] = useState(false)
   useEffect(() => {
+    if(currentFile==null)
+    {
+      if(editorRef.current)
+      {editorRef.current.setOption('readOnly', true)}
+    }
+    else
+    {
+      const currentUserRole = connectedUserRoles.find(user => user.name === storedUserData.current.name)?.role;
+      if (currentUserRole === "viewer") 
+      {
+      editorRef.current.setOption('readOnly', true)
+      }
+      else
+      {
+        editorRef.current.setOption('readOnly', false)
+      }
+    }
     const handleCtrlS = (event) => {
       if (event.ctrlKey && event.key === 's') {
-        handleSaveFile(currentFile)
+        handleSaveFile(currentFile,true)
         event.preventDefault()
       }
     }
@@ -78,13 +99,15 @@ const FileView = ({
     }
   }, [currentFile])
 
-  const handleSaveFile = (fileId) => {
-    if (!fileId) {
+
+  const handleSaveFile = (fileId,show) => {
+    if(!fileId) {
       return
     }
     //For file saving , socket action is: SAVE_FILE
-    socketRef.current.emit(ACTIONS.SAVE_FILE, { roomId, fileId, code: editorRef.current.getValue() })
-    toast.success(`File saved`)
+    socketRef.current.emit(ACTIONS.SAVE_FILE, { roomId, fileId, code: editorRef.current.getValue() }) 
+    if(show)
+    {toast.success(`File saved`)}
   }
 
   useEffect(() => {
@@ -137,27 +160,37 @@ const FileView = ({
     reader.onload = (e) => {
       const content = e.target.result;
 
-      // code before
-      // // setFileContent(content)
-      // window.localStorage.setItem('fileContent', JSON.stringify(fileContent))
-      // // console.log(content)
-      // // fileRef.current = content
+        // code before
+        // // setFileContent(content)
+        // window.localStorage.setItem('fileContent', JSON.stringify(fileContent))
+        // // console.log(content)
+        // // fileRef.current = content
 
-      (async () => {
-        try {
-          const response = await axios.post(
-            `${process.env.REACT_APP_API_URL}/filesystem/uploadfile`,
-            {
-              name: file.name,
-              parentId: parentFolder._id,
-              roomId: roomId,
-              content: content,
+        (async () => {
+          try {
+            setLoading(true)
+            const response = await axios.post(
+              `${process.env.REACT_APP_API_URL}/filesystem/uploadfile`,
+              {
+                name: file.name,
+                parentId: parentFolder._id,
+                roomId: roomId,
+                content: content,
+              }
+            )
+            const newFile = {
+              _id: response.data.file._id,
+              name: response.data.file.name,
+              type: response.data.file.type,
             }
-          )
-          const newFile = {
-            _id: response.data.file._id,
-            name: response.data.file.name,
-            type: response.data.file.type,
+            parentFolder.children.push(newFile)
+            console.log('pushed')
+            setFolders([...folders])
+          } catch (error) {
+            console.log(error)
+          } finally {
+            setLoading(false)
+
           }
           parentFolder.children.push(newFile)
           console.log('pushed')
@@ -175,6 +208,10 @@ const FileView = ({
   }
 
   const handleFileClick = async (fileId) => {
+    if(currentFile!=null)
+    {
+      handleSaveFile(currentFile,false)
+    }
     try {
       if (currentFile ) {
         handleSaveFile(currentFile);
@@ -205,6 +242,7 @@ const FileView = ({
     if (newName) {
       (async () => {
         try {
+          setLoading(true)
           const response = await axios.put(
             `${process.env.REACT_APP_API_URL}/filesystem/renamedirectory`,
             {
@@ -218,6 +256,8 @@ const FileView = ({
           setSelectedFileFolder(folder)
         } catch (error) {
           console.log('error in renaming directory', error)
+        } finally {
+          setLoading(false)
         }
       })()
     }
@@ -228,6 +268,7 @@ const FileView = ({
     if (newName) {
       (async () => {
         try {
+          setLoading(true)
           const response = await axios.put(
             `${process.env.REACT_APP_API_URL}/filesystem/renamefile`,
             {
@@ -240,6 +281,8 @@ const FileView = ({
           setFolders([...folders])
         } catch (error) {
           console.log('error in renaming file', error)
+        } finally {
+          setLoading(false)
         }
       })()
     }
@@ -282,7 +325,13 @@ const FileView = ({
   }
 
   async function deleteFile(fileId, parentFolder) {
+    if(currentFile===fileId._id)
+    {
+      editorRef.current.setValue("")
+      setCurrentFile(null)
+    }
     try {
+      setLoading(true)
       const index = parentFolder.children.indexOf(fileId)
       const response = await axios.delete(
         `${process.env.REACT_APP_API_URL}/filesystem/deletefile`,
@@ -300,6 +349,8 @@ const FileView = ({
     } catch (error) {
       console.error('Error deleting file:', error.message)
       throw new Error('Failed to delete file.')
+    } finally {
+      setLoading(false)
     }
   }
   const sortAlphabetically = (array) => {
@@ -322,6 +373,7 @@ const FileView = ({
     if (newFileName) {
       (async () => {
         try {
+          setLoading(true)
           const response = await axios.post(
             `${process.env.REACT_APP_API_URL}/filesystem/createfile`,
             {
@@ -341,6 +393,8 @@ const FileView = ({
           setFolders([...folders])
         } catch (error) {
           console.log(error)
+        } finally {
+          setLoading(false)
         }
       })()
     }
@@ -352,6 +406,7 @@ const FileView = ({
     if (newFolderName) {
       (async () => {
         try {
+          setLoading(true)
           const response = await axios.post(
             `${process.env.REACT_APP_API_URL}/filesystem/createdirectory`,
             {
@@ -371,6 +426,8 @@ const FileView = ({
           setFolders([...folders])
         } catch (error) {
           console.log(error)
+        } finally {
+          setLoading(false)
         }
       })()
     }
@@ -565,6 +622,7 @@ const FileView = ({
   const sendDataToServer = async (data) => {
     try {
       // console.log('Data to be sent to the server:', data)
+      setLoading(true)
       const response = await axios.post(
         `${process.env.REACT_APP_API_URL}/filesystem/uploaddirectory`,
         {
@@ -586,6 +644,9 @@ const FileView = ({
 
     } catch (error) {
       console.error('Error sending data to server:', error)
+      toast.error(error.request.statusText,{duration:2000})
+    } finally {
+      setLoading(false)
     }
   }
   return (
@@ -750,6 +811,11 @@ const FileView = ({
               </div>
             )}
           </div>
+          {loading===true && (
+            <div className="flex justify-center items-center pb-2">
+              <CircularProgress color='inherit' size={30}/> 
+            </div>
+          )} 
           <div className='flex justify-between grow'>
             <div className='grow relative overflow-y-scroll' ref={parentRef}>
               {folders.map((folder) => renderFolder(folder))}

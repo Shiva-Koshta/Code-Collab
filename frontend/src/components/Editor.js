@@ -88,7 +88,7 @@ const Editor = ({
     if (!editorRef.current) return;
 
     editorRef.current.setValue(""); // to avoid repetition of old instances
-    // console.log("fileref  current:",fileRef.current)
+    // console.log("fileref  current:")
     if (fileContent) {
       editorRef.current.setValue(fileContent);
     }
@@ -96,7 +96,7 @@ const Editor = ({
   useEffect(() => {
     // console.log("file added");
     if (fileContent) {
-      console.log(fileContent);
+      // console.log(fileContent);
       const code = fileContent;
       socketRef.current.emit(ACTIONS.CODE_CHANGE, {
         roomId,
@@ -114,7 +114,7 @@ const Editor = ({
           autoCloseTags: true,
           autoCloseBrackets: true,
           lineNumbers: true,
-          readOnly: false,
+          readOnly: true,
         }
       );
 
