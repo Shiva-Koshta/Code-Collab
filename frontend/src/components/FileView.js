@@ -15,7 +15,7 @@ import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown'
 import ArrowRightIcon from '@mui/icons-material/ArrowRight'
 import { FolderCopy } from '@mui/icons-material'
 import DriveFolderUploadIcon from '@mui/icons-material/DriveFolderUpload'
-import {CircularProgress}  from "@mui/material";
+import { CircularProgress } from "@mui/material";
 import axios from 'axios'
 import audioIcon from '../icons/audio.png'
 import cIcon from '../icons/c.png'
@@ -70,26 +70,21 @@ const FileView = ({
   const [isSmallScreen, setIsSmallScreen] = useState(false)
   const [loading, setLoading] = useState(false)
   useEffect(() => {
-    if(currentFile==null)
-    {
-      if(editorRef.current)
-      {editorRef.current.setOption('readOnly', true)}
+    if (currentFile == null) {
+      if (editorRef.current) { editorRef.current.setOption('readOnly', true) }
     }
-    else
-    {
+    else {
       const currentUserRole = connectedUserRoles.find(user => user.name === storedUserData.current.name)?.role;
-      if (currentUserRole === "viewer") 
-      {
-      editorRef.current.setOption('readOnly', true)
+      if (currentUserRole === "viewer") {
+        editorRef.current.setOption('readOnly', true)
       }
-      else
-      {
+      else {
         editorRef.current.setOption('readOnly', false)
       }
     }
     const handleCtrlS = (event) => {
       if (event.ctrlKey && event.key === 's') {
-        handleSaveFile(currentFile,true)
+        handleSaveFile(currentFile, true)
         event.preventDefault()
       }
     }
@@ -99,14 +94,13 @@ const FileView = ({
     }
   }, [currentFile])
 
-  const handleSaveFile = (fileId,show) => {
-    if(!fileId) {
+  const handleSaveFile = (fileId, show) => {
+    if (!fileId) {
       return
     }
     //For file saving , socket action is: SAVE_FILE
-    socketRef.current.emit(ACTIONS.SAVE_FILE, { roomId, fileId, code: editorRef.current.getValue() }) 
-    if(show)
-    {toast.success(`File saved`)}
+    socketRef.current.emit(ACTIONS.SAVE_FILE, { roomId, fileId, code: editorRef.current.getValue() })
+    if (show) { toast.success(`File saved`) }
   }
 
   useEffect(() => {
@@ -159,38 +153,38 @@ const FileView = ({
     reader.onload = (e) => {
       const content = e.target.result;
 
-        // code before
-        // // setFileContent(content)
-        // window.localStorage.setItem('fileContent', JSON.stringify(fileContent))
-        // // console.log(content)
-        // // fileRef.current = content
+      // code before
+      // // setFileContent(content)
+      // window.localStorage.setItem('fileContent', JSON.stringify(fileContent))
+      // // console.log(content)
+      // // fileRef.current = content
 
-        (async () => {
-          try {
-            setLoading(true)
-            const response = await axios.post(
-              `${process.env.REACT_APP_API_URL}/filesystem/uploadfile`,
-              {
-                name: file.name,
-                parentId: parentFolder._id,
-                roomId: roomId,
-                content: content,
-              }
-            )
-            const newFile = {
-              _id: response.data.file._id,
-              name: response.data.file.name,
-              type: response.data.file.type,
+      (async () => {
+        try {
+          setLoading(true)
+          const response = await axios.post(
+            `${process.env.REACT_APP_API_URL}/filesystem/uploadfile`,
+            {
+              name: file.name,
+              parentId: parentFolder._id,
+              roomId: roomId,
+              content: content,
             }
-            parentFolder.children.push(newFile)
-            console.log('pushed')
-            setFolders([...folders])
-          } catch (error) {
-            console.log(error)
-          } finally {
-            setLoading(false)
+          )
+          const newFile = {
+            _id: response.data.file._id,
+            name: response.data.file.name,
+            type: response.data.file.type,
           }
-        })()
+          parentFolder.children.push(newFile)
+          console.log('pushed')
+          setFolders([...folders])
+        } catch (error) {
+          console.log(error)
+        } finally {
+          setLoading(false)
+        }
+      })()
     }
     if (file) {
       reader.readAsText(file)
@@ -200,9 +194,8 @@ const FileView = ({
   }
 
   const handleFileClick = async (fileId) => {
-    if(currentFile!=null)
-    {
-      handleSaveFile(currentFile,false)
+    if (currentFile != null) {
+      handleSaveFile(currentFile, false)
     }
     try {
       const response = await axios.post(`${process.env.REACT_APP_API_URL}/filesystem/fetchfile`, {
@@ -315,8 +308,7 @@ const FileView = ({
   }
 
   async function deleteFile(fileId, parentFolder) {
-    if(currentFile===fileId._id)
-    {
+    if (currentFile === fileId._id) {
       editorRef.current.setValue("")
       setCurrentFile(null)
     }
@@ -458,8 +450,8 @@ const FileView = ({
       >
         <div
           className={`flex items-center p-px  overflow-hidden ${selectedFileFolder && selectedFileFolder._id === folder._id
-              ? 'Selected-file-folder'
-              : ''
+            ? 'Selected-file-folder'
+            : ''
             } rounded-md`}
         >
           <div className='grow flex relative overflow-hidden'>
@@ -634,11 +626,24 @@ const FileView = ({
 
     } catch (error) {
       console.error('Error sending data to server:', error)
-      toast.error(error.request.statusText,{duration:2000})
+      toast.error(error.request.statusText, { duration: 2000 })
     } finally {
       setLoading(false)
     }
   }
+  useEffect(() => {
+    const handleUnload = (event) => {
+      if (currentFile !== null) {
+        handleSaveFile(currentFile, false);
+      }
+    };
+
+    window.addEventListener('beforeunload', handleUnload);
+
+    return () => {
+      window.removeEventListener('beforeunload', handleUnload);
+    };
+  }, [currentFile]);
   return (
     <div className='flex flex-col justify-between h-full'>
       <div className='flex justify-between mx-1 relative h-fit grow'>
@@ -801,11 +806,11 @@ const FileView = ({
               </div>
             )}
           </div>
-          {loading===true && (
+          {loading === true && (
             <div className="flex justify-center items-center pb-2">
-              <CircularProgress color='inherit' size={30}/> 
+              <CircularProgress color='inherit' size={30} />
             </div>
-          )} 
+          )}
           <div className='flex justify-between grow'>
             <div className='grow relative overflow-y-scroll' ref={parentRef}>
               {folders.map((folder) => renderFolder(folder))}
