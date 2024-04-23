@@ -631,6 +631,29 @@ const FileView = ({
       setLoading(false)
     }
   }
+
+  const downloadZipFile = async (roomId) => {
+    try {
+        // Make a GET request to the backend endpoint
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}/filesystem/download/${roomId}`, {
+            responseType: 'blob' // Specify the response type as blob
+        });
+
+        // Trigger the download by creating a blob URL and clicking on a temporary link
+        const url = window.URL.createObjectURL(new Blob([response.data], { type: 'application/zip' }));
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `room_${roomId}_files.zip`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+
+    } catch (error) {
+        console.error('Error downloading zip file:', error);
+    }
+  };
+
+
   useEffect(() => {
     const handleUnload = (event) => {
       if (currentFile !== null) {
