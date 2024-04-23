@@ -35,6 +35,7 @@ const Editor = ({
   // }, [])
   let editorChanged = false
   const [UserName,setUserName] = useState();
+  const scrollTopRef = useRef(0);
   // const [cursorPositions, setCursorPositions] = useState({})
   window.localStorage.setItem("roomid", roomId);
   useEffect(() => {
@@ -128,6 +129,7 @@ const Editor = ({
 
       editorRef.current.on("change", (instance, changes) => {
         // console.log(changes)
+        scrollTopRef.current = editorRef.current.getScrollInfo().top
         editorChanged = true
         const { origin } = changes
         const code = instance.getValue()
@@ -187,6 +189,7 @@ const Editor = ({
           editorRef.current.setValue(code);
         }
         renderAllCursors(cursorPosition, socketRef.current.id);
+        editorRef.current.scrollTo(null,scrollTopRef.current )
       });
       socketRef.current.on(ACTIONS.CURSOR_CHANGE, ({ cursorData }) => {
         console.log("cursorData retrieved from user: " + cursorData.user.name);
