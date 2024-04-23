@@ -64,7 +64,7 @@ const EditorPage = () => {
   const [unreadMessages, setUnreadMessages] = useState(-1);
   const [isLeftDivOpen, setIsLeftDivOpen] = useState(true);
   const leftIcon = isLeftDivOpen ? <ChevronLeft /> : <ChevronRight />;
-  // const [menuOpen, setMenuOpen] = useState({})
+  const [menuOpen, setMenuOpen] = useState({})
 
   const toggleLeftDiv = () => {
     setIsLeftDivOpen(prevState => !prevState)
@@ -260,7 +260,10 @@ const EditorPage = () => {
           }));
           setConnectedUsers(updatedUsers);
           setConnectedUsernames(clients.map((client) => client.username));
-
+          setMenuOpen((prevMenuOpen) => ({
+            ...prevMenuOpen,
+            [username]: false,
+          }))
           setConnectedUserRoles(prevRoles => [...prevRoles, { id: socketId, name: username, role: 'editor' }])
 
           console.log(host.current)
@@ -463,6 +466,8 @@ const EditorPage = () => {
           connectedUserRoles={connectedUserRoles}
           setConnectedUserRoles={setConnectedUserRoles}
           socketRef={socketRef}
+          menuOpen={menuOpen}
+          setMenuOpen={setMenuOpen}
         />
 
         </div>

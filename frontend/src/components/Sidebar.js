@@ -35,8 +35,10 @@ const Sidebar = ({
   connectedUserRoles,
   setConnectedUserRoles,
   socketRef,
+  menuOpen,
+  setMenuOpen
 }) => {
-  const [menuOpen, setMenuOpen] = useState({})
+//   const [menuOpen, setMenuOpen] = useState({})
   const handleUserMenuToggle = (username) => {
     setMenuOpen((prevMenuOpen) => ({
       ...prevMenuOpen,
