@@ -89,6 +89,7 @@ const FileView = ({
         editorRef.current.setOption('readOnly', false)
       }
     }
+    document.querySelectorAll(".cursor-marker").forEach((node) => node.remove());
     const handleCtrlS = (event) => {
       if (event.ctrlKey && event.key === 's') {
         handleSaveFile(currentFile,true)
