@@ -294,7 +294,10 @@ const Editor = ({
       cursorMarker.title = user.name;
 
       // Append cursor marker to CodeMirror editor container
-      editorRef.current.getWrapperElement().appendChild(cursorMarker);
+      // console.log(editorRef.current.getWrapperElement())
+      const editorContainer = document.querySelector(".CodeMirror-scroll");
+      editorContainer.appendChild(cursorMarker);
+      // editorRef.current.getWrapperElement().appendChild(cursorMarker);
       cursorMarker.style.animation = "blinkCursor 1s infinite";
       // }
 
@@ -302,8 +305,11 @@ const Editor = ({
         editorRef.current.charCoords({ line, ch }).left
       -300}px`;
       // cursorMarker.style.left = `${leftPosition}px`;
-      cursorMarker.style.top = `${editorRef.current.charCoords({ line, ch }).top
-        }px`;
+      const cursorPosition1 = editorRef.current.charCoords({ line, ch },"local");
+      const topPosition = cursorPosition1.top 
+      cursorMarker.style.top = `${topPosition}px`;
+      // cursorMarker.style.top = `${editorRef.current.charCoords({ line, ch }).top
+      //   }px`;
       // console.log(editorRef.current.charCoords({ line, ch }).top);
       // Define CSS keyframes for blinking effect
     }
