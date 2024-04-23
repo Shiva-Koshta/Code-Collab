@@ -42,11 +42,13 @@ const FileView = ({
   setContentChanged,
   socketRef,
   connectedUserRoles,
-  storedUserData
+  storedUserData,
+  currentFile,
+  setCurrentFile
 }) => {
   const { roomId } = useParams()
   const [isDownloadTrue, setIsDownloadTrue] = useState(false)
-  const [currentFile, setCurrentFile] = useState(null)//id of the currently opened file, null if no file is opened
+  // const [currentFile, setCurrentFile] = useState(null)//id of the currently opened file, null if no file is opened
   const [downloadFileExtension, setFileExtension] = useState('')
   const [downloadFileName, setFileName] = useState('')
   const parentRef = useRef(null)

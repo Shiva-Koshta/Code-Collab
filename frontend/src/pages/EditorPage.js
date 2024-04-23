@@ -49,6 +49,7 @@ const EditorPage = () => {
     return storedMessages ? JSON.parse(storedMessages) : [];
   });
   const CHAT_LIMIT = 15; // Global variable for chat limit
+  const [currentFile, setCurrentFile] = useState(null)
 
   // const [inputText, setInputText] = useState("");
 
@@ -287,7 +288,7 @@ const EditorPage = () => {
                 if (currentUserRole === "viewer") {
                   editorRef.current.setOption("readOnly", true);
                 }
-                if (currentUserRole === "editor") {
+                if (currentUserRole === "editor" && currentFile!=null) {
                   editorRef.current.setOption("readOnly", false);
                 }
 
@@ -471,7 +472,7 @@ const EditorPage = () => {
           if (currentUserRole === "viewer") {
             editorRef.current.setOption("readOnly", true);
           }
-          if (currentUserRole === "editor") {
+          if (currentUserRole === "editor" && currentFile!=null) {
             editorRef.current.setOption("readOnly", false);
           }
           // setHost(data.host);
@@ -520,6 +521,8 @@ const EditorPage = () => {
           connectedUserRoles={connectedUserRoles}
           setConnectedUserRoles={setConnectedUserRoles}
           socketRef={socketRef}
+          currentFile={currentFile}
+          setCurrentFile={setCurrentFile}
         />
 
         </div>

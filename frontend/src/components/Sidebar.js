@@ -31,6 +31,8 @@ const Sidebar = ({
     connectedUserRoles,
     setConnectedUserRoles,
     socketRef,
+    currentFile,
+    setCurrentFile
 }) => {
     const [menuOpen, setMenuOpen] = useState({})
     const handleUserMenuToggle = (username) => {
@@ -187,6 +189,8 @@ const Sidebar = ({
                 socketRef={socketRef}
                 connectedUserRoles={connectedUserRoles}
                 storedUserData={storedUserData}
+                currentFile={currentFile}
+                setCurrentFile={setCurrentFile}
             />
             <div className="Users z-10">
                 <div
