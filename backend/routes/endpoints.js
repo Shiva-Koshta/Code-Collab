@@ -1,11 +1,11 @@
 const express = require("express");
 const router = express.Router();
-const RoomCodeMap = require("./models/RoomCodeMap");
-const RoomUserCount = require("./models/RoomUserCount");
-const authRoute = require("./routes/auth");
+const RoomCodeMap = require("../models/RoomCodeMap");
+const RoomUserCount = require("../models/RoomUserCount");
+const authRoute = require("./auth");
 const nodemailer = require("nodemailer");
-const { io, server, http } = require("./server");
-const ACTIONS = require("../frontend/src/Actions");
+const { io, server, http } = require("../server");
+const ACTIONS = require("../../frontend/src/Actions");
 //initialise env file
 require("dotenv").config();
 
