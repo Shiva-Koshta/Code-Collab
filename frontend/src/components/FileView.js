@@ -2,7 +2,12 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import UploadFileIcon from '@mui/icons-material/UploadFile'
-import { IconButton, duration, sliderClasses, CircularProgress } from '@mui/material'
+import {
+  IconButton,
+  duration,
+  sliderClasses,
+  CircularProgress,
+} from '@mui/material'
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined'
 import FolderIcon from '@mui/icons-material/Folder'
 import FolderOpenIcon from '@mui/icons-material/FolderOpen'
@@ -42,7 +47,7 @@ const FileView = ({
   setContentChanged,
   socketRef,
   connectedUserRoles,
-  storedUserData
+  storedUserData,
 }) => {
   const { roomId } = useParams()
   const [isDownloadTrue, setIsDownloadTrue] = useState(false)
@@ -56,14 +61,14 @@ const FileView = ({
       _id: '0',
       name: 'Root',
       type: 'root',
-      children: []
-    }
+      children: [],
+    },
   ])
   const [selectedFileFolder, setSelectedFileFolder] = useState({
     _id: '0',
     name: 'Root',
     type: 'root',
-    children: []
+    children: [],
   })
   const [selectedFileFolderParent, setSelectedFileFolderParent] = useState({})
   const [isFolderOpen, setIsFolderOpen] = useState({ 0: false })
@@ -103,7 +108,7 @@ const FileView = ({
         const response = await axios.post(
           `${process.env.REACT_APP_API_URL}/filesystem/generatetree`,
           {
-            roomId
+            roomId,
           }
         )
         const root = response.data.tree
@@ -130,7 +135,7 @@ const FileView = ({
     socketRef.current.emit(ACTIONS.SAVE_FILE, {
       roomId,
       fileId,
-      code: editorRef.current.getValue()
+      code: editorRef.current.getValue(),
     })
     if (show) {
       toast.success('File saved')
@@ -143,7 +148,7 @@ const FileView = ({
         const response = await axios.post(
           `${process.env.REACT_APP_API_URL}/filesystem/generatetree`,
           {
-            roomId
+            roomId,
           }
         )
         const root = response.data.tree
@@ -155,7 +160,7 @@ const FileView = ({
       }
     })()
 
-    function handleResize () {
+    function handleResize() {
       setIsSmallScreen(window.innerWidth < 1290) // Adjust the threshold as needed
     }
 
@@ -185,7 +190,7 @@ const FileView = ({
 
     window.localStorage.setItem('contentChanged', contentChanged)
     reader.onload = (e) => {
-      const content = e.target.result;
+      const content = e.target.result
 
       // code before
       // // setFileContent(content)
@@ -202,19 +207,19 @@ const FileView = ({
               name: file.name,
               parentId: parentFolder._id,
               roomId,
-              content
+              content,
             }
           )
           const newFile = {
             _id: response.data.file._id,
             name: response.data.file.name,
-            type: response.data.file.type
+            type: response.data.file.type,
           }
           parentFolder.children.push(newFile)
           console.log('pushed')
           setFolders([...folders])
           socketRef.current.emit(ACTIONS.FILESYSTEM_CHANGE, {
-            roomId
+            roomId,
           })
         } catch (error) {
           console.log(error)
@@ -238,7 +243,7 @@ const FileView = ({
       const response = await axios.post(
         `${process.env.REACT_APP_API_URL}/filesystem/fetchfile`,
         {
-          nodeId: fileId
+          nodeId: fileId,
         }
       )
       console.log(response.data.file.content)
@@ -269,7 +274,7 @@ const FileView = ({
             `${process.env.REACT_APP_API_URL}/filesystem/renamedirectory`,
             {
               name: newName,
-              nodeId: folder._id
+              nodeId: folder._id,
             }
           )
           console.log('renamed directory')
@@ -277,7 +282,7 @@ const FileView = ({
           setFolders([...folders])
           setSelectedFileFolder(folder)
           socketRef.current.emit(ACTIONS.FILESYSTEM_CHANGE, {
-            roomId
+            roomId,
           })
         } catch (error) {
           console.log('error in renaming directory', error)
@@ -298,14 +303,14 @@ const FileView = ({
             `${process.env.REACT_APP_API_URL}/filesystem/renamefile`,
             {
               name: newName,
-              nodeId: file._id
+              nodeId: file._id,
             }
           )
           console.log('renamed file')
           file.name = newName
           setFolders([...folders])
           socketRef.current.emit(ACTIONS.FILESYSTEM_CHANGE, {
-            roomId
+            roomId,
           })
         } catch (error) {
           console.log('error in renaming file', error)
@@ -330,7 +335,7 @@ const FileView = ({
     }
   }
 
-  async function deleteFolder (folderId, parentFolder) {
+  async function deleteFolder(folderId, parentFolder) {
     try {
       const index = parentFolder.children.indexOf(folderId)
       const response = await axios.delete(
@@ -338,8 +343,8 @@ const FileView = ({
         {
           data: {
             nodeId: folderId,
-            fileType: 'folder'
-          }
+            fileType: 'folder',
+          },
         }
       )
       if (index !== -1) {
@@ -347,7 +352,7 @@ const FileView = ({
         setFolders([...folders])
       }
       socketRef.current.emit(ACTIONS.FILESYSTEM_CHANGE, {
-        roomId
+        roomId,
       })
     } catch (error) {
       console.error('Error deleting folder:', error.message)
@@ -355,7 +360,7 @@ const FileView = ({
     }
   }
 
-  async function deleteFile (fileId, parentFolder) {
+  async function deleteFile(fileId, parentFolder) {
     if (currentFile === fileId._id) {
       editorRef.current.setValue('')
       setCurrentFile(null)
@@ -368,8 +373,8 @@ const FileView = ({
         {
           data: {
             nodeId: fileId,
-            fileType: 'file'
-          }
+            fileType: 'file',
+          },
         }
       )
       if (index !== -1) {
@@ -377,7 +382,7 @@ const FileView = ({
         setFolders([...folders])
       }
       socketRef.current.emit(ACTIONS.FILESYSTEM_CHANGE, {
-        roomId
+        roomId,
       })
     } catch (error) {
       console.error('Error deleting file:', error.message)
@@ -412,20 +417,20 @@ const FileView = ({
             {
               name: newFileName,
               parentId: parentFolder._id,
-              roomId
+              roomId,
             }
           )
           const newFile = {
             _id: response.data.file._id,
             name: response.data.file.name,
-            type: response.data.file.type
+            type: response.data.file.type,
           }
           parentFolder.children.push(newFile)
           parentFolder.children = sortAlphabetically(parentFolder.children)
           console.log('pushed')
           setFolders([...folders])
           socketRef.current.emit(ACTIONS.FILESYSTEM_CHANGE, {
-            roomId
+            roomId,
           })
         } catch (error) {
           console.log(error)
@@ -448,20 +453,20 @@ const FileView = ({
             {
               name: newFolderName,
               parentId: parentFolder._id,
-              roomId
+              roomId,
             }
           )
           const newFolder = {
             _id: response.data.directory._id,
             name: response.data.directory.name,
             type: response.data.directory.type,
-            children: []
+            children: [],
           }
           parentFolder.children.push(newFolder)
           parentFolder.children = sortAlphabetically(parentFolder.children)
           setFolders([...folders])
           socketRef.current.emit(ACTIONS.FILESYSTEM_CHANGE, {
-            roomId
+            roomId,
           })
         } catch (error) {
           console.log(error)
@@ -503,7 +508,7 @@ const FileView = ({
           marginLeft: `${depth === 0 ? 0 : 10}px`,
           maxWidth: `${
             depth === 0 ? `${parentWidth}px` : `${parentWidth - depth * 10}px`
-          }`
+          }`,
         }}
       >
         <div
@@ -521,24 +526,20 @@ const FileView = ({
                   setSelectedFileFolder(folder)
                 }}
                 style={{
-                  maxWidth: `${depth === 0 ? '328px' : `${328 - depth}px`}`
+                  maxWidth: `${depth === 0 ? '328px' : `${328 - depth}px`}`,
                 }}
                 className='cursor-pointer mr-2 grow flex overflow-hidden'
               >
-                {isFolderOpen[folder._id]
-                  ? (
-                    <ArrowDropDownIcon />
-                    )
-                  : (
-                    <ArrowRightIcon />
-                    )}
-                {isFolderOpen[folder._id]
-                  ? (
-                    <FolderIcon className='mr-2' style={{ fontSize: 20 }} />
-                    )
-                  : (
-                    <FolderOpenIcon className='mr-2' style={{ fontSize: 20 }} />
-                    )}
+                {isFolderOpen[folder._id] ? (
+                  <ArrowDropDownIcon />
+                ) : (
+                  <ArrowRightIcon />
+                )}
+                {isFolderOpen[folder._id] ? (
+                  <FolderIcon className='mr-2' style={{ fontSize: 20 }} />
+                ) : (
+                  <FolderOpenIcon className='mr-2' style={{ fontSize: 20 }} />
+                )}
 
                 <div className='truncate'>{folder.name}</div>
               </div>
@@ -551,31 +552,27 @@ const FileView = ({
                   setSelectedFileFolderParent(parentFolder)
                 }}
                 style={{
-                  maxWidth: `${depth === 0 ? '328px' : `${328 - depth}px`}`
+                  maxWidth: `${depth === 0 ? '328px' : `${328 - depth}px`}`,
                 }}
                 className='cursor-pointer mr-2 grow flex overflow-hidden'
               >
-                {isFolderOpen[folder._id]
-                  ? (
-                    <ArrowDropDownIcon />
-                    )
-                  : (
-                    <ArrowRightIcon />
-                    )}
-                {isFolderOpen[folder._id]
-                  ? (
-                    <FolderIcon className='mr-2' style={{ fontSize: 20 }} />
-                    )
-                  : (
-                    <FolderOpenIcon className='mr-2' style={{ fontSize: 20 }} />
-                    )}
+                {isFolderOpen[folder._id] ? (
+                  <ArrowDropDownIcon />
+                ) : (
+                  <ArrowRightIcon />
+                )}
+                {isFolderOpen[folder._id] ? (
+                  <FolderIcon className='mr-2' style={{ fontSize: 20 }} />
+                ) : (
+                  <FolderOpenIcon className='mr-2' style={{ fontSize: 20 }} />
+                )}
                 <div className='truncate'>{folder.name}</div>
               </div>
             )}
             {folder.type === 'file' && (
               <div
                 style={{
-                  maxWidth: `${depth === 0 ? '328px' : `${328 - depth}px`}`
+                  maxWidth: `${depth === 0 ? '328px' : `${328 - depth}px`}`,
                 }}
                 className='grow cursor-pointer mr-2 flex overflow-hidden'
                 onClick={() => {
@@ -583,7 +580,7 @@ const FileView = ({
                   setSelectedFileFolderParent(parentFolder)
 
                   handleFileClick(folder._id)
-                  // console.log(findNodeById(folder._id));
+                  // console.log(findNodeById(folder._id))
                 }}
               >
                 {/* <TextFileIcon className='mr-2 pb-0.5' style={{ fontSize: 20 }} /> */}
@@ -617,7 +614,7 @@ const FileView = ({
     pdf: pdfIcon,
     py: pythonIcon,
     txt: textIcon,
-    mp4: videoIcon
+    mp4: videoIcon,
   }
   const getFileIcon = (extension) => {
     return fileIconMap[extension.toLowerCase()] || defaultIcon
@@ -677,14 +674,14 @@ const FileView = ({
         {
           parentId: selectedFileFolder._id,
           data,
-          roomId
+          roomId,
         }
       )
       const newFolder = {
         _id: response.data.directory._id,
         name: response.data.directory.name,
         type: response.data.directory.type,
-        children: response.data.directory.children
+        children: response.data.directory.children,
       }
       toggleFolder(selectedFileFolder, true)
       selectedFileFolder.children.push(newFolder)
@@ -693,7 +690,7 @@ const FileView = ({
       )
       setFolders([...folders])
       socketRef.current.emit(ACTIONS.FILESYSTEM_CHANGE, {
-        roomId
+        roomId,
       })
     } catch (error) {
       console.error('Error sending data to server:', error)
@@ -840,7 +837,8 @@ const FileView = ({
                 <button
                   className='deleteFolderIcon update-buttons '
                   onClick={() =>
-                    deleteFolder(selectedFileFolder, selectedFileFolderParent)}
+                    deleteFolder(selectedFileFolder, selectedFileFolderParent)
+                  }
                   title='Delete Folder'
                 >
                   <DeleteIcon />
@@ -865,7 +863,8 @@ const FileView = ({
                 <button
                   className='deleteFileIcon update-buttons '
                   onClick={() =>
-                    deleteFile(selectedFileFolder, selectedFileFolderParent)}
+                    deleteFile(selectedFileFolder, selectedFileFolderParent)
+                  }
                   title='Delete File'
                 >
                   <DeleteIcon />
@@ -905,7 +904,7 @@ const FileView = ({
               className='mb-3 px-2 py-1 w-full bg-slate-300 rounded border-2 opacity border-gray-400 focus:outline-none focus:border-blue-500'
               style={{
                 color: '#1c1e29',
-                '::placeholder': { color: '#1c1e29' }
+                '::placeholder': { color: '#1c1e29' },
               }}
             />
             <select
