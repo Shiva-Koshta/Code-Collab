@@ -275,10 +275,10 @@ const Editor = ({
       // if (!cursorMarker){
       // Get the total width of the screen
       if (!connectedClients.current.includes(user.name) || user.name===UserName) return
-      const totalScreenWidth = window.innerWidth;
-      const sidebarWidth = (2 / 10) * totalScreenWidth;
-      const cursorPosition = editorRef.current.charCoords({ line, ch });
-      const leftPosition = cursorPosition.left - sidebarWidth;
+      // const totalScreenWidth = window.innerWidth;
+      // const sidebarWidth = (2 / 10) * totalScreenWidth;
+      // const cursorPosition = editorRef.current.charCoords({ line, ch });
+      // const leftPosition = cursorPosition.left - sidebarWidth;
 
       const prevCursorMarkers = document.querySelectorAll(
         `.cursor-marker[title="${user.name}"]`
@@ -298,10 +298,10 @@ const Editor = ({
       cursorMarker.style.animation = "blinkCursor 1s infinite";
       // }
 
-      // cursorMarker.style.left = `${
-      //   editorRef.current.charCoords({ line, ch }).left
-      // -324}px`;
-      cursorMarker.style.left = `${leftPosition}px`;
+      cursorMarker.style.left = `${
+        editorRef.current.charCoords({ line, ch }).left
+      -300}px`;
+      // cursorMarker.style.left = `${leftPosition}px`;
       cursorMarker.style.top = `${editorRef.current.charCoords({ line, ch }).top
         }px`;
       // console.log(editorRef.current.charCoords({ line, ch }).top);
