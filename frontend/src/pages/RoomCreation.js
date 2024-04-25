@@ -5,12 +5,31 @@ import { useNavigate } from "react-router-dom";
 import "../index";
 import axios from "axios";
 const MAXUSERS = 10;
+
+export async function getRoomUsersCount(roomId) {
+  const apiurl = `${process.env.REACT_APP_API_URL}/rooms/numUsersInRoom`;
+  const requestBody = {
+    roomId: roomId
+  };
+
+  try {
+    const response = await axios.post(apiurl, requestBody);
+    if (response.status !== 200) {
+      return -1;
+    }
+    return response.data.numUsers;
+  } catch (error) {
+    return -1;
+  }
+}
+
 const RoomCreation = () => {
   const navigate = useNavigate();
 
   const [roomId, setRoomId] = useState('')
   const [userName, setUserName] = useState('')
   const [userimage, setUserimage] = useState('')
+  const [loading, setLoading] = useState(false);
   //const [roomUsersCount, setRoomUsersCount] = useState(0)
 
 
@@ -63,6 +82,7 @@ const RoomCreation = () => {
   //   this function is used to create a new room
   const createNewRoom = (e) => {
     e.preventDefault();
+    setLoading(true);
     const id = uuidV4();
     setRoomId(id);
 
@@ -86,29 +106,14 @@ const RoomCreation = () => {
           },
         });
       } catch (error) {
-        console.error("Error:", error);
+        //console.error("Error:", error);
+      }
+      finally {
+        setLoading(false); // Set loading state to false when finished
       }
     };
     postData();
 
-  }
-  async function getRoomUsersCount() {
-    const apiurl = `${process.env.REACT_APP_API_URL}/rooms/numUsersInRoom`;
-    const requestBody = {
-      roomId: roomId
-    };
-    const postData = async () => {
-      try {
-        const response = await axios.post(apiurl, requestBody);
-        if (response.status !== 200) {
-          return -1;
-        }
-        return response.data.numUsers;
-      } catch (error) {
-        return -1;
-      }
-    };
-    return await postData();
   }
 
   // this function is used to join a room
@@ -120,7 +125,7 @@ const RoomCreation = () => {
       return;
     }
 
-    let numUsers = await getRoomUsersCount();
+    let numUsers = await getRoomUsersCount(roomId);
     console.log('numUsers:', numUsers);
     if (numUsers === -1) {
       toast.error('Error joining room');
@@ -132,7 +137,7 @@ const RoomCreation = () => {
     }
     // this will navigate to the editor page
     // axios.post("http://localhost:8080/createroom", { "roomId" : roomId})
-    
+
     try {
       // Call the initialize endpoint with roomId and username in the request body
       await axios.post("http://localhost:8080/initialize", {
@@ -147,7 +152,7 @@ const RoomCreation = () => {
         },
       });
     } catch (error) {
-      console.error("Failed to call initialize endpoint:", error.message);
+      //console.error("Failed to call initialize endpoint:", error.message);
     }
   };
 
@@ -164,6 +169,11 @@ const RoomCreation = () => {
   return (
     <div className="flex flex-col text-white">
       <Toaster />
+      {loading && (
+        <div className="loader absolute top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-50 z-50">
+          <div className="loader-circle"></div>
+        </div>
+      )}
       <div
         className="flex justify-left gap-3 "
         style={{ backgroundColor: "#282a36" }}
@@ -259,6 +269,22 @@ const RoomCreation = () => {
           </button>
         </div>
       </div>
+      <style jsx>{`
+        .loader-circle {
+          width: 40px;
+          height: 40px;
+          border-radius: 50%;
+          border: 4px solid rgba(255, 255, 255, 0.3);
+          border-top-color: #fff;
+          animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+          to {
+            transform: rotate(360deg);
+          }
+        }
+      `}</style>
     </div>
 
   )

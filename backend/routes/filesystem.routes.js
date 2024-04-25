@@ -12,5 +12,6 @@ router.delete('/deletefile', filesystem.deletefile);
 router.delete('/deletedirectory', filesystem.deletedirectory);
 router.put('/renamefile', filesystem.renamefile);
 router.put('/renamedirectory', filesystem.renamedirectory);
+router.get('/download/:roomId', filesystem.downloadFile);
 
 module.exports = router;

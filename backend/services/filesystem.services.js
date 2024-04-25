@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const FileNodeSchema = require('../models/FileNode')
-
+const fs = require('fs');
+const archiver = require('archiver');
 const FileNode = mongoose.model('FileNode', FileNodeSchema);
 
 // Function to upload a file
@@ -132,6 +133,21 @@ async function fetchFile(nodeId) {
     return fileNode;
 }
 
+async function saveFile(nodeId, content)
+{
+    try {
+        // Find the file node by ID and update its content
+        const updatedNode = await FileNode.findByIdAndUpdate( nodeId, { content }, { new: true } );
+        // Check if the file node exists
+        if (!updatedNode) {
+            throw new Error('File node not found.');
+        }
+        return { success: true, message: 'File saved successfully.'};
+    } catch (error) {
+        console.error('Error saving file:', error.message);
+        return { success: false, message: 'Failed to save file.' };
+    }
+}
 // Add a function to create a root directory for a room
 async function createRootDirectory(roomId) {
     // Check if the root directory already exists for the room
@@ -260,6 +276,48 @@ async function renameDirectory(nodeId, newName) {
     }
 }
 
+// Function to create a zip file with folder structure
+async function createZipFile(roomId, archive, ) {
+    try {
+        // Find all folders and files belonging to the specified room ID
+        const rootFolder = await FileNode.findOne({ type: 'root', roomId });
+        const roomFiles = await FileNode.find({ type: { $in: ['directory', 'file'] }, roomId });
+        // const files = await FileNode.find({ type: 'file', roomId });
+
+        let currentPath = ``;
+        let currentParent = rootFolder;
+        const stack = [{currentParent: currentParent, currentPath: currentPath}];
+
+
+        while(stack.length > 0) {
+            const {currentParent, currentPath} = stack.pop();
+
+            for (const item of roomFiles) {
+                if(item.type === 'file' && item.parent.equals(currentParent._id)) {
+                    const filename = currentPath + item.name;
+                    archive.append(item.content, {name: filename});
+                }
+    
+                if(item.type === 'directory' && item.parent.equals(currentParent._id)) {
+                    const foldername = currentPath + `${item.name}/`;
+                    archive.append(null, {name: foldername, type: 'directory'});
+                    stack.push({currentParent: item, currentPath: foldername});
+                }
+            }
+
+        }
+
+        // Finalize the archive
+        await archive.finalize();
+
+        return archive;
+
+    } catch (error) {
+        console.error(`Error creating zip file: ${error}`);
+        throw error;
+    }
+}
+
 module.exports = {
     uploadFile,
     createDirectory,
@@ -270,5 +328,7 @@ module.exports = {
     deleteFile,
     deleteDirectory,
     renameFile,
-    renameDirectory
+    renameDirectory,
+    saveFile,
+    createZipFile,
 }
