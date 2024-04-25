@@ -204,8 +204,8 @@ const FileView = ({
       });
       console.log(response.data.file.content);
       setCurrentFile(fileId)
-      setFileContent(response.data.file.content);
-
+      // setFileContent(response.data.file.content);
+      editorRef.current.setValue(response.data.file.content)
     } catch (error) {
       console.error(error)
     }
