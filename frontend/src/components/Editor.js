@@ -117,14 +117,14 @@ const Editor = ({
           readOnly: true,
         }
       );
-
-      if (fileContent) {
-        editorRef.current.setValue(fileContent);
+      editorRef.current.setValue(fileContent);
+      // if (fileContent) {
+        
         // socketRef.current.emit(ACTIONS.CODE_CHANGE, {
         //   roomId,
         //   fileRef.current,
         // }); // Set file content to CodeMirror editor
-      }
+      // }
 
       editorRef.current.on("change", (instance, changes) => {
         // console.log(changes)
