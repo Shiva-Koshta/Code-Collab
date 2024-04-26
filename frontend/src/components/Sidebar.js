@@ -110,12 +110,12 @@ const Sidebar = ({
 
       if (userCountResponse.ok) {
         const { numUsers } = await userCountResponse.json()
-        const confirmLeave = window.confirm('Are you sure you want to leave the room?')
+        const confirmLeave = window.confirm('Confirm leave room?')
 
         if (confirmLeave) {
           if (numUsers === 1) {
             const confirmDownload = window.confirm(
-              'You are the last user in the room. Do you want to download the content of the room before leaving?'
+              'Changes are not saved.\nContinue downloading project?'
             )
 
             if (confirmDownload) {
