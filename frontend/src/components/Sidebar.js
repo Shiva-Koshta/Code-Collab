@@ -99,24 +99,24 @@ const Sidebar = ({
   const reactNavigator = useNavigate()
   const leaveRoom = async () => {
     try {
-      const userData = JSON.parse(localStorage.getItem('userData'));
+      const userData = JSON.parse(localStorage.getItem('userData'))
       const userCountResponse = await fetch('http://localhost:8080/rooms/numUsersInRoom', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ roomId }),
-      });
+      })
 
       if (userCountResponse.ok) {
-        const { numUsers } = await userCountResponse.json();
-        const confirmLeave = window.confirm('Are you sure you want to leave the room?');
+        const { numUsers } = await userCountResponse.json()
+        const confirmLeave = window.confirm('Are you sure you want to leave the room?')
 
         if (confirmLeave) {
           if (numUsers === 1) {
             const confirmDownload = window.confirm(
               'You are the last user in the room. Do you want to download the content of the room before leaving?'
-            );
+            )
 
             if (confirmDownload) {
               downloadZipFile(roomId)
@@ -129,14 +129,14 @@ const Sidebar = ({
                 'Content-Type': 'application/json',
               },
               body: JSON.stringify({ roomId, username: userData.name }),
-            });
+            })
 
             if (leaveResponse.ok) {
-              const data = await leaveResponse.json();
-              console.log(data);
-              reactNavigator('/', { roomId });
+              const data = await leaveResponse.json()
+              console.log(data)
+              reactNavigator('/', { roomId })
             } else {
-              reactNavigator('/', { roomId });
+              reactNavigator('/', { roomId })
             }
           } else {
             // Not the last user, simply leave the room
@@ -146,24 +146,24 @@ const Sidebar = ({
                 'Content-Type': 'application/json',
               },
               body: JSON.stringify({ roomId, username: userData.name }),
-            });
+            })
 
             if (leaveResponse.ok) {
-              const data = await leaveResponse.json();
-              console.log(data);
-              reactNavigator('/', { roomId });
+              const data = await leaveResponse.json()
+              console.log(data)
+              reactNavigator('/', { roomId })
             } else {
-              reactNavigator('/', { roomId });
+              reactNavigator('/', { roomId })
             }
           }
         }
       } else {
-        throw new Error('Failed to fetch user count from the server');
+        throw new Error('Failed to fetch user count from the server')
       }
     } catch (error) {
-      console.error('Error leaving room:', error);
+      console.error('Error leaving room:', error)
     }
-  };
+  }
 
   async function copyRoomId() {
     try {

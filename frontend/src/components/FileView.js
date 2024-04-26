@@ -104,8 +104,8 @@ const FileView = ({
         event.preventDefault()
       }
       else if (event.ctrlKey && event.key === 'd') {
-        event.preventDefault();
-        downloadZipFile(roomId);
+        event.preventDefault()
+        downloadZipFile(roomId)
       }
     }
     document.addEventListener('keydown', handleCtrlS)
@@ -529,12 +529,10 @@ const FileView = ({
         }}
       >
         <div
-          className={`flex items-center p-px  ${
-
-            selectedFileFolder && selectedFileFolder._id === folder._id
+          className={`flex items-center p-px  ${selectedFileFolder && selectedFileFolder._id === folder._id
               ? 'Selected-file-folder'
               : ''
-          } rounded-md`}
+            } rounded-md`}
 
         >
           <div className='grow flex relative '>
