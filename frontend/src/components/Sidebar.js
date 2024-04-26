@@ -12,6 +12,8 @@ import { Tooltip } from '@mui/material' // Import IconButton component from Mate
 import ChatIcon from '@mui/icons-material/Chat' // Import ChatIcon from Material-UI
 import FileCopyIcon from '@mui/icons-material/FileCopy' // Import FileCopyIcon from Material-UI
 import ExitToAppIcon from '@mui/icons-material/ExitToApp' // Import ExitToAppIcon from Material-UI
+import DownloadIcon from '@mui/icons-material/Download'
+import axios from 'axios'
 
 const Sidebar = ({
   contentChanged,
@@ -38,7 +40,27 @@ const Sidebar = ({
   menuOpen,
   setMenuOpen
 }) => {
-//   const [menuOpen, setMenuOpen] = useState({})
+  //   const [menuOpen, setMenuOpen] = useState({})
+  const downloadZipFile = async (roomId) => {
+    try {
+      // Make a GET request to the backend endpoint
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/filesystem/download/${roomId}`, {
+        responseType: 'blob' // Specify the response type as blob
+      });
+
+      // Trigger the download by creating a blob URL and clicking on a temporary link
+      const url = window.URL.createObjectURL(new Blob([response.data], { type: 'application/zip' }));
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `room_${roomId}_files.zip`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+
+    } catch (error) {
+      console.error('Error downloading zip file:', error);
+    }
+  };
   const handleUserMenuToggle = (username) => {
     setMenuOpen((prevMenuOpen) => ({
       ...prevMenuOpen,
@@ -73,108 +95,76 @@ const Sidebar = ({
   const handleToggle = () => {
     setIsConnectedComponentOpen(!isConnectedComponentOpen)
   }
-  const [downloadFileExtension, setFileExtension] = useState('')
-  const [downloadFileName, setFileName] = useState('')
-  const handleDownloadFile = () => {
-    const myContent = editorRef.current.getValue()
-    const element = document.createElement('a')
-    const file = new Blob([myContent], { type: 'text/plain' })
-    element.href = URL.createObjectURL(file)
-    element.download = `${downloadFileName}.${downloadFileExtension}`
-    document.body.appendChild(element)
-    element.click()
-    document.body.removeChild(element)
-  }
 
   const reactNavigator = useNavigate()
   const leaveRoom = async () => {
     try {
-      const userData = JSON.parse(localStorage.getItem('userData'))
-      const userCountResponse = await fetch(
-        'http://localhost:8080/rooms/numUsersInRoom',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ roomId }),
-        }
-      )
+      const userData = JSON.parse(localStorage.getItem('userData'));
+      const userCountResponse = await fetch('http://localhost:8080/rooms/numUsersInRoom', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ roomId }),
+      });
+
       if (userCountResponse.ok) {
-        const { numUsers } = await userCountResponse.json()
-        if (numUsers === 1) {
-          const confirmDownload = window.confirm(
-            'You are the last user in the room. Once leaving the room the data will be deleted permanently. Do you want to download the content of the room before leaving ?'
-          )
-          if (confirmDownload) {
-            handleDownloadFile()
-            setTimeout(async () => {
-              const leaveResponse = await fetch(
-                'http://localhost:8080/delete-entry',
-                {
-                  method: 'POST',
-                  headers: {
-                    'Content-Type': 'application/json',
-                  },
-                  body: JSON.stringify({ roomId, username: userData.name }),
-                }
-              )
+        const { numUsers } = await userCountResponse.json();
+        const confirmLeave = window.confirm('Are you sure you want to leave the room?');
 
-              if (leaveResponse.ok) {
-                const data = await leaveResponse.json()
-                console.log(data)
-                reactNavigator('/', { roomId })
-              } else {
-                reactNavigator('/', { roomId })
-              }
-            }, 2000)
-          } else {
-            const leaveResponse = await fetch(
-              'http://localhost:8080/delete-entry',
-              {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ roomId, username: userData.name }),
-              }
-            )
+        if (confirmLeave) {
+          if (numUsers === 1) {
+            const confirmDownload = window.confirm(
+              'You are the last user in the room. Do you want to download the content of the room before leaving?'
+            );
 
-            if (leaveResponse.ok) {
-              const data = await leaveResponse.json()
-              console.log(data)
-              reactNavigator('/', { roomId })
-            } else {
-              reactNavigator('/', { roomId })
+            if (confirmDownload) {
+              downloadZipFile(roomId)
             }
-          }
-        } else {
-          const leaveResponse = await fetch(
-            'http://localhost:8080/delete-entry',
-            {
+
+            // Regardless of download confirmation, proceed with leaving the room
+            const leaveResponse = await fetch('http://localhost:8080/delete-entry', {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
               },
               body: JSON.stringify({ roomId, username: userData.name }),
-            }
-          )
+            });
 
-          if (leaveResponse.ok) {
-            const data = await leaveResponse.json()
-            console.log(data)
-            reactNavigator('/', { roomId })
+            if (leaveResponse.ok) {
+              const data = await leaveResponse.json();
+              console.log(data);
+              reactNavigator('/', { roomId });
+            } else {
+              reactNavigator('/', { roomId });
+            }
           } else {
-            reactNavigator('/', { roomId })
+            // Not the last user, simply leave the room
+            const leaveResponse = await fetch('http://localhost:8080/delete-entry', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ roomId, username: userData.name }),
+            });
+
+            if (leaveResponse.ok) {
+              const data = await leaveResponse.json();
+              console.log(data);
+              reactNavigator('/', { roomId });
+            } else {
+              reactNavigator('/', { roomId });
+            }
           }
         }
       } else {
-        throw new Error('Failed to fetch user count from the server')
+        throw new Error('Failed to fetch user count from the server');
       }
     } catch (error) {
-      console.error('Error leaving room:', error)
+      console.error('Error leaving room:', error);
     }
-  }
+  };
+
   async function copyRoomId() {
     try {
       await navigator.clipboard.writeText(roomId)
@@ -184,11 +174,11 @@ const Sidebar = ({
       console.error(err)
     }
   }
+  const download = async () => { downloadZipFile(roomId) }
   return (
     <div
-      className={`flex flex-col justify-between h-screen text-white px-4 relative transition-all duration-500 ease-in-out transform ${
-        isLeftDivOpen ? 'col-span-2 ' : '-translate-x-full'
-      }`}
+      className={`flex flex-col justify-between h-screen text-white px-4 relative transition-all duration-500 ease-in-out transform ${isLeftDivOpen ? 'col-span-2 ' : '-translate-x-full'
+        }`}
       style={{ backgroundColor: '#1c1e29', minWidth: '80px' }}
     >
       <div className='logo flex items-center'>
@@ -261,8 +251,8 @@ const Sidebar = ({
                         {user.username === host.current
                           ? 'host'
                           : connectedUserRoles.find(
-                              (userRole) => userRole.name === user.username
-                            )?.role}
+                            (userRole) => userRole.name === user.username
+                          )?.role}
                       </div>
                     </MenuItem>
                     {storedUserData.current.name === host.current &&
@@ -286,6 +276,14 @@ const Sidebar = ({
           className='flex gap-2'
           style={{ display: 'flex', justifyContent: 'right' }}
         >
+          <Tooltip title='Download'>
+            <IconButton
+              onClick={download}
+              style={{ color: '#e74c3c' }}
+            >
+              <DownloadIcon style={{ fontSize: 35 }} />
+            </IconButton>
+          </Tooltip>
           <Tooltip title='Chat'>
             <IconButton
               // className='btn chat-btn'
