@@ -40,10 +40,10 @@ const Chat = ({
   };
   const CHAT_LIMIT = 15;
   return (
-    <div className='chat-container'>
+    <div className='chat-container' style={{backgroundColor: "#1c1e29"}}>
 
-      <div className='chat-popup'>
-        <div className='chat-header'>
+      <div className='chat-popup' style={{backgroundColor: "#1c1e29"}}>
+        <div className='chat-header' >
           Chat
           {/* <button className='close-icon' onClick={() => setIsChatOpen(false)}>X</button> */}
           <DisabledByDefaultIcon className='close-icon mt-1' onClick={() => setIsChatOpen(false)} />

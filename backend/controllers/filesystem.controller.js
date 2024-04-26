@@ -1,5 +1,7 @@
 const { stringify } = require('uuid');
 const filesys = require('../services/filesystem.services');
+const fs = require('fs');
+const archiver = require('archiver');
 
 
 createfile = async(req, res) => {
@@ -184,6 +186,43 @@ renamedirectory = async(req, res) => {
     }
 }
 
+downloadFile = async (req, res) => {
+    const roomId = req.params.roomId;
+
+    try {
+        // Define the path for the zip file
+        const zipFilePath = `room_${roomId}_files.zip`;
+
+        // Create a write stream for the zip file
+        const output = fs.createWriteStream(zipFilePath);
+
+        // Create a new archiver instance for creating the zip file
+        let archive = archiver('zip', {
+            zlib: { level: 9 } // Set compression level to maximum
+        });
+
+        // Pipe the archive data to the output file
+        archive.pipe(output);
+
+        archive = await filesys.createZipFile(roomId, archive);
+
+        output.on("finish", () => {
+            // Send the zip file to the client
+            res.download(zipFilePath, (err) => {
+                if (err) {
+                    console.error('Error downloading zip file:', err);
+                } else {
+                    // Delete the zip file after downloading
+                    fs.unlinkSync(zipFilePath);
+                }
+            });
+        });
+        
+    } catch (error) {
+        console.error('Error creating zip file:', error);
+        res.status(500).send('Internal Server Error');
+    }
+}
 
 module.exports = {
     createfile,
@@ -196,5 +235,6 @@ module.exports = {
     deletefile,
     deletedirectory,
     renamefile,
-    renamedirectory
+    renamedirectory,
+    downloadFile,
 }
