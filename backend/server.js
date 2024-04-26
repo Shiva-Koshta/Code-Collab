@@ -87,24 +87,20 @@ io.on("connection", (socket) => {
     socket.in(roomId).emit(ACTIONS.CODE_CHANGE, { code, cursorPosition });
   });
 
-  socket.on(ACTIONS.SAVE_FILE, async ({ code , fileId }) => {
+  socket.on(ACTIONS.SAVE_FILE, async ({ code, fileId }) => {
     // console.log("fileId", fileId);
     // console.log("code", code);
-    if(fileId === null || fileId === undefined || fileId === ""){
+    if (fileId === null || fileId === undefined || fileId === "") {
       // console.log("fileId is null");
       return;
-    }
-    else {
-      try{
+    } else {
+      try {
         await FileSystemService.saveFile(fileId, code);
-      } catch(error){
+      } catch (error) {
         // console.error("Error in saving file", error);
-
       }
     }
-  }
-  );
-
+  });
 
   socket.on(ACTIONS.CURSOR_CHANGE, ({ roomId, cursorData }) => {
     socket.in(roomId).emit(ACTIONS.CURSOR_CHANGE, { cursorData });
@@ -133,21 +129,23 @@ io.on("connection", (socket) => {
     console.log(`User joined room ${roomId}`);
   });
 
-  socket.on(ACTIONS.ROLE_CHANGE, ({roomId, username, newRole}) => {
+  socket.on(ACTIONS.ROLE_CHANGE, ({ roomId, username, newRole }) => {
     RoomUserCount.findOneAndUpdate(
-      { roomId, 'users.username': username },
-      { $set: { 'users.$.role': newRole } },
+      { roomId, "users.username": username },
+      { $set: { "users.$.role": newRole } },
       { new: true }
     )
-    .then(() => {io.to(roomId).emit(ACTIONS.ROLE_CHANGE, {
-      username,
-      newRole
-    })})
-    .catch((error) => {
-      console.error("Error in changing role",error)
-    })
-  })
-  
+      .then(() => {
+        io.to(roomId).emit(ACTIONS.ROLE_CHANGE, {
+          username,
+          newRole,
+        });
+      })
+      .catch((error) => {
+        console.error("Error in changing role", error);
+      });
+  });
+
   socket.on(ACTIONS.MESSAGE_SEND, ({ roomId, message, sender, sendname }) => {
     console.log(sender);
     console.log(sendname);
@@ -156,6 +154,12 @@ io.on("connection", (socket) => {
       sender,
       sendname,
     });
+  });
+
+  socket.on(ACTIONS.FILESYSTEM_CHANGE, ({ roomId }) => {
+    console.log("ho hioooo");
+    // Emit the FILE_CHANGE event to all room members except the current socket
+    socket.to(roomId).emit(ACTIONS.FILESYSTEM_CHANGE, {});
   });
 });
 

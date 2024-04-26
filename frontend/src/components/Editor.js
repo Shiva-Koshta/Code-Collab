@@ -278,10 +278,10 @@ const Editor = ({
       // if (!cursorMarker){
       // Get the total width of the screen
       if (!connectedClients.current.includes(user.name) || user.name===UserName) return
-      const totalScreenWidth = window.innerWidth;
-      const sidebarWidth = (2 / 10) * totalScreenWidth;
-      const cursorPosition = editorRef.current.charCoords({ line, ch });
-      const leftPosition = cursorPosition.left - sidebarWidth;
+      // const totalScreenWidth = window.innerWidth;
+      // const sidebarWidth = (2 / 10) * totalScreenWidth;
+      // const cursorPosition = editorRef.current.charCoords({ line, ch });
+      // const leftPosition = cursorPosition.left - sidebarWidth;
 
       const prevCursorMarkers = document.querySelectorAll(
         `.cursor-marker[title="${user.name}"]`
