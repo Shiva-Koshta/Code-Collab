@@ -323,12 +323,12 @@ const FileView = ({
 
   const toggleFolder = (folder, flag = false) => {
     if (flag && folder.type !== 'file') {
-      const folderOpen = isFolderOpen
+      let folderOpen = isFolderOpen
       folderOpen[folder._id] = true
       setIsFolderOpen(folderOpen)
       setFolders([...folders])
     } else if (!flag && folder.type !== 'file') {
-      const folderOpen = isFolderOpen
+      let folderOpen = isFolderOpen
       folderOpen[folder._id] = !isFolderOpen[folder._id]
       setIsFolderOpen(folderOpen)
       setFolders([...folders])
