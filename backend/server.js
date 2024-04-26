@@ -32,7 +32,7 @@ const corsOptions = {
   credentials: true
 };
 
-router.use(cors(corsOptions));
+app.use(cors(corsOptions));
 
 app.use("/filesystem", filesysrouter);
 
