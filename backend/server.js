@@ -14,6 +14,7 @@ const ACTIONS = require("../frontend/src/Actions");
 const { log } = require("console");
 const FileNodeSchema = require("./models/FileNode");
 const path = require('path');
+const cors = require('cors');
 
 
 

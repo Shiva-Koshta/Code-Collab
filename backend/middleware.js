@@ -14,11 +14,12 @@ const cors = require('cors')
 // )
 
 const corsOptions = {
-  origin: ['*'],
-  methods: 'GET,POST,PUT,DELETE'
+  origin: [`${process.env.CLIENT_URL}`],
+  methods: 'GET,POST,PUT,DELETE',
+  credentials: true
 };
 
-router.use(cors());
+router.use(cors(corsOptions));
 
 router.use(bodyParser.json())
 
