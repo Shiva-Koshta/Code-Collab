@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const FileNodeSchema = require('../models/FileNode')
-
+const fs = require('fs');
+const archiver = require('archiver');
 const FileNode = mongoose.model('FileNode', FileNodeSchema);
 
 // Function to upload a file
@@ -275,6 +276,48 @@ async function renameDirectory(nodeId, newName) {
     }
 }
 
+// Function to create a zip file with folder structure
+async function createZipFile(roomId, archive, ) {
+    try {
+        // Find all folders and files belonging to the specified room ID
+        const rootFolder = await FileNode.findOne({ type: 'root', roomId });
+        const roomFiles = await FileNode.find({ type: { $in: ['directory', 'file'] }, roomId });
+        // const files = await FileNode.find({ type: 'file', roomId });
+
+        let currentPath = ``;
+        let currentParent = rootFolder;
+        const stack = [{currentParent: currentParent, currentPath: currentPath}];
+
+
+        while(stack.length > 0) {
+            const {currentParent, currentPath} = stack.pop();
+
+            for (const item of roomFiles) {
+                if(item.type === 'file' && item.parent.equals(currentParent._id)) {
+                    const filename = currentPath + item.name;
+                    archive.append(item.content, {name: filename});
+                }
+    
+                if(item.type === 'directory' && item.parent.equals(currentParent._id)) {
+                    const foldername = currentPath + `${item.name}/`;
+                    archive.append(null, {name: foldername, type: 'directory'});
+                    stack.push({currentParent: item, currentPath: foldername});
+                }
+            }
+
+        }
+
+        // Finalize the archive
+        await archive.finalize();
+
+        return archive;
+
+    } catch (error) {
+        console.error(`Error creating zip file: ${error}`);
+        throw error;
+    }
+}
+
 module.exports = {
     uploadFile,
     createDirectory,
@@ -286,5 +329,6 @@ module.exports = {
     deleteDirectory,
     renameFile,
     renameDirectory,
-    saveFile
+    saveFile,
+    createZipFile,
 }
