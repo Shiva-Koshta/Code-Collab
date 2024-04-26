@@ -75,6 +75,7 @@ uploaddirectory = async(req, res) => {
         res.status(200).json(responseJSON);
     } catch (error) {
         console.log(error)
+        res.status(500).json({ message: 'Error uploading directory' })
     }
 }
 createrootdirectory = async(req, res) => {
@@ -154,6 +155,7 @@ deletedirectory = async(req, res) => {
         res.status(200).json({ success: true, message: 'Directory deleted successfully.', dir });
     } catch (error) {
         console.log(error)
+        res.status(500).json({ message: 'Error deleting directory' })
     }
 }
 
