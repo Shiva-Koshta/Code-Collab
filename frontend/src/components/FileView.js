@@ -103,6 +103,10 @@ const FileView = ({
         handleSaveFile(currentFile, true)
         event.preventDefault()
       }
+      else if (event.ctrlKey && event.key === 'd') {
+        event.preventDefault()
+        downloadZipFile(roomId)
+      }
     }
     document.addEventListener('keydown', handleCtrlS)
     return () => {
@@ -265,6 +269,7 @@ const FileView = ({
       console.error(error)
     }
   }
+
 
   const handleDownloadFile = () => {
     const myContent = editorRef.current.getValue()
@@ -519,18 +524,16 @@ const FileView = ({
         className='flex flex-col mb-1 h-fit'
         style={{
           marginLeft: `${depth === 0 ? 0 : 10}px`,
-          maxWidth: `${
-            depth === 0 ? `${parentWidth}px` : `${parentWidth - depth * 10}px`
-          }`,
+          maxWidth: `${depth === 0 ? `${parentWidth}px` : `${parentWidth - depth * 10}px`
+            }`,
         }}
       >
         <div
-          className={`flex items-center p-px  ${
-
-            selectedFileFolder && selectedFileFolder._id === folder._id
+          className={`flex items-center p-px  ${selectedFileFolder && selectedFileFolder._id === folder._id
               ? 'Selected-file-folder'
               : ''
-          } rounded-md`}
+            } rounded-md`}
+
         >
           <div className='grow flex relative '>
             {folder.type === 'root' && (
@@ -739,22 +742,22 @@ const FileView = ({
 
   const downloadZipFile = async (roomId) => {
     try {
-        // Make a GET request to the backend endpoint
-        const response = await axios.get(`${process.env.REACT_APP_API_URL}/filesystem/download/${roomId}`, {
-            responseType: 'blob' // Specify the response type as blob
-        });
+      // Make a GET request to the backend endpoint
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/filesystem/download/${roomId}`, {
+        responseType: 'blob' // Specify the response type as blob
+      });
 
-        // Trigger the download by creating a blob URL and clicking on a temporary link
-        const url = window.URL.createObjectURL(new Blob([response.data], { type: 'application/zip' }));
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `room_${roomId}_files.zip`;
-        document.body.appendChild(a);
-        a.click();
-        window.URL.revokeObjectURL(url);
+      // Trigger the download by creating a blob URL and clicking on a temporary link
+      const url = window.URL.createObjectURL(new Blob([response.data], { type: 'application/zip' }));
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `room_${roomId}_files.zip`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
 
     } catch (error) {
-        console.error('Error downloading zip file:', error);
+      console.error('Error downloading zip file:', error);
     }
   };
 
@@ -948,6 +951,7 @@ const FileView = ({
             )}
           </div>
           {loading === true && (
+
             <div className='flex justify-center items-center pb-2'>
 
               <CircularProgress color='inherit' size={30} />

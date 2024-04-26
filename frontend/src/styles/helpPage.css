@@ -16,7 +16,7 @@
 }
 
 .bigger-container {
-    background-image: url("https://img.freepik.com/premium-photo/colorful-line-wave-background-geometric-banner-flyer-wallpaper-template_665280-5059.jpg?w=360");
+    /* background-image: url("https://img.freepik.com/premium-photo/colorful-line-wave-background-geometric-banner-flyer-wallpaper-template_665280-5059.jpg?w=360"); */
     color: #ffffff;
     background-size: cover;
     font-family: 'Roboto', sans-serif;
@@ -74,7 +74,7 @@
 .stepimage img {
     max-width: 100%;
     border-radius: 5px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 0 10px rgba(245, 244, 244, 0.5);
 }
 
 .frm {
