@@ -19,7 +19,7 @@ const corsOptions = {
   credentials: true
 };
 
-router.use(cors(corsOptions));
+router.use(cors());
 
 router.use(bodyParser.json())
 
