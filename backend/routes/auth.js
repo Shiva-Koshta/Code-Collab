@@ -5,8 +5,9 @@ router.get('/login/success', (req, res) => {
   //   req.logout();
   //   res.redirect(process.env.CLIENT_URL);
   console.log("here\n\n");
+  console.log("Req.user = ",req.user);
   if (req.user) {
-    res.status(200).json({
+    return res.status(200).json({
       error: false,
       message: 'Successfully Loged In',
       user: req.user
