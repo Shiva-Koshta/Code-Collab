@@ -8,6 +8,7 @@ import {
   sliderClasses,
   CircularProgress,
 } from '@mui/material'
+
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined'
 import FolderIcon from '@mui/icons-material/Folder'
 import FolderOpenIcon from '@mui/icons-material/FolderOpen'
@@ -20,7 +21,6 @@ import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown'
 import ArrowRightIcon from '@mui/icons-material/ArrowRight'
 import { FolderCopy } from '@mui/icons-material'
 import DriveFolderUploadIcon from '@mui/icons-material/DriveFolderUpload'
-
 import axios from 'axios'
 import audioIcon from '../icons/audio.png'
 import cIcon from '../icons/c.png'
@@ -56,6 +56,7 @@ const FileView = ({
   const { roomId } = useParams()
   const [isDownloadTrue, setIsDownloadTrue] = useState(false)
   // const [currentFile, setCurrentFile] = useState(null)//id of the currently opened file, null if no file is opened
+
   const [downloadFileExtension, setFileExtension] = useState('')
   const [downloadFileName, setFileName] = useState('')
   const parentRef = useRef(null)
@@ -65,14 +66,18 @@ const FileView = ({
       _id: '0',
       name: 'Root',
       type: 'root',
+
       children: []
     }
+
   ])
   const [selectedFileFolder, setSelectedFileFolder] = useState({
     _id: '0',
     name: 'Root',
     type: 'root',
+
     children: []
+
   })
   const [selectedFileFolderParent, setSelectedFileFolderParent] = useState({})
   const [isFolderOpen, setIsFolderOpen] = useState({ 0: false })
@@ -139,8 +144,15 @@ const FileView = ({
     }
 
     //For file saving , socket action is: SAVE_FILE
-    socketRef.current.emit(ACTIONS.SAVE_FILE, { roomId, fileId, code: editorRef.current.getValue() })
-    if (show) { toast.success(`File saved`) }
+    socketRef.current.emit(ACTIONS.SAVE_FILE, {
+      roomId,
+      fileId,
+      code: editorRef.current.getValue(),
+    })
+    if (show) {
+      toast.success(`File saved`)
+    }
+
   }
 
   useEffect(() => {
@@ -162,6 +174,7 @@ const FileView = ({
     })()
 
     function handleResize() {
+
       setIsSmallScreen(window.innerWidth < 1260) // Adjust the threshold as needed
     }
 
@@ -209,7 +222,7 @@ const FileView = ({
           const newFile = {
             _id: response.data.file._id,
             name: response.data.file.name,
-            type: response.data.file.type
+            type: response.data.file.type,
 
           }
           parentFolder.children.push(newFile)
@@ -229,6 +242,7 @@ const FileView = ({
     if (file) {
       reader.readAsText(file)
     }
+
     event.target.value = null
   }
 
@@ -245,6 +259,7 @@ const FileView = ({
       )
       console.log(response.data.file.content)
       setCurrentFile(fileId)
+
       // setFileContent(response.data.file.content);
       editorRef.current.setValue(response.data.file.content)
 
@@ -252,8 +267,6 @@ const FileView = ({
       console.error(error)
     }
   }
-  
-  // More code...
 
   const handleDownloadFile = () => {
     const myContent = editorRef.current.getValue()
@@ -921,6 +934,7 @@ const FileView = ({
                   Download File
                 </div>
                 <button
+
                   className='deleteFileIcon update-buttons '
                   onClick={() =>
                     deleteFile(selectedFileFolder, selectedFileFolderParent)
