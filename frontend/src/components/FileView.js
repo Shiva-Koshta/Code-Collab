@@ -84,10 +84,29 @@ const FileView = ({
   const [isSmallScreen, setIsSmallScreen] = useState(false)
   const [loading, setLoading] = useState(false)
 
+  const handleFilesystemChange = async () => {
+    console.log('came here')
+    try {
+      const response = await axios.post(
+        `${process.env.REACT_APP_API_URL}/filesystem/generatetree`,
+        {
+          roomId,
+        }
+      )
+      const root = response.data.tree
+      setSelectedFileFolder(root)
+      setFolders([root])
+      return root._id
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
   useEffect(() => {
     if (currentFile == null) {
       if (editorRef.current) {
         editorRef.current.setOption('readOnly', true)
+        editorRef.current.setValue('')
       }
     } else {
       const currentUserRole = connectedUserRoles.find(
@@ -113,26 +132,20 @@ const FileView = ({
   }, [currentFile])
 
   useEffect(() => {
-    const handleFilesystemChange = async () => {
-      console.log('came here')
-      try {
-        const response = await axios.post(
-          `${process.env.REACT_APP_API_URL}/filesystem/generatetree`,
-          {
-            roomId,
-          }
-        )
-        const root = response.data.tree
-        setSelectedFileFolder(root)
-        setFolders([root])
-        return root._id
-      } catch (error) {
-        console.log(error)
-      }
-    }
+
 
     if (socketRef.current) {
-      socketRef.current.on(ACTIONS.FILESYSTEM_CHANGE, handleFilesystemChange)
+      socketRef.current.on(ACTIONS.FILESYSTEM_CHANGE,({isdelete})=> {
+        if(isdelete){setCurrentFile(null)}
+        handleFilesystemChange()
+      })
+
+      socketRef.current.on(ACTIONS.SELECTED_FILE_CHANGE, ({folder, parentFolder}) =>{
+        setCurrentFile(folder._id)
+        handleFileClick(folder,parentFolder,false)
+        setSelectedFileFolder(folder)
+        setSelectedFileFolderParent(parentFolder)
+      })
     }
 
     // Cleanup function
@@ -246,7 +259,8 @@ const FileView = ({
     event.target.value = null
   }
 
-  const handleFileClick = async (fileId) => {
+  const handleFileClick = async (folder,parentFolder,isClicked) => {
+    const fileId = folder._id
     if (currentFile != null) {
       handleSaveFile(currentFile, false)
     }
@@ -262,7 +276,19 @@ const FileView = ({
 
       // setFileContent(response.data.file.content);
       editorRef.current.setValue(response.data.file.content)
-
+      if(isClicked)
+      {socketRef.current.emit(ACTIONS.SELECTED_FILE_CHANGE, {
+        roomId,
+        folder,
+        parentFolder
+      })}
+      if(!isClicked)
+      {const fileElement = document.getElementById(fileId);
+        console.log(fileElement)
+        if (fileElement) {
+          fileElement.click();
+        }
+      }
     } catch (error) {
       console.error(error)
     }
@@ -331,6 +357,7 @@ const FileView = ({
           console.log('error in renaming file', error)
         } finally {
           setLoading(false)
+          handleFilesystemChange()
         }
       })()
     }
@@ -398,12 +425,14 @@ const FileView = ({
       }
       socketRef.current.emit(ACTIONS.FILESYSTEM_CHANGE, {
         roomId,
+        isdelete: true
       })
     } catch (error) {
       console.error('Error deleting file:', error.message)
       throw new Error('Failed to delete file.')
     } finally {
       setLoading(false)
+      handleFilesystemChange()
     }
   }
   const sortAlphabetically = (array) => {
@@ -527,6 +556,7 @@ const FileView = ({
         }}
       >
         <div
+          id={folder._id}
           className={`flex items-center p-px  ${
 
             selectedFileFolder && selectedFileFolder._id === folder._id
@@ -562,7 +592,7 @@ const FileView = ({
                     <FolderOpenIcon className='mr-2' style={{ fontSize: 20 }} />
                   )}
 
-                  <div className='kruncate' style={{ maxWidth: '200px' }}>
+                  <div className='truncate' style={{ maxWidth: '200px' }}>
                     {folder.name}
                   </div>
                 </div>
@@ -595,7 +625,7 @@ const FileView = ({
                   ) : (
                     <FolderOpenIcon className='mr-2' style={{ fontSize: 20 }} />
                   )}
-                  <div className='kruncate' style={{ maxWidth: '200px' }}>
+                  <div className='truncate' style={{ maxWidth: '200px' }}>
                     {folder.name}
                   </div>
                 </div>
@@ -616,11 +646,11 @@ const FileView = ({
                     setSelectedFileFolder(folder)
                     setSelectedFileFolderParent(parentFolder)
 
-                    handleFileClick(folder._id)
+                    handleFileClick(folder,parentFolder,true)
                   }}
                 >
                   {renderFileIcon(folder)}
-                  <div className='kruncate' style={{ maxWidth: '200px' }}>
+                  <div className='truncate' style={{ maxWidth: '200px' }}>
                     {folder.name}
                   </div>
                 </div>
@@ -960,7 +990,7 @@ const FileView = ({
             style={{ maxHeight: '380px', maxWidth: '300px' }}
           >
             <div
-              className='grow relative overflow-y-scroll overflow-x-scroll'
+              className='grow relative overflow-y-auto'
               style={{ maxHeight: '380px', maxWidth: '300px' }}
               ref={parentRef}
             >
