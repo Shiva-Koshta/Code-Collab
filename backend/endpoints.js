@@ -2,11 +2,14 @@ const express = require("express");
 const router = express.Router();
 const RoomCodeMap = require("./models/RoomCodeMap");
 const RoomUserCount = require("./models/RoomUserCount");
+const FileNodeSchema = require("./models/FileNode");
 const authRoute = require("./routes/auth");
 const nodemailer = require("nodemailer");
 const { io, server, http } = require("./server");
 const ACTIONS = require("../frontend/src/Actions");
+const mongoose = require("mongoose");
 //initialise env file
+const FileNode = mongoose.model("FileNode", FileNodeSchema);
 require("dotenv").config();
 
 let transporter = nodemailer.createTransport({
@@ -135,6 +138,17 @@ router.post("/delete-entry", async (req, res) => {
     if (room.userCount === 0) {
       console.log("hi");
       const deletedRoomCodeMap = await RoomCodeMap.findOneAndDelete({ roomId });
+      let deletedCount = 0;
+      const fileNodes = await FileNode.find({ roomId });
+
+      for (const fileNode of fileNodes) {
+        const deletedFileNode = await FileNode.findOneAndDelete({
+          roomId: fileNode.roomId,
+        });
+        if (deletedFileNode) {
+          deletedCount++;
+        }
+      }
 
       if (!deletedRoomCodeMap) {
         return res.status(404).json({ error: "Room code map entry not found" });
