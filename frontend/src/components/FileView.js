@@ -148,7 +148,7 @@ const FileView = ({
         const response = await axios.post(
           `${process.env.REACT_APP_API_URL}/filesystem/generatetree`,
           {
-            roomId,
+            roomId: roomId,
           }
         )
         const root = response.data.tree
@@ -206,8 +206,8 @@ const FileView = ({
             {
               name: file.name,
               parentId: parentFolder._id,
-              roomId,
-              content,
+              roomId: roomId,
+              content: content,
             }
           )
           const newFile = {
@@ -417,7 +417,7 @@ const FileView = ({
             {
               name: newFileName,
               parentId: parentFolder._id,
-              roomId,
+              roomId: roomId,
             }
           )
           const newFile = {
@@ -453,7 +453,7 @@ const FileView = ({
             {
               name: newFolderName,
               parentId: parentFolder._id,
-              roomId,
+              roomId: roomId,
             }
           )
           const newFolder = {
@@ -673,8 +673,8 @@ const FileView = ({
         `${process.env.REACT_APP_API_URL}/filesystem/uploaddirectory`,
         {
           parentId: selectedFileFolder._id,
-          data,
-          roomId,
+          data: data,
+          roomId: roomId,
         }
       )
       const newFolder = {
