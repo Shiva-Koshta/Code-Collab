@@ -185,7 +185,7 @@ const FileView = ({
 
     window.localStorage.setItem('contentChanged', contentChanged)
     reader.onload = (e) => {
-      const content = e.target.result
+      const content = e.target.result;
 
       // code before
       // // setFileContent(content)
