@@ -31,6 +31,8 @@ const userSocketMap = {};
 const usercnt = {};
 const cursorPosition = {};
 
+console.log("Process.env = ", process.env.CLIENT_URL);
+
 function getAllConnectedClients(roomId) {
   return Array.from(io.sockets.adapter.rooms.get(roomId) || []).map(
     (socketId) => {
