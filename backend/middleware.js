@@ -3,7 +3,6 @@ const router = express.Router()
 const bodyParser = require('body-parser')
 const cookieSession = require('cookie-session')
 const passport = require('passport')
-const cors = require('cors')
 
 // router.use(
 //   cors({
@@ -13,15 +12,7 @@ const cors = require('cors')
 //   })
 // )
 
-const corsOptions = {
-  origin: ['*'],
-  methods: 'GET,POST,PUT,DELETE',
-  credentials: true
-};
 
-
-
-router.use(cors(corsOptions));
 
 router.use(bodyParser.json())
 

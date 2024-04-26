@@ -25,6 +25,15 @@ const port = process.env.PORT || 8080;
 
 app.use(express.static(path.join(__dirname, 'build')));
 app.use(middleware);
+
+const corsOptions = {
+  origin: ['https://code-collab-tawny.vercel.app/'],
+  methods: 'GET,POST,PUT,DELETE',
+  credentials: true
+};
+
+router.use(cors(corsOptions));
+
 app.use("/filesystem", filesysrouter);
 
 const userSocketMap = {};
@@ -32,6 +41,8 @@ const usercnt = {};
 const cursorPosition = {};
 
 console.log("Process.env = ", process.env.CLIENT_URL);
+
+
 
 function getAllConnectedClients(roomId) {
   return Array.from(io.sockets.adapter.rooms.get(roomId) || []).map(
