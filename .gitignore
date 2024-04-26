@@ -12,6 +12,7 @@
 # backend/.env
 frontend/coverage
 backend/coverage
+
 .env
 frontend/package.json
 frontend/package-lock.json
