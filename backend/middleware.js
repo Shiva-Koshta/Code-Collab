@@ -14,9 +14,8 @@ const cors = require('cors')
 // )
 
 const corsOptions = {
-  origin: [`${process.env.CLIENT_URL}`],
-  methods: 'GET,POST,PUT,DELETE',
-  credentials: true
+  origin: ['*'],
+  methods: 'GET,POST,PUT,DELETE'
 };
 
 router.use(cors());
