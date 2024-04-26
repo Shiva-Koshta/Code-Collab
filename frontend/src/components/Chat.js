@@ -2,7 +2,6 @@ import React, { useState } from 'react'
 import ACTIONS from '../Actions'
 import DisabledByDefaultIcon from '@mui/icons-material/DisabledByDefault'
 import '../styles/Chat.css'
-import { useParams } from 'react-router-dom'
 
 const Chat = ({
   setIsChatOpen,

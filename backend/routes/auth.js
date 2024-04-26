@@ -4,6 +4,7 @@ const passport = require('passport')
 router.get('/login/success', (req, res) => {
   //   req.logout();
   //   res.redirect(process.env.CLIENT_URL);
+  console.log("here\n\n");
   if (req.user) {
     res.status(200).json({
       error: false,

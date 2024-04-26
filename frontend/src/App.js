@@ -25,6 +25,7 @@ function App () {
       try {
         const url = `${process.env.REACT_APP_API_URL}/auth/login/success`
         const { data } = await axios.get(url, { withCredentials: true })
+        console.log(data);
         setUser(data.user._json)
         window.localStorage.setItem('userData', JSON.stringify(data.user._json))
       } catch (err) {

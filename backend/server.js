@@ -13,12 +13,15 @@ const RoomUserCount = require("./models/RoomUserCount");
 const ACTIONS = require("../frontend/src/Actions");
 const { log } = require("console");
 const FileNodeSchema = require("./models/FileNode");
+const path = require('path');
+
 
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 const port = process.env.PORT || 8080;
 
+app.use(express.static(path.join(__dirname, 'build')));
 app.use(middleware);
 app.use("/filesystem", filesysrouter);
 
