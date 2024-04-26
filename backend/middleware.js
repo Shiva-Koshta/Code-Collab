@@ -14,7 +14,7 @@ const cors = require('cors')
 // )
 
 const corsOptions = {
-  origin: [`${process.env.CLIENT_URL}`, 'http://code-collab-q5qj.onrender.com/auth/login/success', 'http://code-collab-q5qj.onrender.com', 'https://code-collab-q5qj.onrender.com'],
+  origin: [`${process.env.CLIENT_URL}`, 'http://code-collab-q5qj.onrender.com/auth/login/success', 'http://code-collab-q5qj.onrender.com', 'https://code-collab-q5qj.onrender.com', 'https://code-collab-q5qj.onrender.com/auth/login/success'],
   methods: 'GET,POST,PUT,DELETE',
   credentials: true
 };
