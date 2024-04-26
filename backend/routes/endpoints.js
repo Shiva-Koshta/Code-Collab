@@ -1,12 +1,12 @@
 const express = require("express");
 const router = express.Router();
-const RoomCodeMap = require("./models/RoomCodeMap");
-const RoomUserCount = require("./models/RoomUserCount");
-const FileNodeSchema = require("./models/FileNode");
-const authRoute = require("./routes/auth");
+const RoomCodeMap = require("../models/RoomCodeMap");
+const RoomUserCount = require("../models/RoomUserCount");
+const FileNodeSchema = require("../models/FileNode");
+const authRoute = require("./auth");
 const nodemailer = require("nodemailer");
-const { io, server, http } = require("./server");
-const ACTIONS = require("../frontend/src/Actions");
+const { io, server, http } = require("../server");
+const ACTIONS = require("../../frontend/src/Actions");
 const mongoose = require("mongoose");
 //initialise env file
 const FileNode = mongoose.model("FileNode", FileNodeSchema);
