@@ -11,6 +11,7 @@ const ACTIONS = {
   HOST_CHANGE: "host-change",
   ROLE_CHANGE: "role-change",
   SAVE_FILE: "save-file",
+  FILESYSTEM_CHANGE: "filesystemchanged",
 };
 
 module.exports = ACTIONS;

@@ -2,7 +2,12 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import UploadFileIcon from '@mui/icons-material/UploadFile'
-import { IconButton, duration, sliderClasses } from '@mui/material'
+import {
+  IconButton,
+  duration,
+  sliderClasses,
+  CircularProgress,
+} from '@mui/material'
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined'
 import FolderIcon from '@mui/icons-material/Folder'
 import FolderOpenIcon from '@mui/icons-material/FolderOpen'
@@ -15,7 +20,7 @@ import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown'
 import ArrowRightIcon from '@mui/icons-material/ArrowRight'
 import { FolderCopy } from '@mui/icons-material'
 import DriveFolderUploadIcon from '@mui/icons-material/DriveFolderUpload'
-import { CircularProgress } from "@mui/material";
+
 import axios from 'axios'
 import audioIcon from '../icons/audio.png'
 import cIcon from '../icons/c.png'
@@ -49,7 +54,7 @@ const FileView = ({
 }) => {
   const { roomId } = useParams()
   const [isDownloadTrue, setIsDownloadTrue] = useState(false)
-  const [currentFile, setCurrentFile] = useState(null)//id of the currently opened file, null if no file is opened
+  const [currentFile, setCurrentFile] = useState(null) // id of the currently opened file, null if no file is opened
   const [downloadFileExtension, setFileExtension] = useState('')
   const [downloadFileName, setFileName] = useState('')
   const parentRef = useRef(null)
@@ -75,14 +80,16 @@ const FileView = ({
 
   useEffect(() => {
     if (currentFile == null) {
-      if (editorRef.current) { editorRef.current.setOption('readOnly', true) }
-    }
-    else {
-      const currentUserRole = connectedUserRoles.find(user => user.name === storedUserData.current.name)?.role;
-      if (currentUserRole === "viewer") {
+      if (editorRef.current) {
         editorRef.current.setOption('readOnly', true)
       }
-      else {
+    } else {
+      const currentUserRole = connectedUserRoles.find(
+        (user) => user.name === storedUserData.current.name
+      )?.role
+      if (currentUserRole === 'viewer') {
+        editorRef.current.setOption('readOnly', true)
+      } else {
         editorRef.current.setOption('readOnly', false)
       }
     }
@@ -98,14 +105,40 @@ const FileView = ({
     }
   }, [currentFile])
 
+  useEffect(() => {
+    const handleFilesystemChange = async () => {
+      console.log('came here')
+      try {
+        const response = await axios.post(
+          `${process.env.REACT_APP_API_URL}/filesystem/generatetree`,
+          {
+            roomId,
+          }
+        )
+        const root = response.data.tree
+        setSelectedFileFolder(root)
+        setFolders([root])
+        return root._id
+      } catch (error) {
+        console.log(error)
+      }
+    }
+
+    if (socketRef.current) {
+      socketRef.current.on(ACTIONS.FILESYSTEM_CHANGE, handleFilesystemChange)
+    }
+
+    // Cleanup function
+  }, [socketRef.current])
+
   const handleSaveFile = (fileId, show) => {
     if (!fileId) {
       return
     }
+
     //For file saving , socket action is: SAVE_FILE
     socketRef.current.emit(ACTIONS.SAVE_FILE, { roomId, fileId, code: editorRef.current.getValue() })
     if (show) { toast.success(`File saved`) }
-
   }
 
   useEffect(() => {
@@ -180,6 +213,9 @@ const FileView = ({
           parentFolder.children.push(newFile)
           console.log('pushed')
           setFolders([...folders])
+          socketRef.current.emit(ACTIONS.FILESYSTEM_CHANGE, {
+            roomId,
+          })
         } catch (error) {
           console.log(error)
         } finally {
@@ -199,13 +235,17 @@ const FileView = ({
       handleSaveFile(currentFile, false)
     }
     try {
-      const response = await axios.post(`${process.env.REACT_APP_API_URL}/filesystem/fetchfile`, {
-        nodeId: fileId
-      });
-      console.log(response.data.file.content);
+      const response = await axios.post(
+        `${process.env.REACT_APP_API_URL}/filesystem/fetchfile`,
+        {
+          nodeId: fileId,
+        }
+      )
+      console.log(response.data.file.content)
       setCurrentFile(fileId)
       // setFileContent(response.data.file.content);
       editorRef.current.setValue(response.data.file.content)
+
     } catch (error) {
       console.error(error)
     }
@@ -241,6 +281,9 @@ const FileView = ({
           folder.name = newName
           setFolders([...folders])
           setSelectedFileFolder(folder)
+          socketRef.current.emit(ACTIONS.FILESYSTEM_CHANGE, {
+            roomId,
+          })
         } catch (error) {
           console.log('error in renaming directory', error)
         } finally {
@@ -266,6 +309,9 @@ const FileView = ({
           console.log('renamed file')
           file.name = newName
           setFolders([...folders])
+          socketRef.current.emit(ACTIONS.FILESYSTEM_CHANGE, {
+            roomId,
+          })
         } catch (error) {
           console.log('error in renaming file', error)
         } finally {
@@ -305,6 +351,9 @@ const FileView = ({
         parentFolder.children.splice(index, 1)
         setFolders([...folders])
       }
+      socketRef.current.emit(ACTIONS.FILESYSTEM_CHANGE, {
+        roomId,
+      })
     } catch (error) {
       console.error('Error deleting folder:', error.message)
       throw new Error('Failed to delete folder.')
@@ -313,7 +362,7 @@ const FileView = ({
 
   async function deleteFile(fileId, parentFolder) {
     if (currentFile === fileId._id) {
-      editorRef.current.setValue("")
+      editorRef.current.setValue('')
       setCurrentFile(null)
     }
     try {
@@ -332,6 +381,9 @@ const FileView = ({
         parentFolder.children.splice(index, 1)
         setFolders([...folders])
       }
+      socketRef.current.emit(ACTIONS.FILESYSTEM_CHANGE, {
+        roomId,
+      })
     } catch (error) {
       console.error('Error deleting file:', error.message)
       throw new Error('Failed to delete file.')
@@ -377,6 +429,9 @@ const FileView = ({
           parentFolder.children = sortAlphabetically(parentFolder.children)
           console.log('pushed')
           setFolders([...folders])
+          socketRef.current.emit(ACTIONS.FILESYSTEM_CHANGE, {
+            roomId,
+          })
         } catch (error) {
           console.log(error)
         } finally {
@@ -410,6 +465,9 @@ const FileView = ({
           parentFolder.children.push(newFolder)
           parentFolder.children = sortAlphabetically(parentFolder.children)
           setFolders([...folders])
+          socketRef.current.emit(ACTIONS.FILESYSTEM_CHANGE, {
+            roomId,
+          })
         } catch (error) {
           console.log(error)
         } finally {
@@ -455,11 +513,11 @@ const FileView = ({
       >
         <div
           className={`flex items-center p-px  ${
+
             selectedFileFolder && selectedFileFolder._id === folder._id
               ? 'Selected-file-folder'
               : ''
           } rounded-md`}
-
         >
           <div className='grow flex relative '>
             {folder.type === 'root' && (
@@ -654,6 +712,10 @@ const FileView = ({
         selectedFileFolder.children
       )
       setFolders([...folders])
+      socketRef.current.emit(ACTIONS.FILESYSTEM_CHANGE, {
+        roomId,
+      })
+
     } catch (error) {
       console.error('Error sending data to server:', error)
       toast.error(error.request.statusText, { duration: 2000 })
@@ -687,16 +749,16 @@ const FileView = ({
   useEffect(() => {
     const handleUnload = (event) => {
       if (currentFile !== null) {
-        handleSaveFile(currentFile, false);
+        handleSaveFile(currentFile, false)
       }
-    };
+    }
 
-    window.addEventListener('beforeunload', handleUnload);
+    window.addEventListener('beforeunload', handleUnload)
 
     return () => {
-      window.removeEventListener('beforeunload', handleUnload);
-    };
-  }, [currentFile]);
+      window.removeEventListener('beforeunload', handleUnload)
+    }
+  }, [currentFile])
   return (
     <div className='flex flex-col justify-between h-full'>
       <div className='flex justify-between mx-1 relative h-fit grow'>
@@ -704,6 +766,7 @@ const FileView = ({
           <div
             className={`text-lg font-bold flex justify-between items-center my-3 
               }`}
+
           >
             <p>File Explorer</p>
             {selectedFileFolder.type === 'root' && (
@@ -870,8 +933,9 @@ const FileView = ({
               </div>
             )}
           </div>
-            {loading === true && (
-            <div className="flex justify-center items-center pb-2">
+          {loading === true && (
+            <div className='flex justify-center items-center pb-2'>
+
               <CircularProgress color='inherit' size={30} />
             </div>
           )}
