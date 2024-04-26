@@ -28,7 +28,7 @@ const HelpPage = () => {
     e.preventDefault();
     setIsSubmitting(true);
     try {
-      const response = await fetch("http://localhost:8080/help", {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/help`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

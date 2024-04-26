@@ -127,7 +127,7 @@ const EditorPage = () => {
   // const leaveRoom = async () => {
   //   try {
   //     const userData = JSON.parse(localStorage.getItem("userData"));
-  //     const response = await fetch("http://localhost:8080/delete-entry", {
+  //     const response = await fetch(`${process.env.REACT_APP_API_URL}/delete-entry`, {
   //       method: "POST",
   //       headers: {
   //         "Content-Type": "application/json",
@@ -268,7 +268,7 @@ const EditorPage = () => {
           // ]);
           const fetchUserDetails = async () => {
             try {
-              const response = await fetch("http://localhost:8080/getdetails", {
+              const response = await fetch(`${process.env.REACT_APP_API_URL}/getdetails`, {
                 method: "POST",
                 headers: {
                   "Content-Type": "application/json",
@@ -406,7 +406,7 @@ const EditorPage = () => {
         host.current = username;
         const fetchUserDetails = async () => {
           try {
-            const response = await fetch("http://localhost:8080/getdetails", {
+            const response = await fetch(`${process.env.REACT_APP_API_URL}/getdetails`, {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
@@ -456,7 +456,7 @@ const EditorPage = () => {
   useEffect(() => {
     const fetchUserDetails = async () => {
       try {
-        const response = await fetch("http://localhost:8080/getdetails", {
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/getdetails`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

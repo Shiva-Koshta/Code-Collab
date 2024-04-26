@@ -207,7 +207,7 @@ const Editor = ({
       console.log(JSON.stringify({ roomId }));
       async function fetchCode() {
         try {
-          const response = await fetch("http://localhost:8080/receivecode", {
+          const response = await fetch(`${process.env.REACT_APP_API_URL}/receivecode`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",

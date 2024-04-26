@@ -91,7 +91,7 @@ describe("RoomCreation component", () => {
 
     // Check if axios.post is called with correct parameters
     expect(axios.post).toHaveBeenCalledWith(
-      "http://localhost:8080/rooms/numUsersInRoom",
+      `${process.env.REACT_APP_API_URL}/rooms/numUsersInRoom`,
       {
         roomId: "exampleRoomId",
       }
@@ -312,7 +312,7 @@ describe("createNewRoom", () => {
         }
       );
       expect(axios.post).toHaveBeenCalledWith(
-        "http://localhost:8080/initialize",
+        `${process.env.REACT_APP_API_URL}/initialize`,
         {
           roomId: expect.any(String),
           username: expect.any(String),

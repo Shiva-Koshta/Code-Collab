@@ -91,7 +91,7 @@ const Sidebar = ({
     try {
       const userData = JSON.parse(localStorage.getItem('userData'))
       const userCountResponse = await fetch(
-        'http://localhost:8080/rooms/numUsersInRoom',
+        `${process.env.REACT_APP_API_URL}/rooms/numUsersInRoom`,
         {
           method: 'POST',
           headers: {
@@ -110,7 +110,7 @@ const Sidebar = ({
             handleDownloadFile()
             setTimeout(async () => {
               const leaveResponse = await fetch(
-                'http://localhost:8080/delete-entry',
+                `${process.env.REACT_APP_API_URL}/delete-entry`,
                 {
                   method: 'POST',
                   headers: {
@@ -130,7 +130,7 @@ const Sidebar = ({
             }, 2000)
           } else {
             const leaveResponse = await fetch(
-              'http://localhost:8080/delete-entry',
+              `${process.env.REACT_APP_API_URL}/delete-entry`,
               {
                 method: 'POST',
                 headers: {
@@ -150,7 +150,7 @@ const Sidebar = ({
           }
         } else {
           const leaveResponse = await fetch(
-            'http://localhost:8080/delete-entry',
+            `${process.env.REACT_APP_API_URL}/delete-entry`,
             {
               method: 'POST',
               headers: {
