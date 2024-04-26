@@ -71,39 +71,28 @@ const FileView = ({
   const [loading, setLoading] = useState(false)
   useEffect(() => {
     if (currentFile == null) {
-      // Check if editorRef.current is defined before accessing its properties
-      if (editorRef?.current) { 
-        editorRef.current.setOption('readOnly', true);
-      }
-    } else {
+      if (editorRef.current) { editorRef.current.setOption('readOnly', true) }
+    }
+    else {
       const currentUserRole = connectedUserRoles.find(user => user.name === storedUserData.current.name)?.role;
       if (currentUserRole === "viewer") {
-        // Check if editorRef.current is defined before accessing its properties
-        if (editorRef?.current) { 
-          editorRef.current.setOption('readOnly', true);
-        }
-      } else {
-        // Check if editorRef.current is defined before accessing its properties
-        if (editorRef?.current) { 
-          editorRef.current.setOption('readOnly', false);
-        }
+        editorRef.current.setOption('readOnly', true)
+      }
+      else {
+        editorRef.current.setOption('readOnly', false)
       }
     }
-    
     const handleCtrlS = (event) => {
       if (event.ctrlKey && event.key === 's') {
         handleSaveFile(currentFile, true)
         event.preventDefault()
       }
     }
-    
     document.addEventListener('keydown', handleCtrlS)
-    
     return () => {
       document.removeEventListener('keydown', handleCtrlS)
     }
-  }, [currentFile]);
-  
+  }, [currentFile])
 
   const handleSaveFile = (fileId, show) => {
     if (!fileId) {
@@ -681,182 +670,7 @@ const FileView = ({
   return (
     <div className='flex flex-col justify-between h-full'>
       <div className='flex justify-between mx-1 relative h-fit grow'>
-        <div className='flex flex-col grow overflow-hidden'>
-          <div
-            className={`text-lg font-bold flex justify-between items-center my-3 ${isSmallScreen ? 'flex-col' : 'flex-row'
-              }`}
-          >
-            <p>File Explorer</p>
-            {selectedFileFolder.type === 'root' && (
-              <div className='flex items-center relative'>
-                <button
-                  className=''
-                  onClick={() => createFolder(selectedFileFolder)}
-                  title='Add Folder'
-                  data-testid='add-folder-button'
-                >
-                  <CreateNewFolderIcon />
-                </button>
-                <div className='absolute bottom-0 hidden hover:bg-gray-100 hover:rounded hover:p-2 hover:block hover:z-10 hover:border hover:border-gray-300'>
-                  Add Folder
-                </div>
-                <button
-                  className=''
-                  onClick={() => createFile(selectedFileFolder)}
-                  title='Add File'
-                  data-testid='add-file-button'
-                >
-                  <AddIcon />
-                </button>
-                <div className='absolute bottom-0 hidden hover:bg-gray-100 hover:rounded hover:p-2 hover:block hover:z-10 hover:border hover:border-gray-300'>
-                  Add File
-                </div>
-                <input
-                  type='file'
-                  id='fileInput'
-                  style={{ display: 'none' }}
-                  onChange={handleFileChange}
-                />
-                <label htmlFor='fileInput'>
-                  <UploadFileIcon className='text-white cursor-pointer' />
-                </label>
-                <input
-                  type='file'
-                  id='folderInput'
-                  directory=''
-                  webkitdirectory=''
-                  style={{ display: 'none' }}
-                  onChange={handleUpload}
-                />
-                <label htmlFor='folderInput'>
-                  <DriveFolderUploadIcon className='text-white cursor-pointer' />
-                </label>
-                <div className='absolute bottom-0 hidden hover:bg-gray-100 hover:rounded hover:p-2 hover:block hover:z-10 hover:border hover:border-gray-300'>
-                  Upload Folder
-                </div>
-                <button
-                  className='renameFolderIcon update-buttons '
-                  onClick={() => renameFolder(selectedFileFolder)}
-                  title='Rename Folder'
-                  data-testid='rename-folder-button'
-                >
-                  <CreateIcon />
-                </button>
-                <div className='absolute bottom-0 hidden hover:bg-gray-100 hover:rounded hover:p-2 hover:block hover:z-10 hover:border hover:border-gray-300 hover:top-7'>
-                  Rename Folder
-                </div>
-              </div>
-            )}
-            {selectedFileFolder.type === 'directory' && (
-              <div className='flex items-center relative'>
-                <button
-                  className='addFolderIcon update-buttons '
-                  onClick={() => createFolder(selectedFileFolder)}
-                  title='Add Folder'
-                  data-testid='Add-folder-button'
-                >
-                  <CreateNewFolderIcon />
-                </button>
-                <div className='absolute bottom-0 hidden hover:bg-gray-100 hover:rounded hover:p-2 hover:block hover:z-10 hover:border hover:border-gray-300 hover:top-7'>
-                  Add Folder
-                </div>
-                <button
-                  className='addFileIcon update-buttons '
-                  onClick={() => createFile(selectedFileFolder)}
-                  title='Add File'
-                  data-testid='Add-file-button'
-                >
-                  <AddIcon />
-                </button>
-                <div className='absolute bottom-0 hidden hover:bg-gray-100 hover:rounded hover:p-2 hover:block hover:z-10 hover:border hover:border-gray-300 hover:top-7'>
-                  Add File
-                </div>
-                <input
-                  type='file'
-                  id='fileInput'
-                  style={{ display: 'none' }}
-                  onChange={handleFileChange}
-                />
-                <label htmlFor='fileInput'>
-                  <UploadFileIcon className='text-white' />
-                </label>
-                <input
-                  type='file'
-                  id='folderInput'
-                  directory=''
-                  webkitdirectory=''
-                  style={{ display: 'none' }}
-                  onChange={handleUpload}
-                />
-                <label htmlFor='folderInput'>
-                  <DriveFolderUploadIcon className='text-white cursor-pointer' />
-                </label>
-                <div className='absolute bottom-0 hidden hover:bg-gray-100 hover:rounded hover:p-2 hover:block hover:z-10 hover:border hover:border-gray-300'>
-                  Upload Folder
-                </div>
-                <button
-                  className='renameFolderIcon update-buttons '
-                  onClick={() => renameFolder(selectedFileFolder)}
-                  title='Rename Folder'
-                  data-testid='Rename-folder-button'
-                >
-                  <CreateIcon />
-                </button>
-                <div className='absolute bottom-0 hidden hover:bg-gray-100 hover:rounded hover:p-2 hover:block hover:z-10 hover:border hover:border-gray-300 hover:top-7'>
-                  Rename Folder
-                </div>
-                <button
-                  className='deleteFolderIcon update-buttons '
-                  onClick={() =>
-                    deleteFolder(selectedFileFolder, selectedFileFolderParent)
-                  }
-                  title='Delete Folder'
-                >
-                  <DeleteIcon />
-                </button>
-                <div className='absolute bottom-0 hidden hover:bg-gray-100 hover:rounded hover:p-2 hover:block hover:z-10 hover:border hover:border-gray-300 hover:top-7'>
-                  Delete Folder
-                </div>
-              </div>
-            )}
-            {selectedFileFolder.type === 'file' && (
-              <div className='flex items-center relative'>
-                <button
-                  className='renameFileIcon update-buttons '
-                  onClick={() => renameFile(selectedFileFolder)}
-                  title='Rename File'
-                >
-                  <CreateIcon />
-                </button>
-                <div className='absolute bottom-0 hidden hover:bg-gray-100 hover:rounded hover:p-2 hover:block hover:z-10 hover:border hover:border-gray-300 hover:top-7'>
-                  Add Folder
-                </div>
-                <button
-                  className='deleteFileIcon update-buttons '
-                  onClick={() =>
-                    deleteFile(selectedFileFolder, selectedFileFolderParent)
-                  }
-                  title='Delete File'
-                >
-                  <DeleteIcon />
-                </button>
-                <div className='absolute bottom-0 hidden hover:bg-gray-100 hover:rounded hover:p-2 hover:block hover:z-10 hover:border hover:border-gray-300 hover:top-7'>
-                  Delete Folder
-                </div>
-              </div>
-            )}
-          </div>
-          {loading === true && (
-            <div className="flex justify-center items-center pb-2">
-              <CircularProgress data-testid="circular-progress" color='inherit' size={30} />
-            </div>
-          )}
-          <div className='flex justify-between grow'>
-            <div className='grow relative overflow-y-scroll' ref={parentRef}>
-              {folders.map((folder) => renderFolder(folder))}
-            </div>
-          </div>
-        </div>
+        
         {isDownloadTrue && (
           <div className='absolute top-10 bg-slate-700 p-4 rounded-lg shadow-md shadow-slate-400'>
             <div className='flex justify-end mb-4'>

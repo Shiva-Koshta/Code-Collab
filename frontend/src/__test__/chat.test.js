@@ -133,7 +133,7 @@ describe("Chat component", () => {
     );
 
     // Find the close icon by test ID
-    const closeIcon = getByTestId("DisabledByDefaultIcon");
+    const closeIcon = getByTestId("DisabledByDefaultIcon"); 
 
     // Simulate click event on close icon
     fireEvent.click(closeIcon);
