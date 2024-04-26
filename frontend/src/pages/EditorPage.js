@@ -62,7 +62,7 @@ const EditorPage = () => {
   const [unreadMessages, setUnreadMessages] = useState(-1);
   const [isLeftDivOpen, setIsLeftDivOpen] = useState(true);
   const leftIcon = isLeftDivOpen ? <ChevronLeft /> : <ChevronRight />;
-  // const [menuOpen, setMenuOpen] = useState({})
+  const [menuOpen, setMenuOpen] = useState({})
 
   const toggleLeftDiv = () => {
     setIsLeftDivOpen(prevState => !prevState)
@@ -257,6 +257,10 @@ const EditorPage = () => {
           }));
           setConnectedUsers(updatedUsers);
           setConnectedUsernames(clients.map((client) => client.username));
+          setMenuOpen((prevMenuOpen) => ({
+            ...prevMenuOpen,
+            [username]: false,
+          }))
 
           // setConnectedUserRoles((prevRoles) => [
           //   ...prevRoles,
@@ -302,6 +306,7 @@ const EditorPage = () => {
           };
 
           fetchUserDetails();
+
 
           console.log(host.current);
         }
@@ -492,12 +497,12 @@ const EditorPage = () => {
   }
 
   return (
-    <div className="flex flex-col justify-center">
-      <div className="grid grid-cols-10">
+    <div className="flex flex-col justify-center" style={{backgroundColor: "#1c1e29"}}>
+      <div className="grid grid-cols-10" style={{backgroundColor: "#1c1e29"}}>
         {<Toaster position="top-center" reverseOrder={false} />}
 
         {/* {isLeftDivOpen && ( */}
-        <div style={{width: "300px", position:"fixed", left:"0", top:"0"}}>
+        <div style={{width: "300px", position:"fixed", left:"0", top:"0", backgroundColor: "#1c1e29"}}>
         <Sidebar
           contentChanged={contentChanged}
           setContentChanged={setContentChanged}
@@ -520,13 +525,15 @@ const EditorPage = () => {
           connectedUserRoles={connectedUserRoles}
           setConnectedUserRoles={setConnectedUserRoles}
           socketRef={socketRef}
+          menuOpen={menuOpen}
+          setMenuOpen={setMenuOpen}
         />
 
         </div>
         
         <div
           className={`overflow-y-scroll overflow-x-scroll transition-all duration-500 ease-in-out absolute top-0 `}
-          style={{ width: isChatOpen ? (isLeftDivOpen ? `calc(100% - 592px)` : `calc(100% - 320px)`) : (isLeftDivOpen ? `calc(100% - 300px)` : `calc(100%)`),  left: isLeftDivOpen ?"300px": "0px", overflowX: "scroll", position:"fixed" }}
+          style={{ width: isChatOpen ? (isLeftDivOpen ? `calc(100% - 592px)` : `calc(100% - 298px)`) : (isLeftDivOpen ? `calc(100% - 300px)` : `calc(100%)`),  left: isLeftDivOpen ?"300px": "0px", overflowX: "scroll", position:"fixed", backgroundColor: "#282A36", paddingRight: "10px"}}
         >
           <Editor
             // handleDownloadFile={handleDownloadFile}
@@ -557,7 +564,7 @@ const EditorPage = () => {
           pauseOnHover
           theme="dark"
         />
-
+        <div style={{backgroundColor: "#1c1e29"}}>
         {isChatOpen && (
           <div style={{backgroundColor: "#1c1e29"}}>
             <Chat
@@ -574,6 +581,13 @@ const EditorPage = () => {
             />
           </div>
         )}
+        {
+          !isChatOpen && (
+            <div style={{backgroundColor: "#1c1e29"}}></div>
+          )
+        }
+        </div>
+        
       </div>
     </div>
   );
