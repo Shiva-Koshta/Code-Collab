@@ -13,5 +13,9 @@ router.delete('/deletedirectory', filesystem.deletedirectory);
 router.put('/renamefile', filesystem.renamefile);
 router.put('/renamedirectory', filesystem.renamedirectory);
 router.get('/download/:roomId', filesystem.downloadFile);
+// router.get('/', (req, res) => {
+//     console.log("Backend Live");
+//     res.status(200).json('Backend Live');
+// });
 
 module.exports = router;

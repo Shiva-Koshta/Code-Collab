@@ -268,7 +268,7 @@ const EditorPage = () => {
           // ]);
           const fetchUserDetails = async () => {
             try {
-              const response = await fetch("http://localhost:8080/getdetails", {
+              const response = await fetch(`${process.env.REACT_APP_API_URL}/getdetails`, {
                 method: "POST",
                 headers: {
                   "Content-Type": "application/json",
@@ -406,7 +406,7 @@ const EditorPage = () => {
         host.current = username;
         const fetchUserDetails = async () => {
           try {
-            const response = await fetch("http://localhost:8080/getdetails", {
+            const response = await fetch(`${process.env.REACT_APP_API_URL}/getdetails`, {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
@@ -456,7 +456,7 @@ const EditorPage = () => {
   useEffect(() => {
     const fetchUserDetails = async () => {
       try {
-        const response = await fetch("http://localhost:8080/getdetails", {
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/getdetails`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

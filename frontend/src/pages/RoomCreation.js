@@ -96,7 +96,7 @@ const RoomCreation = () => {
         const response = await axios.post(apiurl, requestBody);
         console.log("Response:", response.data);
         // the create room button should lead directly to the editor page and not after explicitly clicking the join button
-        await axios.post("http://localhost:8080/initialize", {
+        await axios.post(`${process.env.REACT_APP_API_URL}/initialize`, {
           roomId: id,
           username: userName,
         });
@@ -140,7 +140,7 @@ const RoomCreation = () => {
 
     try {
       // Call the initialize endpoint with roomId and username in the request body
-      await axios.post("http://localhost:8080/initialize", {
+      await axios.post(`${process.env.REACT_APP_API_URL}/initialize`, {
         roomId,
         username: userName,
       });

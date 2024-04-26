@@ -1,6 +1,6 @@
 {
   "name": "server",
-  "proxy": "http:http://localhost:8080",
+  "proxy": "http:https://code-collab-q5qj.onrender.com",
   "version": "1.0.0",
   "description": "",
   "main": "server.js",

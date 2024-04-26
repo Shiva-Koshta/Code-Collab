@@ -161,7 +161,7 @@ describe("Form functionality", () => {
       expect(getByText("Form submitted successfully")).toBeInTheDocument();
 
       // Assert that fetch was called with the correct URL and payload
-      expect(global.fetch).toHaveBeenCalledWith("http://localhost:8080/help", {
+      expect(global.fetch).toHaveBeenCalledWith(`${process.env.REACT_APP_API_URL}/help`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
