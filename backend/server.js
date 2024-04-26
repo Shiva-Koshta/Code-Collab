@@ -24,7 +24,6 @@ const io = new Server(server);
 const port = process.env.PORT || 8080;
 
 app.use(express.static(path.join(__dirname, 'build')));
-app.use(middleware);
 
 const corsOptions = {
   origin: ['https://code-collab-tawny.vercel.app/'],
@@ -34,6 +33,7 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
+app.use(middleware);
 app.use("/filesystem", filesysrouter);
 
 const userSocketMap = {};
