@@ -164,7 +164,7 @@ io.on("connection", (socket) => {
 });
 
 module.exports = { io, server, http };
-const endpoints = require("./endpoints");
+const endpoints = require("./routes/endpoints");
 app.use(endpoints);
 
 // Connect to MongoDB
