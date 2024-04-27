@@ -6,7 +6,8 @@
   "main": "server.js",
   "scripts": {
     "start": "nodemon server.js",
-    "test": "jest --coverage"
+    "test": "jest --coverage",
+    "build": "npm i"
   },
   "keywords": [],
   "author": "",

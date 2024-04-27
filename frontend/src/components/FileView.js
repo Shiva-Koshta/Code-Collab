@@ -2,7 +2,13 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import UploadFileIcon from '@mui/icons-material/UploadFile'
-import { IconButton, duration, sliderClasses } from '@mui/material'
+import {
+  IconButton,
+  duration,
+  sliderClasses,
+  CircularProgress,
+} from '@mui/material'
+
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined'
 import FolderIcon from '@mui/icons-material/Folder'
 import FolderOpenIcon from '@mui/icons-material/FolderOpen'
@@ -15,7 +21,6 @@ import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown'
 import ArrowRightIcon from '@mui/icons-material/ArrowRight'
 import { FolderCopy } from '@mui/icons-material'
 import DriveFolderUploadIcon from '@mui/icons-material/DriveFolderUpload'
-import { CircularProgress } from "@mui/material";
 import axios from 'axios'
 import audioIcon from '../icons/audio.png'
 import cIcon from '../icons/c.png'
@@ -49,7 +54,8 @@ const FileView = ({
 }) => {
   const { roomId } = useParams()
   const [isDownloadTrue, setIsDownloadTrue] = useState(false)
-  const [currentFile, setCurrentFile] = useState(null)//id of the currently opened file, null if no file is opened
+  const [currentFile, setCurrentFile] = useState(null) //id of the currently opened file, null if no file is opened
+
   const [downloadFileExtension, setFileExtension] = useState('')
   const [downloadFileName, setFileName] = useState('')
   const parentRef = useRef(null)
@@ -59,14 +65,18 @@ const FileView = ({
       _id: '0',
       name: 'Root',
       type: 'root',
+
       children: []
     }
+
   ])
   const [selectedFileFolder, setSelectedFileFolder] = useState({
     _id: '0',
     name: 'Root',
     type: 'root',
+
     children: []
+
   })
   const [selectedFileFolderParent, setSelectedFileFolderParent] = useState({})
   const [isFolderOpen, setIsFolderOpen] = useState({ 0: false })
@@ -113,9 +123,16 @@ const FileView = ({
     if (!fileId) {
       return
     }
+
     //For file saving , socket action is: SAVE_FILE
-    socketRef.current.emit(ACTIONS.SAVE_FILE, { roomId, fileId, code: editorRef.current.getValue() })
-    if (show) { toast.success(`File saved`) }
+    socketRef.current.emit(ACTIONS.SAVE_FILE, {
+      roomId,
+      fileId,
+      code: editorRef.current.getValue(),
+    })
+    if (show) {
+      toast.success(`File saved`)
+    }
 
   }
 
@@ -138,6 +155,7 @@ const FileView = ({
     })()
 
     function handleResize() {
+
       setIsSmallScreen(window.innerWidth < 1260) // Adjust the threshold as needed
     }
 
@@ -185,12 +203,15 @@ const FileView = ({
           const newFile = {
             _id: response.data.file._id,
             name: response.data.file.name,
-            type: response.data.file.type
+            type: response.data.file.type,
 
           }
           parentFolder.children.push(newFile)
           console.log('pushed')
           setFolders([...folders])
+          socketRef.current.emit(ACTIONS.FILESYSTEM_CHANGE, {
+            roomId,
+          })
         } catch (error) {
           console.log(error)
         } finally {
@@ -202,6 +223,7 @@ const FileView = ({
     if (file) {
       reader.readAsText(file)
     }
+
     event.target.value = null
   }
 
@@ -210,19 +232,23 @@ const FileView = ({
       handleSaveFile(currentFile, false)
     }
     try {
-      const response = await axios.post(`${process.env.REACT_APP_API_URL}/filesystem/fetchfile`, {
-        nodeId: fileId
-      });
-      console.log(response.data.file.content);
+      const response = await axios.post(
+        `${process.env.REACT_APP_API_URL}/filesystem/fetchfile`,
+        {
+          nodeId: fileId,
+        }
+      )
+      console.log(response.data.file.content)
       setCurrentFile(fileId)
+
       // setFileContent(response.data.file.content);
       editorRef.current.setValue(response.data.file.content)
+
     } catch (error) {
       console.error(error)
     }
   }
-  
-  // More code...
+
 
   const handleDownloadFile = () => {
     const myContent = editorRef.current.getValue()
@@ -252,6 +278,9 @@ const FileView = ({
           folder.name = newName
           setFolders([...folders])
           setSelectedFileFolder(folder)
+          socketRef.current.emit(ACTIONS.FILESYSTEM_CHANGE, {
+            roomId,
+          })
         } catch (error) {
           console.log('error in renaming directory', error)
         } finally {
@@ -277,6 +306,9 @@ const FileView = ({
           console.log('renamed file')
           file.name = newName
           setFolders([...folders])
+          socketRef.current.emit(ACTIONS.FILESYSTEM_CHANGE, {
+            roomId,
+          })
         } catch (error) {
           console.log('error in renaming file', error)
         } finally {
@@ -316,6 +348,9 @@ const FileView = ({
         parentFolder.children.splice(index, 1)
         setFolders([...folders])
       }
+      socketRef.current.emit(ACTIONS.FILESYSTEM_CHANGE, {
+        roomId,
+      })
     } catch (error) {
       console.error('Error deleting folder:', error.message)
       throw new Error('Failed to delete folder.')
@@ -324,7 +359,7 @@ const FileView = ({
 
   async function deleteFile(fileId, parentFolder) {
     if (currentFile === fileId._id) {
-      editorRef.current.setValue("")
+      editorRef.current.setValue('')
       setCurrentFile(null)
     }
     try {
@@ -343,6 +378,9 @@ const FileView = ({
         parentFolder.children.splice(index, 1)
         setFolders([...folders])
       }
+      socketRef.current.emit(ACTIONS.FILESYSTEM_CHANGE, {
+        roomId,
+      })
     } catch (error) {
       console.error('Error deleting file:', error.message)
       throw new Error('Failed to delete file.')
@@ -388,6 +426,9 @@ const FileView = ({
           parentFolder.children = sortAlphabetically(parentFolder.children)
           console.log('pushed')
           setFolders([...folders])
+          socketRef.current.emit(ACTIONS.FILESYSTEM_CHANGE, {
+            roomId,
+          })
         } catch (error) {
           console.log(error)
         } finally {
@@ -421,6 +462,9 @@ const FileView = ({
           parentFolder.children.push(newFolder)
           parentFolder.children = sortAlphabetically(parentFolder.children)
           setFolders([...folders])
+          socketRef.current.emit(ACTIONS.FILESYSTEM_CHANGE, {
+            roomId,
+          })
         } catch (error) {
           console.log(error)
         } finally {
@@ -459,17 +503,15 @@ const FileView = ({
         className='flex flex-col mb-1 h-fit'
         style={{
           marginLeft: `${depth === 0 ? 0 : 10}px`,
-          maxWidth: `${
-            depth === 0 ? `${parentWidth}px` : `${parentWidth - depth * 10}px`
-          }`,
+          maxWidth: `${depth === 0 ? `${parentWidth}px` : `${parentWidth - depth * 10}px`
+            }`,
         }}
       >
         <div
-          className={`flex items-center p-px  ${
-            selectedFileFolder && selectedFileFolder._id === folder._id
+          className={`flex items-center p-px  ${selectedFileFolder && selectedFileFolder._id === folder._id
               ? 'Selected-file-folder'
               : ''
-          } rounded-md`}
+            } rounded-md`}
 
         >
           <div className='grow flex relative '>
@@ -668,6 +710,10 @@ const FileView = ({
         selectedFileFolder.children
       )
       setFolders([...folders])
+      socketRef.current.emit(ACTIONS.FILESYSTEM_CHANGE, {
+        roomId,
+      })
+
     } catch (error) {
       console.error('Error sending data to server:', error)
       toast.error(error.request.statusText, { duration: 2000 })
@@ -678,22 +724,22 @@ const FileView = ({
 
   const downloadZipFile = async (roomId) => {
     try {
-        // Make a GET request to the backend endpoint
-        const response = await axios.get(`${process.env.REACT_APP_API_URL}/filesystem/download/${roomId}`, {
-            responseType: 'blob' // Specify the response type as blob
-        });
+      // Make a GET request to the backend endpoint
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/filesystem/download/${roomId}`, {
+        responseType: 'blob' // Specify the response type as blob
+      });
 
-        // Trigger the download by creating a blob URL and clicking on a temporary link
-        const url = window.URL.createObjectURL(new Blob([response.data], { type: 'application/zip' }));
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `room_${roomId}_files.zip`;
-        document.body.appendChild(a);
-        a.click();
-        window.URL.revokeObjectURL(url);
+      // Trigger the download by creating a blob URL and clicking on a temporary link
+      const url = window.URL.createObjectURL(new Blob([response.data], { type: 'application/zip' }));
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `room_${roomId}_files.zip`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
 
     } catch (error) {
-        console.error('Error downloading zip file:', error);
+      console.error('Error downloading zip file:', error);
     }
   };
 
@@ -701,16 +747,16 @@ const FileView = ({
   useEffect(() => {
     const handleUnload = (event) => {
       if (currentFile !== null) {
-        handleSaveFile(currentFile, false);
+        handleSaveFile(currentFile, false)
       }
-    };
+    }
 
-    window.addEventListener('beforeunload', handleUnload);
+    window.addEventListener('beforeunload', handleUnload)
 
     return () => {
-      window.removeEventListener('beforeunload', handleUnload);
-    };
-  }, [currentFile]);
+      window.removeEventListener('beforeunload', handleUnload)
+    }
+  }, [currentFile])
   return (
     <div className='flex flex-col justify-between h-full'>
       <div className='flex justify-between mx-1 relative h-fit grow'>
@@ -718,6 +764,7 @@ const FileView = ({
           <div
             className={`text-lg font-bold flex justify-between items-center my-3 
               }`}
+
           >
             <p>File Explorer</p>
             {selectedFileFolder.type === 'root' && (
@@ -876,6 +923,7 @@ const FileView = ({
                   Download File
                 </div>
                 <button
+
                   className='deleteFileIcon update-buttons '
                   onClick={() =>
                     deleteFile(selectedFileFolder, selectedFileFolderParent)

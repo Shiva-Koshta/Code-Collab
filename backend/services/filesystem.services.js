@@ -144,7 +144,7 @@ async function saveFile(nodeId, content)
         }
         return { success: true, message: 'File saved successfully.'};
     } catch (error) {
-        console.error('Error saving file:', error.message);
+        console.log('Error saving file:', error.message);
         return { success: false, message: 'Failed to save file.' };
     }
 }
@@ -214,7 +214,7 @@ async function deleteFile(nodeId) {
         }
         return { success: true, message: 'File deleted successfully.', deletedNode };
     } catch (error) {
-        console.error('Error deleting file:', error.message);
+        console.log('Error deleting file:', error.message);
         return { success: false, message: 'Failed to delete file.' };
     }
 }
@@ -229,7 +229,7 @@ async function deleteDirectory(nodeId) {
         }
         return { success: true, message: 'File deleted successfully.', deletedNode };
     } catch (error) {
-        console.error('Error deleting file:', error.message);
+        console.log('Error deleting file:', error.message);
         return { success: false, message: 'Failed to delete file.' };
     }
 }
@@ -250,7 +250,7 @@ async function renameFile(nodeId, newName) {
         return { success: true, message: 'File renamed successfully.', updatedNode };
 
     } catch (error) {
-        console.error('Error renaming file:', error.message);
+        console.log('Error renaming file:', error.message);
         return { success: false, message: 'Failed to rename file.' };
     }
 }
@@ -271,7 +271,7 @@ async function renameDirectory(nodeId, newName) {
         return { success: true, message: 'Directory renamed successfully.', updatedNode };
 
     } catch (error) {
-        console.error('Error renaming Directory:', error.message);
+        console.log('Error renaming Directory:', error.message);
         return { success: false, message: 'Failed to rename file.' };
     }
 }
@@ -313,7 +313,7 @@ async function createZipFile(roomId, archive, ) {
         return archive;
 
     } catch (error) {
-        console.error(`Error creating zip file: ${error}`);
+        console.log(`Error creating zip file: ${error}`);
         throw error;
     }
 }
