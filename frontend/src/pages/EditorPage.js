@@ -48,7 +48,7 @@ const EditorPage = () => {
     const storedMessages = window.localStorage.getItem(`messages_${roomId}`);
     return storedMessages ? JSON.parse(storedMessages) : [];
   });
-  const CHAT_LIMIT = 15; // Global variable for chat limit
+  const CHAT_LIMIT = 50; // Global variable for chat limit
 
   // const [inputText, setInputText] = useState("");
 
