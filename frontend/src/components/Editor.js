@@ -317,7 +317,7 @@ const Editor = ({
 
       const tooltip = document.createElement("div");
       tooltip.className = "tooltip"
-      tooltip.innerText = user.name
+      tooltip.innerText = user.name.split(" ")[0]
       tooltip.style.fontSize = "10px"
       tooltip.style.padding = "2px 4px"
 
