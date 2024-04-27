@@ -36,7 +36,7 @@ const Sidebar = ({
     setConnectedUserRoles,
     socketRef,
     currentFile,
-    setCurrentFile,
+    // setCurrentFile,
     menuOpen,
     setMenuOpen
 }) => {
@@ -211,7 +211,7 @@ const Sidebar = ({
         connectedUserRoles={connectedUserRoles}
         storedUserData={storedUserData}
         currentFile={currentFile}
-        setCurrentFile={setCurrentFile}
+        // setCurrentFile={setCurrentFile}
       />
       <div className='Users z-10 '>
         <div

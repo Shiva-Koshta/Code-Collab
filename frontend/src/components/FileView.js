@@ -51,7 +51,7 @@ const FileView = ({
   connectedUserRoles,
   storedUserData,
   currentFile,
-  setCurrentFile
+  // setCurrentFile
 }) => {
   const { roomId } = useParams()
   const [isDownloadTrue, setIsDownloadTrue] = useState(false)
@@ -103,12 +103,14 @@ const FileView = ({
   }
 
   useEffect(() => {
-    if (currentFile == null) {
+    console.log(currentFile.current)
+    if (currentFile.current == null) {
       if (editorRef.current) {
         editorRef.current.setOption('readOnly', true)
         editorRef.current.setValue('')
       }
     } else {
+      console.log(currentFile.current)
       const currentUserRole = connectedUserRoles.find(
         (user) => user.name === storedUserData.current.name
       )?.role
@@ -121,7 +123,7 @@ const FileView = ({
     document.querySelectorAll(".cursor-marker").forEach((node) => node.remove());
     const handleCtrlS = (event) => {
       if (event.ctrlKey && event.key === 's') {
-        handleSaveFile(currentFile, true)
+        handleSaveFile(currentFile.current, true)
         event.preventDefault()
       }
     }
@@ -129,19 +131,19 @@ const FileView = ({
     return () => {
       document.removeEventListener('keydown', handleCtrlS)
     }
-  }, [currentFile])
+  }, [currentFile.current])
 
   useEffect(() => {
 
 
     if (socketRef.current) {
       socketRef.current.on(ACTIONS.FILESYSTEM_CHANGE,({isdelete})=> {
-        if(isdelete){setCurrentFile(null)}
+        if(isdelete){currentFile.current=null}
         handleFilesystemChange()
       })
 
       socketRef.current.on(ACTIONS.SELECTED_FILE_CHANGE, ({folder, parentFolder}) =>{
-        setCurrentFile(folder._id)
+        // currentFile.current=folder._id
         handleFileClick(folder,parentFolder,false)
         setSelectedFileFolder(folder)
         setSelectedFileFolderParent(parentFolder)
@@ -261,19 +263,19 @@ const FileView = ({
 
   const handleFileClick = async (folder,parentFolder,isClicked) => {
     const fileId = folder._id
-    if (currentFile != null) {
-      handleSaveFile(currentFile, false)
+    console.log(fileId)
+    if (currentFile.current != null) {
+      handleSaveFile(currentFile.current, false)
     }
     try {
+      currentFile.current=fileId
       const response = await axios.post(
         `${process.env.REACT_APP_API_URL}/filesystem/fetchfile`,
         {
           nodeId: fileId,
         }
       )
-      console.log(response.data.file.content)
-      setCurrentFile(fileId)
-
+      console.log(currentFile.current)
       // setFileContent(response.data.file.content);
       editorRef.current.setValue(response.data.file.content)
       if(isClicked)
@@ -403,9 +405,9 @@ const FileView = ({
   }
 
   async function deleteFile(fileId, parentFolder) {
-    if (currentFile === fileId._id) {
+    if (currentFile.current === fileId._id) {
       editorRef.current.setValue('')
-      setCurrentFile(null)
+      currentFile.current=null
     }
     try {
       setLoading(true)
@@ -793,8 +795,8 @@ const FileView = ({
 
   useEffect(() => {
     const handleUnload = (event) => {
-      if (currentFile !== null) {
-        handleSaveFile(currentFile, false)
+      if (currentFile.current !== null) {
+        handleSaveFile(currentFile.current, false)
       }
     }
 

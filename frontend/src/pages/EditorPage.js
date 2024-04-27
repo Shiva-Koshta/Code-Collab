@@ -50,8 +50,8 @@ const EditorPage = () => {
     return storedMessages ? JSON.parse(storedMessages) : [];
   });
   const CHAT_LIMIT = 15; // Global variable for chat limit
-  const [currentFile, setCurrentFile] = useState(null)
-
+  // const [currentFile, setCurrentFile] = useState(null)
+  const currentFile = useRef(null)
   // const [inputText, setInputText] = useState("");
 
   // const fileRef=useRef(null);
@@ -293,7 +293,7 @@ const EditorPage = () => {
                 if (currentUserRole === "viewer") {
                   editorRef.current.setOption("readOnly", true);
                 }
-                if (currentUserRole === "editor" && currentFile!=null) {
+                if (currentUserRole === "editor" && currentFile.current!=null) {
                   editorRef.current.setOption("readOnly", false);
                 }
 
@@ -388,14 +388,15 @@ const EditorPage = () => {
         );
         console.log(connectedUserRoles);
         console.log(connectedUsers);
-
+        console.log(currentFile.current)
         if (username === storedUserData.current.name && newRole == "viewer") {
           console.log("yes");
           editorRef.current.setOption("readOnly", true);
           // editor.setOption('readOnly', true)
           // editor.readOnly.of(true)
         }
-        if (username === storedUserData.current.name && newRole === "editor" && currentFile!=null) {
+        if (username === storedUserData.current.name && newRole === "editor" && currentFile.current!=null) {
+          console.log("Asdds")
           editorRef.current.setOption("readOnly", false);
           // const editor = editorRef.current.getCodeMirror()
           // editor.setOption('readOnly', false)
@@ -428,7 +429,7 @@ const EditorPage = () => {
               if (currentUserRole === "viewer") {
                 editorRef.current.setOption("readOnly", true);
               }
-              if (currentUserRole === "editor" && currentFile!=null) {
+              if (currentUserRole === "editor" && currentFile.current!=null) {
                 editorRef.current.setOption("readOnly", false);
               }
 
@@ -478,7 +479,7 @@ const EditorPage = () => {
           if (currentUserRole === "viewer") {
             editorRef.current.setOption("readOnly", true);
           }
-          if (currentUserRole === "editor" && currentFile!=null) {
+          if (currentUserRole === "editor" && currentFile.current!=null) {
             editorRef.current.setOption("readOnly", false);
           }
           // setHost(data.host);
@@ -528,7 +529,7 @@ const EditorPage = () => {
           setConnectedUserRoles={setConnectedUserRoles}
           socketRef={socketRef}
           currentFile={currentFile}
-          setCurrentFile={setCurrentFile}
+          // setCurrentFile={setCurrentFile}
           menuOpen={menuOpen}
           setMenuOpen={setMenuOpen}
         />

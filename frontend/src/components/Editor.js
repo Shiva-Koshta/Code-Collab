@@ -291,7 +291,7 @@ const Editor = ({
       const cursorMarker = document.createElement("div");
       cursorMarker.className = "cursor-marker";
       cursorMarker.style.position = "absolute";
-      cursorMarker.classList.add("h-8", "w-px");
+      cursorMarker.classList.add("h-8", "w-0.5");
 
       cursorMarker.style.backgroundColor = getRandomColor(); // Assign a random color
       cursorMarker.title = user.name;
@@ -314,7 +314,14 @@ const Editor = ({
       // cursorMarker.style.top = `${editorRef.current.charCoords({ line, ch }).top
       //   }px`;
       // console.log(editorRef.current.charCoords({ line, ch }).top);
-      // Define CSS keyframes for blinking effect
+
+      const tooltip = document.createElement("div");
+      tooltip.className = "tooltip"
+      tooltip.innerText = user.name
+      tooltip.style.fontSize = "10px"
+      tooltip.style.padding = "2px 4px"
+
+      cursorMarker.appendChild(tooltip);
     }
   };
   // Clean up cursor markers when component unmounts
