@@ -1,35 +1,63 @@
-import { initSocket } from '../socket'; // Assuming this file is in the same directory
+import { initSocket } from '../socket';
 
-// Mocking the socket.io-client module
-jest.mock('socket.io-client', () => {
-    const onMock = jest.fn();
-    return {
-      io: jest.fn((url, options) => ({
-        on: onMock,
-      })),
-      __onMock: onMock, // Expose the mock for assertion purposes
+const io = require('socket.io-client');
+jest.mock('socket.io-client');
+
+describe('initSocket', () => {
+  afterEach(() => {
+    jest.clearAllMocks(); // Clear mock function call history after each test
+  });
+
+  it('initializes socket connection with provided options', async () => {
+    const mockSocket = {
+      on: jest.fn(),
     };
-  });
-  
-  describe('initSocket', () => {
-    it('should initialize socket connection with correct options', async () => {
-      process.env.REACT_APP_BACKEND_URL = 'http://example.com';
-  
-      const socket = await initSocket();
-  
-      // Assert that the io function was called with the correct URL and options
-      expect(require('socket.io-client').io).toHaveBeenCalledWith(
-        'http://example.com',
-        {
-          'force new connection': true,
-          reconnectionAttempt: 'Infinity',
-          timeout: 2000,
-          transports: ['websocket'],
-        }
-      );
-  
-      // Additional assertion on whether the 'on' method is called correctly
-      expect(socket.on).toHaveBeenCalledWith('connect', expect.any(Function));
+
+    // Mock the 'io' function to return a mock socket instance
+    io.mockReturnValue(mockSocket);
+
+    const fakeUrl = 'http://localhost:8080';
+    const fakeOptions = {
+      'force new connection': true,
+      reconnectionAttempt: 'Infinity',
+      timeout: 2000,
+      transports: ['websocket'],
+    };
+
+    // Create a mock implementation for the 'on' method of mockSocket
+    mockSocket.on.mockImplementation((eventName, callback) => {
+      if (eventName === 'connect') {
+        // Simulate the socket connection being established
+        callback();
+      }
     });
+
+    await initSocket();
+
+    // Ensure that the 'io' function is called with the correct URL and options
+    expect(io).toHaveBeenCalledWith(fakeUrl, fakeOptions);
+
+    // Ensure that the 'connect' event handler is added
+    expect(mockSocket.on).toHaveBeenCalledWith('connect', expect.any(Function));
+    // Ensure that the 'connect_error' event handler is added
+    expect(mockSocket.on).toHaveBeenCalledWith('connect_error', expect.any(Function));
   });
-  
+
+  it('handles connection errors', async () => {
+    const mockSocket = {
+      on: jest.fn(),
+    };
+
+    io.mockReturnValue(mockSocket);
+
+    // Mock a connection error
+    const error = new Error('Connection error');
+    mockSocket.on.mockImplementation((event, callback) => {
+      if (event === 'connect_error') {
+        callback(error);
+      }
+    });
+
+    await expect(initSocket()).rejects.toThrow('Connection error');
+  });
+});

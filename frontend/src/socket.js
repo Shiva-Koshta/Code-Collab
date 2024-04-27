@@ -32,7 +32,7 @@ export const initSocket = async () => {
     });
 
     socket.on('connect_error', (error) => {
-      console.error('Socket connection error:', error);
+      //console.error('Socket connection error:', error);
       reject(error);
     });
   });
