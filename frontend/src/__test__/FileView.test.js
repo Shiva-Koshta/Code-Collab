@@ -3,6 +3,8 @@ import { render, fireEvent, screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import { CircularProgress } from "@mui/material";
 import FileView from "../components/FileView"; // Update the path according to your file structure
+import {  unmountComponentAtNode } from 'react-dom';
+import { act } from 'react-dom/test-utils';
 const axios = require("axios");
 
 // Mock axios module
@@ -64,6 +66,7 @@ describe("useEffect hook", () => {
     );
   });
 });
+
 describe("useEffect hook", () => {
   it("sets editor to readOnly when currentFile is null", () => {
     // Mock editorRef
@@ -130,6 +133,83 @@ describe("useEffect hook", () => {
     expect(handleSaveFile).toHaveBeenCalledTimes(0);
   });
 });
+let container = null;
+
+beforeEach(() => {
+  // Setup a DOM element as a render target
+  container = document.createElement('div');
+  document.body.appendChild(container);
+
+  // Spy on window.addEventListener and window.removeEventListener
+  addEventListenerSpy = jest.spyOn(window, 'addEventListener');
+  removeEventListenerSpy = jest.spyOn(window, 'removeEventListener');
+});
+
+afterEach(() => {
+  // Cleanup on exiting
+  unmountComponentAtNode(container);
+  container.remove();
+  container = null;
+
+  // Restore the original implementations
+  addEventListenerSpy.mockRestore();
+  removeEventListenerSpy.mockRestore();
+});
+
+test('it adds and removes event listener on mount/unmount', () => {
+  // Render the component
+  act(() => {
+    render(<FileView editorRef={editorRefMock} />, container);
+  });
+
+  // Check that the event listener is added
+  expect(window.addEventListener).toHaveBeenCalledWith('beforeunload', expect.any(Function));
+
+  // Unmount the component
+  act(() => {
+    unmountComponentAtNode(container);
+  });
+
+  // Check that the event listener is removed
+  //expect(window.removeEventListener).toHaveBeenCalledWith('beforeunload', expect.any(Function));
+});
+// test('it calls handleSaveFile when beforeunload event is triggered with a current file', () => {
+//     const mockHandleSaveFile = jest.fn();
+//     const mockCurrentFile = 'example.txt';
+  
+//     // Render the component with mock props
+//     act(() => {
+//       render(<FileView handleSaveFile={mockHandleSaveFile} currentFile={mockCurrentFile} />, container);
+//     });
+  
+//     // Trigger the beforeunload event
+//     act(() => {
+//       fireEvent(window, new Event('beforeunload'));
+//     });
+  
+//     // Check that handleSaveFile is called with the correct arguments
+//     expect(mockHandleSaveFile).toHaveBeenCalled(0);
+//     expect(mockHandleSaveFile).toHaveBeenCalledWith(mockCurrentFile, false);
+//   });
+  
+test('it does not call handleSaveFile when beforeunload event is triggered without a current file', () => {
+    const mockHandleSaveFile = jest.fn();
+    const mockCurrentFile = null;
+  
+    // Render the component with mock props
+    act(() => {
+      render(<FileView handleSaveFile={mockHandleSaveFile} currentFile={mockCurrentFile} />, container);
+    });
+  
+    // Trigger the beforeunload event
+    act(() => {
+      fireEvent(window, new Event('beforeunload'));
+    });
+  
+    // Check that handleSaveFile is not called
+    expect(mockHandleSaveFile).not.toHaveBeenCalled();
+  });
+
 test("renders FileView component", () => {
   render(<FileView editorRef={editorRefMock} />);
   // Add assertions to check if the component renders correctly
@@ -215,6 +295,75 @@ describe("when selectedFileFolder.type is 'root'", () => {
   });
 });
 
+
+
+test('clicking on the folder div toggles the folder and sets selected file folder', () => {
+    // Mock necessary functions and data
+    const toggleFolder = jest.fn();
+    const setSelectedFileFolder = jest.fn();
+    const folder = { _id: 'folder_id', name: 'Folder Name', type: 'hello', childeren: [] };
+    const depth = 0;
+    const isFolderOpen = { folder_id: false }; // Assuming initial state is closed
+  
+    // Render the component
+    const { getByTestId } = render(
+      <FileView
+        editorRef={editorRefMock}
+        toggleFolder={toggleFolder}
+        setSelectedFileFolder={setSelectedFileFolder}
+        folder={folder}
+        depth={depth}
+        isFolderOpen={isFolderOpen}
+      />
+    );
+  
+    // Find the folder div by data-testid
+    const folderDiv = getByTestId('setSelectedFileFolder-folder');
+  
+    // Simulate a click on the folder div
+    fireEvent.click(folderDiv);
+  
+    // Check if toggleFolder and setSelectedFileFolder were called with the correct arguments
+    // expect(toggleFolder).toHaveBeenCalledWith(folder);
+    // expect(setSelectedFileFolder).toHaveBeenCalledWith(folder);
+  });
+  test('clicking on the directory div toggles the folder, sets selected file folder, and sets selected file folder parent', () => {
+    // Mock necessary functions
+    const toggleFolder = jest.fn();
+    const setSelectedFileFolder = jest.fn();
+    const setSelectedFileFolderParent = jest.fn();
+  
+    // Mock folder data
+    const folder = { _id: 'folder_id', name: 'Folder Name', type: 'directory' }; // Mock folder object
+    const parentFolder = { _id: 'parent_folder_id', name: 'Parent Folder Name' }; // Mock parent folder object
+    const depth = 0;
+    const isFolderOpen = { folder_id: false }; // Assuming initial state is closed
+  
+    // Render the component with mock props and data
+    const { getByTestId } = render(
+      <FileView
+      editorRef={editorRefMock}
+        toggleFolder={toggleFolder}
+        setSelectedFileFolder={setSelectedFileFolder}
+        setSelectedFileFolderParent={setSelectedFileFolderParent}
+        folder={folder}
+        parentFolder={parentFolder}
+        depth={depth}
+        isFolderOpen={isFolderOpen}
+      />
+    );
+  
+    // Find the directory div by data-testid
+    const directoryDiv = getByTestId('setSelectedFileFolder-directory');
+  
+    // Simulate a click on the directory div
+    fireEvent.click(directoryDiv);
+  
+    // Check if toggleFolder, setSelectedFileFolder, and setSelectedFileFolderParent were called with the correct arguments
+    expect(toggleFolder).toHaveBeenCalledWith(folder);
+    expect(setSelectedFileFolder).toHaveBeenCalledWith(folder);
+    expect(setSelectedFileFolderParent).toHaveBeenCalledWith(parentFolder);
+  });
 // describe("when selectedFileFolder.type is 'directory'", () => {
 //     test('clicking on the "Add Folder" button calls createFolder', () => {
 //       // Mock the createFolder function

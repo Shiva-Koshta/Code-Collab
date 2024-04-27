@@ -480,9 +480,10 @@ const FileView = ({
                 placement='right'
               >
                 <div
+                  data-testid = 'setSelectedFileFolder-folder'
                   onClick={() => {
                     toggleFolder(folder)
-                    setSelectedFileFolder(folder)
+                    setSelectedFileFolder(folder)  
                   }}
                   style={{
                     maxWidth: `${depth === 0 ? '300px' : `${300 - depth}px`}`,
@@ -513,6 +514,7 @@ const FileView = ({
                 placement='right'
               >
                 <div
+                data-testid = 'setSelectedFileFolder-directory'
                   onClick={() => {
                     toggleFolder(folder)
                     setSelectedFileFolder(folder)
@@ -546,6 +548,7 @@ const FileView = ({
                 placement='right'
               >
                 <div
+                data-testid = 'setSelectedFileFolder-directory'
                   style={{
                     maxWidth: `${depth === 0 ? '328px' : `${328 - depth}px`}`,
                   }}
@@ -782,8 +785,8 @@ const FileView = ({
                 <button
                   className='addFolderIcon update-buttons '
                   onClick={() => createFolder(selectedFileFolder)}
-                  title='Add Folder'
-                  data-testid='Add-folder-button'
+                  title='Addddd Folder'
+                  data-testid='add-folder-button-directory'
                 >
                   <CreateNewFolderIcon />
                 </button>

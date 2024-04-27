@@ -1,7 +1,11 @@
 import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
 import FileView, { renderFolder } from "../components/FileView";
-import userEvent from '@testing-library/user-event'; 
+// import   downloadZipFile  from "../components/FileView";
+import userEvent from "@testing-library/user-event";
+import { unmountComponentAtNode } from "react-dom";
+import { act } from "react-dom/test-utils";
+import axios from "axios";
 // Mock axios module
 jest.mock("axios");
 // Mock the useNavigate hook
@@ -19,22 +23,258 @@ const editorRefMock = {
 };
 
 
+describe('YourComponent', () => {
+    it('should render Add Folder button for Directory and trigger createFolder function when clicked', () => {
+      // Mock the createFolder function
+      const mockCreateFolder = jest.fn();
+      // Mock selectedFileFolder to be of type 'directory'
+      const selectedFileFolder = {
+        _id: '1',
+        name: 'Directory',
+        type: 'directory',
+        children: []
+      };
+  
+      // Render the component with mock functions and props
+      const { getByTestId } = render(
+        <FileView 
+          selectedFileFolder={selectedFileFolder} 
+          createFolder={mockCreateFolder} 
+        />
+      );
+  
+      // Find the Add Folder button
+      const addFolderButton = getByTestId('add-folder-button-directory');
+  
+      // Simulate a click on the Add Folder button
+      fireEvent.click(addFolderButton);
+  
+      // Expect the createFolder function to be called
+      expect(mockCreateFolder).toHaveBeenCalled();
+    });
+  });
 
+// test('clicking on the "Add Folder" button calls createFolder', () => {
+//   // Mock the createFolder function
+//   const createFolder = jest.fn();
+//   const setSelectedFileFolder = jest.fn();
+//   const selectedFileFolder = { name: "test", _id:"asdf", children: [], type: "directory" }; // Mock the selectedFileFolder object
+//   // Render the component with the "Add Folder" button
+//   const { getByTestId, getByText } = render(
+//     <FileView
+//       editorRef={editorRefMock}
+//       createFolder={createFolder}
+//     />
+//   );
+//   FileView.setSelectedFileFolder(selectedFileFolder);
+  
+//   expect(selectedFileFolder.type).toBe('directory');
 
+//   expect(getByText("File Explorer")).toBeInTheDocument();
+//   // Simulate a user click on the "Add Folder" button
+//   fireEvent.click(getByTestId("add-folder-button-directory"));
 
+//   // Check if createFolder was called with the correct argument
 
+//   // expect(createFolder).toHaveBeenCalledWith(selectedFileFolder);
+// });
+// describe('handleFileClick', () => {
+//     test('it handles file click and updates current file', async () => {
+//         // Mock necessary functions
+//         const handleSaveFileMock = jest.fn();
+//         const axiosPostMock = jest.fn();
 
+//         // Mock current file and editorRef
+//         const currentFile = null;
+//         const editorRefMock = { current: { setValue: jest.fn() } };
 
+//         // Mock axios
+//         jest.mock('axios', () => ({
+//           post: axiosPostMock,
+//         }));
 
+//         // Mock axios post response
+//         const fileId = 'file_id';
+//         const fileContent = 'Mock file content';
+//         axiosPostMock.mockResolvedValueOnce({ data: { file: { content: fileContent } } });
 
+//         // Render the component
+//         const { container } = render(
+//           <FileView
+//             currentFile={currentFile}
+//             editorRef={editorRefMock}
+//             handleSaveFile={handleSaveFileMock}
+//           />
+//         );
 
+//         // Find the file element and simulate a click
+//         const fileElement = container.querySelector('your-selector-for-file-element');
+//         fireEvent.click(fileElement);
 
+//         // Check if axios post request was made with correct parameters
+//         expect(axiosPostMock).toHaveBeenCalledWith(`${process.env.REACT_APP_API_URL}/filesystem/fetchfile`, {
+//           nodeId: fileId
+//         });
 
+//         // Check if currentFile is updated
+//         expect(FileView.getCurrentFile()).toBe(fileId);
 
+//         // Check if handleSaveFile was not called (because currentFile is null)
+//         expect(handleSaveFileMock).not.toHaveBeenCalled();
 
+//         // Check if editorRef's setValue function was called with correct content
+//         expect(editorRefMock.current.setValue).toHaveBeenCalledWith(fileContent);
+//       });
 
+//     test('it handles file click when currentFile is not null', async () => {
+//       // Mock current file and editorRef
+//       const currentFile = 'previous_file_id';
+//       const editorRefMock = { current: { setValue: jest.fn() } };
 
+//       // Mock axios post response
+//       const fileId = 'file_id';
+//       const fileContent = 'Mock file content';
+//       const mockAxiosPost = jest.spyOn(axios, 'post').mockResolvedValueOnce({ data: { file: { content: fileContent } } });
 
+//       // Mock handleSaveFile function
+//       const handleSaveFileMock = jest.fn();
+
+//       // Render the component
+//       await act(async () => {
+//         FileView.handleFileClick(fileId, currentFile, editorRefMock, handleSaveFileMock);
+//       });
+
+//       // Check if handleSaveFile was called with correct parameters
+//       expect(handleSaveFileMock).toHaveBeenCalledWith(currentFile, false);
+
+//       // Check if axios post request was made with correct parameters
+//       expect(mockAxiosPost).toHaveBeenCalledWith(`${process.env.REACT_APP_API_URL}/filesystem/fetchfile`, {
+//         nodeId: fileId
+//       });
+
+//       // Check if currentFile is updated
+//       expect(FileView.getCurrentFile()).toBe(fileId);
+
+//       // Check if editorRef's setValue function was called with correct content
+//       expect(editorRefMock.current.setValue).toHaveBeenCalledWith(fileContent);
+//     });
+
+//     test('it handles error during file click', async () => {
+//       // Mock current file and editorRef
+//       const currentFile = null;
+//       const editorRefMock = { current: { setValue: jest.fn() } };
+
+//       // Mock axios post error
+//       const mockAxiosPost = jest.spyOn(axios, 'post').mockRejectedValueOnce(new Error('Mock API error'));
+
+//       // Mock console.error
+//       const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+
+//       // Render the component
+//       await act(async () => {
+//         FileView.handleFileClick('file_id', currentFile, editorRefMock);
+//       });
+
+//       // Check if axios post request was made with correct parameters
+//       expect(mockAxiosPost).toHaveBeenCalledWith(`${process.env.REACT_APP_API_URL}/filesystem/fetchfile`, {
+//         nodeId: 'file_id'
+//       });
+
+//       // Check if console.error was called with the error
+//       expect(consoleErrorSpy).toHaveBeenCalledWith(expect.any(Error));
+
+//       // Ensure that currentFile and editorRef are not updated
+//       expect(FileView.getCurrentFile()).toBe(currentFile);
+//       expect(editorRefMock.current.setValue).not.toHaveBeenCalled();
+
+//       // Restore console.error
+//       consoleErrorSpy.mockRestore();
+//     });
+//   });
+
+// describe('FileView component', () => {
+//     test('it triggers file download upon successful API response', async () => {
+//       const roomId = '123';
+//       const mockResponseData = new Blob(['mock zip file content'], { type: 'application/zip' });
+//       const mockAxiosGet = jest.spyOn(axios, 'get').mockResolvedValueOnce({ data: mockResponseData });
+
+//       await act(async () => {
+//         render(<FileView editorRef={editorRefMock} />);
+//       });
+
+//       // Simulate download
+//       await act(async () => {
+//         await FileView.downloadZipFile(roomId);
+//       });
+
+//       // Check if axios GET request is made with the correct URL and options
+//       expect(mockAxiosGet).toHaveBeenCalledWith(`${process.env.REACT_APP_API_URL}/filesystem/download/${roomId}`, {
+//         responseType: 'blob'
+//       });
+
+//       // Check if temporary link is created with correct attributes
+//       const a = document.querySelector('a');
+//       expect(a).not.toBeNull();
+//       expect(a.href).toContain(`room_${roomId}_files.zip`);
+//       expect(a.download).toBe(`room_${roomId}_files.zip`);
+
+//       // Clean up
+//       a.remove();
+//       mockAxiosGet.mockRestore();
+//     });
+
+//     test('it logs an error upon failed API response', async () => {
+//       const roomId = '123';
+//       const mockAxiosGet = jest.spyOn(axios, 'get').mockRejectedValueOnce(new Error('Mock API error'));
+//       const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+
+//       await act(async () => {
+//         render(<FileView />);
+//       });
+
+//       // Simulate download
+//       await act(async () => {
+//         await FileView.downloadZipFile(roomId);
+//       });
+
+//       // Check if axios GET request is made with the correct URL and options
+//       expect(mockAxiosGet).toHaveBeenCalledWith(`${process.env.REACT_APP_API_URL}/filesystem/download/${roomId}`, {
+//         responseType: 'blob'
+//       });
+
+//       // Check if error is logged
+//       expect(consoleErrorSpy).toHaveBeenCalledWith('Error downloading zip file:', expect.any(Error));
+
+//       // Clean up
+//       mockAxiosGet.mockRestore();
+//       consoleErrorSpy.mockRestore();
+//     });
+//   });
+
+let container = null;
+let addEventListenerSpy;
+let removeEventListenerSpy;
+
+beforeEach(() => {
+  // Setup a DOM element as a render target
+  container = document.createElement("div");
+  document.body.appendChild(container);
+
+  // Spy on window.addEventListener and window.removeEventListener
+  addEventListenerSpy = jest.spyOn(window, "addEventListener");
+  removeEventListenerSpy = jest.spyOn(window, "removeEventListener");
+});
+
+afterEach(() => {
+  // Cleanup on exiting
+  unmountComponentAtNode(container);
+  container.remove();
+  container = null;
+
+  // Restore the original implementations
+  addEventListenerSpy.mockRestore();
+  removeEventListenerSpy.mockRestore();
+});
 
 // Mock functions if needed
 // const mockHandleDownloadFile = jest.fn();
@@ -56,21 +296,6 @@ const editorRefMock = {
 //   addEventListenerSpy.mockRestore();
 //   removeEventListenerSpy.mockRestore();
 // });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 // describe("useEffect hook", () => {
 //   it("calls handleSaveFile when currentFile changes", () => {
