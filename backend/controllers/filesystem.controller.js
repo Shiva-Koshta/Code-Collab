@@ -20,7 +20,7 @@ createfile = async(req, res) => {
         }     
         res.status(200).json(responseJSON);
     } catch (error) {
-        console.log(error)
+        // console.log(error)
         res.status(500).json({ message: 'Error creating file' })
     }
 }
@@ -40,7 +40,7 @@ uploadfile = async(req, res) => {
         }     
         res.status(200).json(responseJSON);
     } catch (error) {
-        console.log(error)
+        // console.log(error)
         res.status(500).json({ message: 'Error uploading file' })
     }
 }
@@ -61,7 +61,7 @@ createdirectory = async(req, res) => {
         }     
         res.status(200).json(responseJSON);
     } catch (error) {
-        console.log(error)
+        // console.log(error)
         res.status(500).json({ message: 'Error creating directory' })
     }
 }
@@ -74,7 +74,8 @@ uploaddirectory = async(req, res) => {
         }    
         res.status(200).json(responseJSON);
     } catch (error) {
-        console.log(error)
+        // console.log(error)
+        res.status(500).json({ message: 'Error uploading directory' })
     }
 }
 createrootdirectory = async(req, res) => {
@@ -93,7 +94,7 @@ createrootdirectory = async(req, res) => {
         }    
         res.status(200).json(responseJSON);
     } catch (error) {
-        console.log(error)
+        // console.log(error)
         res.status(500).json({ message: 'Error creating root directory' })
     }
 
@@ -116,7 +117,7 @@ fetchfile = async(req, res) => {
         // console.log(file.content.toString());
         res.status(200).json(responseJSON);
     } catch (error) {
-        console.log(error)
+        // console.log(error)
         res.status(500).json({ message: 'Error fetching file' })
     }
 }
@@ -131,7 +132,7 @@ generatetree = async(req, res) => {
         }    
         res.status(200).json(responseJSON);
     } catch (error) {
-        console.log(error)
+        // console.log(error)
         res.status(500).json({ message: 'Error fetching file' })
     }
 }
@@ -153,7 +154,8 @@ deletedirectory = async(req, res) => {
         dir = await filesys.deleteDirectory(req.body.nodeId);  
         res.status(200).json({ success: true, message: 'Directory deleted successfully.', dir });
     } catch (error) {
-        console.log(error)
+        // console.log(error)
+        res.status(500).json({ message: 'Error deleting directory' })
     }
 }
 
@@ -167,7 +169,7 @@ renamefile = async(req, res) => {
         }     
         res.status(200).json(responseJSON);
     } catch (error) {
-        console.log(error)
+        // console.log(error)
         res.status(500).json({ message: 'Error renaming file' })
     }
 }
@@ -181,7 +183,7 @@ renamedirectory = async(req, res) => {
         }     
         res.status(200).json(responseJSON);
     } catch (error) {
-        console.log(error)
+        // console.log(error)
         res.status(500).json({ message: 'Error renaming directory' })
     }
 }
@@ -210,7 +212,7 @@ downloadFile = async (req, res) => {
             // Send the zip file to the client
             res.download(zipFilePath, (err) => {
                 if (err) {
-                    console.error('Error downloading zip file:', err);
+                    // console.error('Error downloading zip file:', err);
                 } else {
                     // Delete the zip file after downloading
                     fs.unlinkSync(zipFilePath);
@@ -219,7 +221,7 @@ downloadFile = async (req, res) => {
         });
         
     } catch (error) {
-        console.error('Error creating zip file:', error);
+        // console.error('Error creating zip file:', error);
         res.status(500).send('Internal Server Error');
     }
 }

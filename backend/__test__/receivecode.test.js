@@ -1,7 +1,7 @@
 const request = require('supertest');
 const express = require('express');
 const bodyParser = require('body-parser');
-const router = require('../endpoints'); // Import the router with the endpoint
+const router = require('../routes/endpoints'); // Import the router with the endpoint
 
 // Importing Mongoose and the RoomCodeMap model
 const mongoose = require('mongoose');
