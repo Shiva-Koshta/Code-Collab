@@ -25,44 +25,54 @@ app.use("/filesystem", filesysrouter);
 const userSocketMap = {};
 const usercnt = {};
 const cursorPosition = {};
-
+  /*
+  Retrieves information about all connected clients in the specified room.
+  Inputs:
+    roomId (string): The ID of the room for which connected clients are to be retrieved.
+  Outputs:
+    Array: An array containing objects representing connected clients, each object containing socketId, username, and picture.
+  */
 function getAllConnectedClients(roomId) {
   return Array.from(io.sockets.adapter.rooms.get(roomId) || []).map(
     (socketId) => {
-      console.log("userSocketMap:");
-      console.log(userSocketMap);
       return {
         socketId,
         username: userSocketMap[socketId].username,
         picture: userSocketMap[socketId].picture,
-        //consolelog(username)
+        
       };
     }
   );
 }
-// Define socket.io logic
+// Define socket.io logic for handling client connections
 io.on("connection", (socket) => {
   console.log("Socket connected", socket.id);
+   /*
+    Handles the JOIN event when a user joins a room.
+    Inputs:
+      roomId (string): The ID of the room the user is joining.
+      username (string): The username of the user joining.
+      picture (string): The picture URL of the user joining.
+    Outputs:
+      None
+    */
 
   socket.on(ACTIONS.JOIN, async ({ roomId, username, picture }) => {
-    // Add the user to the socket map
     userSocketMap[socket.id] = { username, picture };
     usercnt[roomId] = (usercnt[roomId] || 0) + 1;
-
-    // Join the room
     socket.join(roomId);
 
     try {
-      // Get all connected clients for the room
+      
       const clients = getAllConnectedClients(roomId);
-      // Emit the JOINED event to all clients in the room
+      
       clients.forEach(({ socketId }) => {
         io.to(socketId).emit(ACTIONS.JOINED, {
           clients,
           username,
           picture,
           socketId: socket.id,
-          // Pass the updated user count to clients
+          
         });
       });
     } catch (error) {
@@ -70,46 +80,54 @@ io.on("connection", (socket) => {
     }
   });
   socket.on(ACTIONS.CODE_CHANGE, ({ roomId, code, cursorData, socketid }) => {
-    // Save or update the code in the database
-    // RoomCodeMap.findOneAndUpdate(
-    //   { roomId },
-    //   { code },
-    //   { new: true, upsert: true }
-    // )
-    //   .then((updatedMap) => {
-    //     // console.log("Code updated in database:");
-    //   })
-    //   .catch((error) => {
-    //     console.error("Error retrieving code from database:", error);
-    //   });
+
     cursorPosition[socketid] = cursorData;
-    // Emit the code change to other sockets in the room
+  
     socket.in(roomId).emit(ACTIONS.CODE_CHANGE, { code, cursorPosition });
   });
 
+  /*
+  Handles the SAVE_FILE event to save code to a file.
+  Inputs:
+    code (string): The code content to be saved.
+    fileId (string): The ID of the file to which the code will be saved.
+  Outputs:
+    None
+  */
   socket.on(ACTIONS.SAVE_FILE, async ({ code, fileId }) => {
-    // console.log("fileId", fileId);
-    // console.log("code", code);
+    
     if (fileId === null || fileId === undefined || fileId === "") {
-      // console.log("fileId is null");
+      
       return;
     } else {
       try {
         await FileSystemService.saveFile(fileId, code);
       } catch (error) {
-        // console.error("Error in saving file", error);
+        
       }
     }
   });
 
+ //handles cursor change.
   socket.on(ACTIONS.CURSOR_CHANGE, ({ roomId, cursorData }) => {
     socket.in(roomId).emit(ACTIONS.CURSOR_CHANGE, { cursorData });
   });
+
+  //handles the syncing of files.
   socket.on(ACTIONS.SYNC_CODE, ({ socketId, code }) => {
-    // console.log("yes code syncing");
     io.to(socketId).emit(ACTIONS.CODE_CHANGE, { code });
   });
-
+  /*
+  Handles the disconnecting event when a socket disconnects from the server.
+  Inputs:
+    None
+  Outputs:
+    None
+  Implementation:
+    - Retrieves the rooms associated with the disconnecting socket.
+    - Emits the DISCONNECTED event to all clients in each room to notify them about the disconnection.
+    - Leaves each room.
+  */
   socket.on("disconnecting", async () => {
     const rooms = [...socket.rooms];
     rooms.forEach((roomId) => {
@@ -118,7 +136,7 @@ io.on("connection", (socket) => {
         username: userSocketMap[socket.id].username,
       });
     });
-    // Leave all rooms
+    
     rooms.forEach((roomId) => {
       socket.leave(roomId);
     });
@@ -129,6 +147,19 @@ io.on("connection", (socket) => {
     console.log(`User joined room ${roomId}`);
   });
 
+ /*
+  Handles the ROLE_CHANGE event when a user's role changes in a room.
+  Inputs:
+    roomId (string): The ID of the room where the role change occurs.
+    username (string): The username of the user whose role is changing.
+    newRole (string): The new role assigned to the user.
+  Outputs:
+    None
+  Implementation:
+    - Updates the user's role in the database for the specified room.
+    - Emits the ROLE_CHANGE event to all clients in the room to notify them about the role change.
+    - If an error occurs during the process, it is caught and logged.
+  */
   socket.on(ACTIONS.ROLE_CHANGE, ({ roomId, username, newRole }) => {
     RoomUserCount.findOneAndUpdate(
       { roomId, "users.username": username },
@@ -146,6 +177,7 @@ io.on("connection", (socket) => {
       });
   });
 
+//This action is triggered when a message is to be sent to all users of the room.
   socket.on(ACTIONS.MESSAGE_SEND, ({ roomId, message, sender, sendname }) => {
     console.log(sender);
     console.log(sendname);
@@ -155,10 +187,17 @@ io.on("connection", (socket) => {
       sendname,
     });
   });
-
+  /*
+  Handles the FILESYSTEM_CHANGE event triggered when filesystem changes are made in a room.
+  Inputs:
+    roomId (string): The ID of the room where filesystem changes occur.
+  Outputs:
+    None
+  Implementation:
+    - Logs a message indicating filesystem changes.
+    - Emits the FILESYSTEM_CHANGE event to all clients in the room to notify them about the changes.
+  */
   socket.on(ACTIONS.FILESYSTEM_CHANGE, ({ roomId }) => {
-    console.log("ho hioooo");
-    // Emit the FILE_CHANGE event to all room members except the current socket
     socket.to(roomId).emit(ACTIONS.FILESYSTEM_CHANGE, {});
   });
 });
