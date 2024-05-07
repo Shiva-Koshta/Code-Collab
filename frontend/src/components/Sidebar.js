@@ -16,29 +16,31 @@ import DownloadIcon from '@mui/icons-material/Download'
 import axios from 'axios'
 
 const Sidebar = ({
-  contentChanged,
-  setContentChanged,
-  fileContent,
-  setFileContent,
-  editorRef,
-  // isConnectedComponentOpen,
-  // handleToggle,
-  connectedUsers,
-  toggleChat,
-  unreadMessages,
-  // copyRoomId,
-  // leaveRoom,
-  roomId,
-  isLeftDivOpen,
-  toggleLeftDiv,
-  leftIcon,
-  storedUserData,
-  host,
-  connectedUserRoles,
-  setConnectedUserRoles,
-  socketRef,
-  menuOpen,
-  setMenuOpen
+    contentChanged,
+    setContentChanged,
+    fileContent,
+    setFileContent,
+    editorRef,
+    // isConnectedComponentOpen,
+    // handleToggle,
+    connectedUsers,
+    toggleChat,
+    unreadMessages,
+    // copyRoomId,
+    // leaveRoom,
+    roomId,
+    isLeftDivOpen,
+    toggleLeftDiv,
+    leftIcon,
+    storedUserData,
+    host,
+    connectedUserRoles,
+    setConnectedUserRoles,
+    socketRef,
+    currentFile,
+    // setCurrentFile,
+    menuOpen,
+    setMenuOpen
 }) => {
   //   const [menuOpen, setMenuOpen] = useState({})
   const downloadZipFile = async (roomId) => {
@@ -198,6 +200,8 @@ const Sidebar = ({
         socketRef={socketRef}
         connectedUserRoles={connectedUserRoles}
         storedUserData={storedUserData}
+        currentFile={currentFile}
+        // setCurrentFile={setCurrentFile}
       />
       <div className='Users z-10 '>
         <div
