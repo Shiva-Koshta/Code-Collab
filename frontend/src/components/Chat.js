@@ -38,7 +38,7 @@ const Chat = ({
       handleMessageSend();
     }
   };
-  const CHAT_LIMIT = 15;
+  const CHAT_LIMIT = 50;
   return (
     <div className='chat-container' style={{backgroundColor: "#1c1e29"}}>
 

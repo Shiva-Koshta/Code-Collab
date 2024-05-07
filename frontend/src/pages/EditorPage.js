@@ -15,6 +15,7 @@ import "../styles/EditorPage.css";
 import "../styles/Chat.css";
 import ChatIcon from "@mui/icons-material/Chat";
 import Chat from "../components/Chat";
+import { Tooltip } from '@mui/material'
 import { ChevronLeft, ChevronRight } from "@mui/icons-material";
 import { ToastContainer, toast as reactToastify } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -48,7 +49,10 @@ const EditorPage = () => {
     const storedMessages = window.localStorage.getItem(`messages_${roomId}`);
     return storedMessages ? JSON.parse(storedMessages) : [];
   });
-  const CHAT_LIMIT = 15; // Global variable for chat limit
+
+  const CHAT_LIMIT = 50; // Global variable for chat limit
+  // const [currentFile, setCurrentFile] = useState(null)
+  const currentFile = useRef(null)
 
   // const [inputText, setInputText] = useState("");
 
@@ -291,7 +295,7 @@ const EditorPage = () => {
                 if (currentUserRole === "viewer") {
                   editorRef.current.setOption("readOnly", true);
                 }
-                if (currentUserRole === "editor") {
+                if (currentUserRole === "editor" && currentFile.current!=null) {
                   editorRef.current.setOption("readOnly", false);
                 }
 
@@ -386,14 +390,15 @@ const EditorPage = () => {
         );
         console.log(connectedUserRoles);
         console.log(connectedUsers);
-
+        console.log(currentFile.current)
         if (username === storedUserData.current.name && newRole == "viewer") {
           console.log("yes");
           editorRef.current.setOption("readOnly", true);
           // editor.setOption('readOnly', true)
           // editor.readOnly.of(true)
         }
-        if (username === storedUserData.current.name && newRole === "editor") {
+        if (username === storedUserData.current.name && newRole === "editor" && currentFile.current!=null) {
+          console.log("Asdds")
           editorRef.current.setOption("readOnly", false);
           // const editor = editorRef.current.getCodeMirror()
           // editor.setOption('readOnly', false)
@@ -426,7 +431,7 @@ const EditorPage = () => {
               if (currentUserRole === "viewer") {
                 editorRef.current.setOption("readOnly", true);
               }
-              if (currentUserRole === "editor") {
+              if (currentUserRole === "editor" && currentFile.current!=null) {
                 editorRef.current.setOption("readOnly", false);
               }
 
@@ -476,7 +481,7 @@ const EditorPage = () => {
           if (currentUserRole === "viewer") {
             editorRef.current.setOption("readOnly", true);
           }
-          if (currentUserRole === "editor") {
+          if (currentUserRole === "editor" && currentFile.current!=null) {
             editorRef.current.setOption("readOnly", false);
           }
           // setHost(data.host);
@@ -525,6 +530,8 @@ const EditorPage = () => {
           connectedUserRoles={connectedUserRoles}
           setConnectedUserRoles={setConnectedUserRoles}
           socketRef={socketRef}
+          currentFile={currentFile}
+          // setCurrentFile={setCurrentFile}
           menuOpen={menuOpen}
           setMenuOpen={setMenuOpen}
         />
@@ -546,11 +553,13 @@ const EditorPage = () => {
             connectedClients={connectedUsernamesRef}
           />
           {!isLeftDivOpen && (
+            <Tooltip title='Toggle Left Div'>
             <div style={{zIndex: "9999"}} className="absolute left-0 top-1/2 transform transition duration-500 hover:animate-bounce-right">
               <button className="text-white" onClick={toggleLeftDiv}>
                 {leftIcon}
               </button>
             </div>
+            </Tooltip>
           )}
         </div>
 
