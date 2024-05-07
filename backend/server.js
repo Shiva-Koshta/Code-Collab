@@ -187,6 +187,7 @@ io.on("connection", (socket) => {
       sendname,
     });
   });
+
   /*
   Handles the FILESYSTEM_CHANGE event triggered when filesystem changes are made in a room.
   Inputs:
@@ -197,8 +198,24 @@ io.on("connection", (socket) => {
     - Logs a message indicating filesystem changes.
     - Emits the FILESYSTEM_CHANGE event to all clients in the room to notify them about the changes.
   */
-  socket.on(ACTIONS.FILESYSTEM_CHANGE, ({ roomId }) => {
-    socket.to(roomId).emit(ACTIONS.FILESYSTEM_CHANGE, {});
+
+  socket.on(ACTIONS.FILESYSTEM_CHANGE, ({ roomId ,isdelete}) => {
+    console.log("ho hioooo");
+    // Emit the FILE_CHANGE event to all room members except the current socket
+    if(isdelete)
+    {
+      socket.to(roomId).emit(ACTIONS.FILESYSTEM_CHANGE, {isdelete})
+    }
+    else 
+    {
+      socket.to(roomId).emit(ACTIONS.FILESYSTEM_CHANGE, {})
+    }
+  });
+
+  socket.on(ACTIONS.SELECTED_FILE_CHANGE, ({ roomId ,folder, parentFolder}) => {
+    // Emit the SELECTED_FILE_CHANGE event to all room members except the current socket
+    socket.to(roomId).emit(ACTIONS.SELECTED_FILE_CHANGE, {folder, parentFolder});
+
   });
 });
 

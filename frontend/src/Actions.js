@@ -12,6 +12,7 @@ const ACTIONS = {
   ROLE_CHANGE: "role-change",
   SAVE_FILE: "save-file",
   FILESYSTEM_CHANGE: "filesystemchanged",
+  SELECTED_FILE_CHANGE: "selected-file-change"
 };
 
 module.exports = ACTIONS;
