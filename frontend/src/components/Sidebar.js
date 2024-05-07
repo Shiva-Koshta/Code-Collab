@@ -194,8 +194,6 @@ const Sidebar = ({
       <FileView
         contentChanged={contentChanged}
         setContentChanged={setContentChanged}
-        fileContent={fileContent}
-        setFileContent={setFileContent}
         editorRef={editorRef}
         socketRef={socketRef}
         connectedUserRoles={connectedUserRoles}

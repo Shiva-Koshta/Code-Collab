@@ -8,134 +8,95 @@ import 'codemirror/addon/edit/closebrackets'
 import ACTIONS from '../Actions'
 
 const Editor = ({
-  //handleDownloadFile
   socketRef,
   roomId,
   editorRef,
   fileContent,
-  setFileContent,
   contentChanged,
   connectedClients,
 }) => {
-  // const [fileContent, setFileContent] = useState("")
-  // const [contentChanged, setContentChanged] = useState(false)
-  // useEffect(() => {
-  //   const handleStorageChange = () => {
-  //     setFileContent(window.localStorage.getItem('fileContent'))
-  //     setContentChanged(window.localStorage.getItem('contentChange'))
-  //   }
-  //   window.addEventListener('storage', handleStorageChange)
-  //   return () => {
-  //     window.removeEventListener('storage', handleStorageChange)
-  //   }
-  // }, [])
-  // useEffect(() => {
-  //   setFileContent(window.localStorage.getItem("fileContent"))
-  //   setContentChanged(window.localStorage.getItem("contentChanged"))
-  // }, [])
   let editorChanged = false
-  const [UserName,setUserName] = useState();
-  const scrollTopRef = useRef(0);
-  // const [cursorPositions, setCursorPositions] = useState({})
-  window.localStorage.setItem("roomid", roomId);
+  const [UserName,setUserName] = useState()
+  const scrollTopRef = useRef(0)
+  window.localStorage.setItem('roomid', roomId)
+  // Retrieve user data from local storage
   useEffect(() => {
-    // Retrieve user data from local storage
-    const storedUserData = window.localStorage.getItem("userData");
+    const storedUserData = window.localStorage.getItem('userData')
     if (storedUserData) {
-      const userData = JSON.parse(storedUserData);
-      setUserName(userData.name);
+      const userData = JSON.parse(storedUserData)
+      setUserName(userData.name)
     }
-  }, []);
-
-
+  }, [])
+  //inputs: 1.cursorPosition- list containing cursor position of all users in room, 2.currentUserId- socketId of current user 
+  //This function loops through cursorposition list and calls rendercursor for all users other self
   const renderAllCursors = (cursorPosition,currentUserId) => {
-    console.log("Cursor position type:", typeof cursorPosition);
-    console.log("hi")
-    // console.log(userId)
-    console.log(currentUserId)
     Object.entries(cursorPosition).forEach(([userId,cursorData]) => {
-      console.log(userId)
-      console.log(currentUserId)
       if(userId!==currentUserId){
         renderCursors(cursorData)
       }
     })
   }
+  //add blinkcursor style to document and remove when unmounts
   useEffect(() => {
-    // Create style element
-    const style = document.createElement("style");
+    const style = document.createElement('style')
     style.textContent = `
       @keyframes blinkCursor {
         0%, 100% {
-          opacity: 1;
+          opacity: 1
         }
         100% {
-          opacity: 0;
+          opacity: 0
         }
       }
-    `;
-
-    // Append style to document head
-    document.head.appendChild(style);
-
-    // Clean up function to remove style element when component unmounts
+    `
+    document.head.appendChild(style)
     return () => {
-      document.head.removeChild(style);
-    };
-  }, []);
-
-  useEffect(() => {
-    // console.log("hi");
-    if (!editorRef.current) return;
-
-    editorRef.current.setValue(""); // to avoid repetition of old instances
-    // console.log("fileref  current:")
-    if (fileContent) {
-      editorRef.current.setValue(fileContent);
+      document.head.removeChild(style)
     }
-  }, [fileContent, contentChanged]);
+  }, [])
+  //update editor content when file is uploaded and emit changed code to room
   useEffect(() => {
-    // console.log("file added");
+    if (!editorRef.current) return
+    editorRef.current.setValue('') // to avoid repetition of old instances
     if (fileContent) {
-      // console.log(fileContent);
-      const code = fileContent;
+      editorRef.current.setValue(fileContent)
+      const code = fileContent
       socketRef.current.emit(ACTIONS.CODE_CHANGE, {
         roomId,
         code,
       })
     }
-  }, [fileContent, contentChanged]);
+  }, [fileContent, contentChanged])
+  
   useEffect(() => {
     async function init() {
+      //create codemirror editor instance from textarea element and sets it theme and readonly initially
       editorRef.current = Codemirror.fromTextArea(
-        document.getElementById("realEditor"),
+        document.getElementById('realEditor'),
         {
-          mode: { name: "javascript", json: true },
-          theme: "dracula",
+          mode: { name: 'javascript', json: true },
+          theme: 'dracula',
           autoCloseTags: true,
           autoCloseBrackets: true,
           lineNumbers: true,
           readOnly: true,
         }
-      );
-
+      )
+      //set editor value if file is present
       if (fileContent) {
-        editorRef.current.setValue(fileContent);
-        // socketRef.current.emit(ACTIONS.CODE_CHANGE, {
-        //   roomId,
-        //   fileRef.current,
-        // }); // Set file content to CodeMirror editor
+        editorRef.current.setValue(fileContent)
       }
-
-      editorRef.current.on("change", (instance, changes) => {
-        // console.log(changes)
+      //attach event listener to listen code change event by codemirror and callback function which has
+      //inputs: instance- instance of codemirror where change occured , changes- contains information of code change
+      //the function checks if change has occured non programatically and emits the cursor info and code to the room
+      editorRef.current.on('change', (instance, changes) => {
         scrollTopRef.current = editorRef.current.getScrollInfo().top
         editorChanged = true
         const { origin } = changes
         const code = instance.getValue()
         if (origin !== 'setValue') {
-          const cursor = instance.getCursor();
-          const userData = JSON.parse(localStorage.getItem("userData"));
+          const cursor = instance.getCursor()
+          const userData = JSON.parse(localStorage.getItem('userData'))
           const cursorData = {
             cursor: { line: cursor.line, ch: cursor.ch },
             user: {email: userData.email, name: userData.name },
@@ -149,28 +110,23 @@ const Editor = ({
             socketid
           })
         }
-      });
+      })
     }
-    init();
-  }, []);
-
+    init()
+  }, [])
+  //attach event listener to listen cursorActivity event by codemirror and callback function which has
+  //input: instance- the code mirror instance where cursor activity was observed
+  //this function checks if the cursor has been moved without editor content being changed and
+  //in which case emits the cursor info to the room 
   useEffect(() => {
-    editorRef.current.on("cursorActivity", (instance) => {
-      const cursor = instance.getCursor();
-      // if (cursor.line !== prevCursor.current.line || cursor.ch !== prevCursor.current.ch){
-        // console.log("!")
-        // console.log(prevCursor.current.line)
-        // console.log(prevCursor.current.ch)
-        // console.log(cursor.line)
-        // console.log(cursor.ch)
-        // console.log("!")
-      const userData = JSON.parse(localStorage.getItem("userData"));
+    editorRef.current.on('cursorActivity', (instance) => {
+      const cursor = instance.getCursor()
+      const userData = JSON.parse(localStorage.getItem('userData'))
       const cursorData = {
         cursor: { line: cursor.line, ch: cursor.ch },
         user: { email: userData.email, name: userData.name },
         tab: null,
-      };
-      console.log(cursorData);
+      }
       if (!editorChanged) {
         socketRef.current.emit(ACTIONS.CURSOR_CHANGE, {
           roomId,
@@ -181,162 +137,123 @@ const Editor = ({
       }
     )
   },[editorRef])
+  
   useEffect(() => {
     if (socketRef.current) {
+      //if socket connection is availale listen CODE_CHANGE event which has
+      //input: code- contains new change code, cursorPosition- contains cursor position list of all users in room
+      //and set editor value to code recieved and call renderAllCursors function with cursorPosition and scoket id as parameters
+      //and prevent scrolling to top
       socketRef.current.on(ACTIONS.CODE_CHANGE, ({ code , cursorPosition}) => {
-        // console.log("hi");
         if (code !== null) {
-          editorRef.current.setValue(code);
+          editorRef.current.setValue(code)
         }
-        renderAllCursors(cursorPosition, socketRef.current.id);
+        renderAllCursors(cursorPosition, socketRef.current.id)
         editorRef.current.scrollTo(null,scrollTopRef.current )
-      });
+      })
+      //listen for CURSOR_CHANGE event and call rendercursors with cursorData as parameter
+      //input- cursorData: info of cursor changed
       socketRef.current.on(ACTIONS.CURSOR_CHANGE, ({ cursorData }) => {
-        console.log("cursorData retrieved from user: " + cursorData.user.name);
-        console.log(cursorData);
-        renderCursors(cursorData);
-      });
+        renderCursors(cursorData)
+      })
+      //listen for DISCONNECTED event and remove cursors of that user if present
       socketRef.current.on(ACTIONS.DISCONNECTED, ({ username }) => {
         const prevCursorMarkers = document.querySelectorAll(
-          `.cursor-marker[title="${username}"]`
-        );
-        prevCursorMarkers.forEach((marker) => marker.remove());
-      });
+          `.cursor-marker[title='${username}']`
+        )
+        prevCursorMarkers.forEach((marker) => marker.remove())
+      })
     }
-  }, [socketRef.current]);
+  }, [socketRef.current])
+  
   useEffect(() => {
     // Fetch code from the backend using room ID
     if (roomId) {
-      console.log(JSON.stringify({ roomId }));
       async function fetchCode() {
         try {
-          const response = await fetch("http://localhost:8080/receivecode", {
-            method: "POST",
+          const response = await fetch(`${process.env.REACT_APP_API_URL}/receivecode`, {
+            method: 'POST',
             headers: {
-              "Content-Type": "application/json",
+              'Content-Type': 'application/json',
             },
             body: JSON.stringify({ roomId }),
-          });
+          })
           if (response.ok) {
-            const { code } = await response.json();
+            const { code } = await response.json()
             if (code !== null) {
-              editorRef.current.setValue(code);
+              editorRef.current.setValue(code)
             }
           } else {
-            console.error("Failed to fetch code");
+            console.log('Failed to fetch code')
           }
         } catch (error) {
-          console.error("Error fetching code:", error);
+          console.log('Error fetching code:', error)
         }
       }
-      fetchCode();
+      fetchCode()
     }
-  }, [roomId]);
-
-  // useEffect(() => {
-  //   console.log(newusernameRef.current)
-  //   if (socketRef.current && newusernameRef.current !== null) {
-  //     if (newusernameRef.current === "RITESH PATIL") {
-  //       console.log("entered here")
-  //       console.log(newusernameRef.current)
-  //       var code = editorRef.current.getValue()
-  //       console.log("code1 :",code)
-  //       socketRef.current.emit(ACTIONS.CODE_CHANGE, {
-  //         roomId,
-  //         code,
-  //       })
-  //     }
-  //   }
-  // }, [newuserRef.current, socketRef.current, newusernameRef.current])
-  // useEffect(() => {
-  //   if (socketRef.current) {
-  //     console.log("hi")
-  //     socketRef.current.on(ACTIONS.SYNC_CHANGE, ({ code }) => {
-  //       if (code !== null) {
-  //         editorRef.current.setValue(code);
-  //       }
-  //     });
-  //   }
-  // }, [socketRef.current]);
+  }, [roomId])
+  //function generates random color each time using random()
+  //input- none ,output- random generated color number format "#AAAAAA"
   const getRandomColor = () => {
-    const letters = "0123456789ABCDEF";
-    let color = "#";
+    const letters = '0123456789ABCDEF'
+    let color = '#'
     for (let i = 0; i < 6; i++) {
-      color += letters[Math.floor(Math.random() * 16)];
+      color += letters[Math.floor(Math.random() * 16)]
     }
-    return color;
-  };
-  // Function to render cursors
+    return color
+  }
+  // Function renders cursor with cursor info provided, assigns proper style to cursor and tooltip displaying username
+  // input: cursorInfoList- cursor info of the cursor to be rendered ,output- attaches cursor div to document at
+  // the desired position
   const renderCursors = (cursorInfoList) => {
     if (cursorInfoList) {
-
-      const { cursor, tab, user } = cursorInfoList;
-      const { ch, line } = cursor;
-      // const cursorMarkerId = `cursor-marker-${user.email}`;
-      // let cursorMarker = document.getElementById(cursorMarkerId);
-      // Create a cursor marker element if not present
-      // if (!cursorMarker){
-      // Get the total width of the screen
+      const { cursor, tab, user } = cursorInfoList
+      const { ch, line } = cursor
       if (!connectedClients.current.includes(user.name) || user.name===UserName) return
-      // const totalScreenWidth = window.innerWidth;
-      // const sidebarWidth = (2 / 10) * totalScreenWidth;
-      // const cursorPosition = editorRef.current.charCoords({ line, ch });
-      // const leftPosition = cursorPosition.left - sidebarWidth;
 
       const prevCursorMarkers = document.querySelectorAll(
-        `.cursor-marker[title="${user.name}"]`
-      );
-      prevCursorMarkers.forEach((marker) => marker.remove());
+        `.cursor-marker[title='${user.name}']`
+      )
+      prevCursorMarkers.forEach((marker) => marker.remove())
 
-      const cursorMarker = document.createElement("div");
-      cursorMarker.className = "cursor-marker";
-      cursorMarker.style.position = "absolute";
-      cursorMarker.classList.add("h-8", "w-0.5");
-
-      cursorMarker.style.backgroundColor = getRandomColor(); // Assign a random color
-      cursorMarker.title = user.name;
-
-      // Append cursor marker to CodeMirror editor container
-      // console.log(editorRef.current.getWrapperElement())
-      const editorContainer = document.querySelector(".CodeMirror-scroll");
-      editorContainer.appendChild(cursorMarker);
-      // editorRef.current.getWrapperElement().appendChild(cursorMarker);
-      cursorMarker.style.animation = "blinkCursor 1s infinite";
-      // }
-
+      const cursorMarker = document.createElement('div')
+      cursorMarker.className = 'cursor-marker'
+      cursorMarker.style.position = 'absolute'
+      cursorMarker.classList.add('h-8', 'w-0.5')
+      cursorMarker.style.backgroundColor = getRandomColor() // Assign a random color
+      cursorMarker.title = user.name
+      const editorContainer = document.querySelector('.CodeMirror-scroll')
+      editorContainer.appendChild(cursorMarker)
+      cursorMarker.style.animation = 'blinkCursor 1s infinite'
       cursorMarker.style.left = `${
         editorRef.current.charCoords({ line, ch }).left
-      -300}px`;
-      // cursorMarker.style.left = `${leftPosition}px`;
-      const cursorPosition1 = editorRef.current.charCoords({ line, ch },"local");
+      -300}px`
+      const cursorPosition1 = editorRef.current.charCoords({ line, ch },'local')
       const topPosition = cursorPosition1.top 
-      cursorMarker.style.top = `${topPosition}px`;
-      // cursorMarker.style.top = `${editorRef.current.charCoords({ line, ch }).top
-      //   }px`;
-      // console.log(editorRef.current.charCoords({ line, ch }).top);
+      cursorMarker.style.top = `${topPosition}px`
 
-      const tooltip = document.createElement("div");
-      tooltip.className = "tooltip"
-      tooltip.innerText = user.name.split(" ")[0]
-      tooltip.style.fontSize = "10px"
-      tooltip.style.padding = "2px 4px"
-
-      cursorMarker.appendChild(tooltip);
+      const tooltip = document.createElement('div')
+      tooltip.className = 'tooltip'
+      tooltip.innerText = user.name.split(' ')[0]
+      tooltip.style.fontSize = '10px'
+      tooltip.style.padding = '2px 4px'
+      cursorMarker.appendChild(tooltip)
     }
-  };
+  }
   // Clean up cursor markers when component unmounts
   useEffect(() => {
     return () => {
       document
-        .querySelectorAll(".cursor-marker")
-        .forEach((node) => node.remove());
-    };
-  }, []);
+        .querySelectorAll('.cursor-marker')
+        .forEach((node) => node.remove())
+    }
+  }, [])
   return (
-    <div className="editor-container" style={{ overflow: 'auto'}}>
-      <textarea id="realEditor" style={{}} />
+    <div className='editor-container' style={{ overflow: 'auto'}}>
+      <textarea id='realEditor' style={{}} />
     </div>
   )
-};
+}
 
-export default Editor;
+export default Editor
