@@ -12,6 +12,7 @@ const Chat = ({
 }) => {
   
   const [inputText, setInputText] = useState('')
+  // Function to send Message
   const handleMessageSend = () => {
     console.log(storedUserData.current)
     if (inputText.trim() !== '') {
@@ -25,12 +26,13 @@ const Chat = ({
       setInputText('')
     }
   }
+  // Function which will send message automatically on clicking key enter
   const handleKeyPress = (e) => {
     if (e.key === 'Enter') {
       handleMessageSend()
     }
   }
-  const CHAT_LIMIT = 50
+  const CHAT_LIMIT = 50 // There is a chat limit of 50
   return (
     <div className='chat-container' style={{backgroundColor: '#1c1e29'}}>
 
