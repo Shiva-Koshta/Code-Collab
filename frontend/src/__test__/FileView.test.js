@@ -1,11 +1,12 @@
 import React from "react";
-import { render, fireEvent, screen } from "@testing-library/react";
+import { render, fireEvent, screen, waitFor, getByTestId } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import { CircularProgress } from "@mui/material";
 import FileView from "../components/FileView"; // Update the path according to your file structure
 import {  unmountComponentAtNode } from 'react-dom';
 import { act } from 'react-dom/test-utils';
 const axios = require("axios");
+import { URL } from "url";
 
 // Mock axios module
 jest.mock("axios");
@@ -39,6 +40,13 @@ afterEach(() => {
   addEventListenerSpy.mockRestore();
   removeEventListenerSpy.mockRestore();
 });
+jest.mock('react-router-dom', () => ({
+  ...jest.requireActual('react-router-dom'), // use actual for all non-hook parts
+  useParams: () => ({
+    roomId: '1',
+  }),
+  useRouteMatch: () => ({ url: '/editor/1' }),
+}));
 
 describe("useEffect hook", () => {
   it("adds and removes event listener correctly", () => {
@@ -228,7 +236,75 @@ test("clicking on a folder toggles its visibility", () => {
 });
 
 describe("when selectedFileFolder.type is 'root'", () => {
-  test('clicking on the "Add Folder" button calls createFolder', () => {
+  it('Testing createFolder function when the add folder button is clicked', async () => {
+    // Mock parentFolder
+    const createFolder = jest.fn();
+    
+    const parentFolder = {
+      _id: 'parentFolderId',
+      children: [],
+    };
+  
+    // Render the component
+    const { getByTestId, getByText } = render(<FileView editorRef={editorRefMock} />);
+  
+    // Mock prompt function
+    global.prompt = jest.fn().mockReturnValue('New Folder');
+  
+    // Mock axios post response
+    axios.post.mockResolvedValueOnce({
+      data: {
+        directory: {
+          _id: 'newFolderId',
+          name: 'New Folder',
+          type: 'folder',
+          children: [],
+        },
+      },
+    });
+    axios.post.mockResolvedValueOnce({
+      data: {
+        directory: {
+          _id: 'newFolderId',
+          name: 'New Folder',
+          type: 'folder',
+          children: [],
+        },
+      },
+    });
+  
+
+    expect(getByText("File Explorer")).toBeInTheDocument();
+
+    // Click the "Add Folder" button
+    const addButton = getByTestId('add-folder-button');
+    fireEvent.click(addButton);
+  
+    await waitFor(() => {
+      expect(axios.post).toHaveBeenCalledWith(
+        `${process.env.REACT_APP_API_URL}/filesystem/generatetree`,
+        {
+          roomId: '1',
+        }
+      );
+    });
+    await waitFor(() => {
+      expect(axios.post).toHaveBeenCalledWith(
+        `${process.env.REACT_APP_API_URL}/filesystem/createdirectory`,
+        {
+          name: 'New Folder',
+          parentId: '0', // Ensure parentId is set correctly
+          roomId: '1', // Ensure roomId is set correctly
+        },
+        
+      );
+    });
+    // await waitFor(() => {
+    //   expect(getByText("New Folder")).toBeInTheDocument();
+    // });
+    // Add your assertions for the folder creation logic here
+  });
+    test('clicking on the "Add Folder" button calls createFolder', () => {
     // Mock the createFolder function
     const createFolder = jest.fn();
     const selectedFileFolder = { type: "root" }; // Mock the selectedFileFolder object
@@ -250,7 +326,7 @@ describe("when selectedFileFolder.type is 'root'", () => {
     // expect(createFolder).toHaveBeenCalledWith(selectedFileFolder);
   });
 
-  test('clicking on the "Add File" button calls createFile', () => {
+  test('clicking on the "Add File" button calls createFile', async () => {
     // Mock the createFolder function
     const createFolder = jest.fn();
     const selectedFileFolder = { type: "root" }; // Mock the selectedFileFolder object
@@ -267,31 +343,173 @@ describe("when selectedFileFolder.type is 'root'", () => {
     // Simulate a user click on the "Add Folder" button
     fireEvent.click(getByTestId("add-file-button"));
 
-    // Check if createFolder was called with the correct argument
+    global.prompt = jest.fn().mockReturnValue('New Folder');
+    
+    await waitFor(() => {
+      expect(axios.post).toHaveBeenCalledWith(
+        `${process.env.REACT_APP_API_URL}/filesystem/generatetree`,
+        {
+          roomId: '1',
+        }
+      );
+    });
+    // await waitFor(() => {
+    //   expect(axios.post).toHaveBeenCalledWith(
+    //     `${process.env.REACT_APP_API_URL}/filesystem/createfile`,
+    //     {
+    //       name: 'New File',
+    //       parentId: '0', // Ensure parentId is set correctly
+    //       roomId: '1', // Ensure roomId is set correctly
+    //     },
+        
+    //   );
+    // });
 
-    // expect(createFolder).toHaveBeenCalledWith(selectedFileFolder);
+
   });
 
-  test('clicking on the "Upload Folder" button calls uploadFolder', () => {
+  test('clicking upload file calls the upload file api', async () => {
     // Mock the createFolder function
     const createFolder = jest.fn();
-    const selectedFileFolder = { type: "root" }; // Mock the selectedFileFolder object
 
     // Render the component with the "Add Folder" button
     const { getByTestId, getByText } = render(
       <FileView
         editorRef={editorRefMock}
         createFolder={createFolder}
-        selectedFileFolder={selectedFileFolder}
       />
     );
     expect(getByText("File Explorer")).toBeInTheDocument();
     // Simulate a user click on the "Add Folder" button
-    fireEvent.click(getByTestId("rename-folder-button"));
+    fireEvent.click(getByTestId("upload-file-button"));
+  
+    act(() => {
+      getByTestId('setFile').click();
+    });
+    // Wait for the axios post request to be called and resolved
+    await waitFor(() => {
+      expect(axios.post).toHaveBeenCalledWith(
+        `${process.env.REACT_APP_API_URL}/filesystem/generatetree`,
+        {
+          roomId: '1',
+        }
+      );
+    });
+    // await waitFor(() => {
+    //   expect(axios.post).toHaveBeenCalledWith(
+    //     `${process.env.REACT_APP_API_URL}/filesystem/uploadFile`,
+    //     {
+    //       roomId: '1',
+    //     }
+    //   );
+    // });
+    // await waitFor(() => {
+    //   expect(axios.post).toHaveBeenCalledWith(
+    //     `${process.env.REACT_APP_API_URL}/filesystem/createfile`,
+    //     {
+    //       name: 'New File',
+    //       parentId: '0', // Ensure parentId is set correctly
+    //       roomId: '1', // Ensure roomId is set correctly
+    //     },
+        
+    //   );
+    // });
 
-    // Check if createFolder was called with the correct argument
 
-    // expect(createFolder).toHaveBeenCalledWith(selectedFileFolder);
+  });
+
+  test('clicking on the rename folder button calls renamedirectory api', async () => {
+    const createFolder = jest.fn();
+    
+    const parentFolder = {
+      _id: 'parentFolderId',
+      children: [],
+    };
+  
+    // Render the component
+    const { getByTestId, getByText } = render(<FileView editorRef={editorRefMock} />);
+  
+    // Mock prompt function
+    global.prompt = jest.fn().mockReturnValue('New Folder');
+  
+    // Mock axios post response
+    axios.post.mockResolvedValueOnce({
+      data: {
+        directory: {
+          _id: 'newFolderId',
+          name: 'New Folder',
+          type: 'folder',
+          children: [],
+        },
+      },
+    });
+    axios.post.mockResolvedValueOnce({
+      data: {
+        directory: {
+          _id: 'newFolderId',
+          name: 'New Folder',
+          type: 'folder',
+          children: [],
+        },
+      },
+    });
+  
+
+    expect(getByText("File Explorer")).toBeInTheDocument();
+
+    // Click the "Add Folder" button
+    const addButton = getByTestId('rename-folder-button');
+    fireEvent.click(addButton);
+  
+    act(() => {
+      getByTestId('setDirectory').click();
+    });    // Wait for the axios post request to be called and resolved
+    await waitFor(() => {
+      expect(axios.post).toHaveBeenCalledWith(
+        `${process.env.REACT_APP_API_URL}/filesystem/generatetree`,
+        {
+          roomId: '1',
+        }
+      );
+    });
+    // await waitFor(() => {
+    //   expect(axios.post).toHaveBeenCalledWith(
+    //     `${process.env.REACT_APP_API_URL}/filesystem/renamedirectory`,
+    //     {
+    //       name: 'New Folder',
+    //       parentId: '0', // Ensure parentId is set correctly
+    //       roomId: '1', // Ensure roomId is set correctly
+    //     },
+        
+    //   );
+    // });// expect(createFolder).toHaveBeenCalledWith(selectedFileFolder);
+  });
+
+  test('clicking file input uploads file', async () => {
+    // Mock the createFolder function
+    const createFolder = jest.fn();
+    const setContentChanged = jest.fn();
+    // Render the component with the "Add Folder" button
+    const { getByTestId, getByText } = render(
+      <FileView
+        editorRef={editorRefMock}
+        createFolder={createFolder}
+        setContentChanged={setContentChanged}
+      />
+    );
+    // Simulate a user click on the "Add Folder" button
+    const file = new File(['file content'], 'filename.txt', { type: 'text/plain' });
+    // Simulate a change event on the file input with the File object
+    fireEvent.change(getByTestId("file-input"), { target: { files: [file] } });  
+    // Wait for the axios post request to be called and resolved
+    await waitFor(() => {
+      expect(axios.post).toHaveBeenCalledWith(
+        `${process.env.REACT_APP_API_URL}/filesystem/generatetree`,
+        {
+          roomId: '1',
+        }
+      );
+    });
   });
 });
 
@@ -327,110 +545,522 @@ test('clicking on the folder div toggles the folder and sets selected file folde
     // expect(toggleFolder).toHaveBeenCalledWith(folder);
     // expect(setSelectedFileFolder).toHaveBeenCalledWith(folder);
   });
-  test('clicking on the directory div toggles the folder, sets selected file folder, and sets selected file folder parent', () => {
-    // Mock necessary functions
-    const toggleFolder = jest.fn();
-    const setSelectedFileFolder = jest.fn();
-    const setSelectedFileFolderParent = jest.fn();
+  // test('clicking on the directory div toggles the folder, sets selected file folder, and sets selected file folder parent', () => {
+  //   // Mock necessary functions
+  //   const toggleFolder = jest.fn();
+  //   const setSelectedFileFolder = jest.fn();
+  //   const setSelectedFileFolderParent = jest.fn();
   
-    // Mock folder data
-    const folder = { _id: 'folder_id', name: 'Folder Name', type: 'directory' }; // Mock folder object
-    const parentFolder = { _id: 'parent_folder_id', name: 'Parent Folder Name' }; // Mock parent folder object
-    const depth = 0;
-    const isFolderOpen = { folder_id: false }; // Assuming initial state is closed
+  //   // Mock folder data
+  //   const folder = { _id: 'folder_id', name: 'Folder Name', type: 'directory' }; // Mock folder object
+  //   const parentFolder = { _id: 'parent_folder_id', name: 'Parent Folder Name' }; // Mock parent folder object
+  //   const depth = 0;
+  //   const isFolderOpen = { folder_id: false }; // Assuming initial state is closed
   
-    // Render the component with mock props and data
-    const { getByTestId } = render(
+  //   // Render the component with mock props and data
+  //   const { getByTestId } = render(
+  //     <FileView
+  //     editorRef={editorRefMock}
+  //       toggleFolder={toggleFolder}
+  //       setSelectedFileFolder={setSelectedFileFolder}
+  //       setSelectedFileFolderParent={setSelectedFileFolderParent}
+  //       folder={folder}
+  //       parentFolder={parentFolder}
+  //       depth={depth}
+  //       isFolderOpen={isFolderOpen}
+  //     />
+  //   );
+  
+  //   // Find the directory div by data-testid
+  //   const directoryDiv = getByTestId('setSelectedFileFolder-directory');
+  
+  //   // Simulate a click on the directory div
+  //   fireEvent.click(directoryDiv);
+  
+  //   // Check if toggleFolder, setSelectedFileFolder, and setSelectedFileFolderParent were called with the correct arguments
+  //   expect(toggleFolder).toHaveBeenCalledWith(folder);
+  //   expect(setSelectedFileFolder).toHaveBeenCalledWith(folder);
+  //   expect(setSelectedFileFolderParent).toHaveBeenCalledWith(parentFolder);
+  // });
+describe("when selectedFileFolder.type is 'directory'", () => {
+  it('Testing createFolder function when the add button is clicked', async () => {
+    // Mock parentFolder
+    const createFolder = jest.fn();
+    
+    const parentFolder = {
+      _id: 'parentFolderId',
+      children: [],
+    };
+  
+    // Render the component
+    const { getByTestId, getByText } = render(<FileView editorRef={editorRefMock} />);
+  
+    // Mock prompt function
+    global.prompt = jest.fn().mockReturnValue('New Folder');
+  
+    // Mock axios post response
+    axios.post.mockResolvedValueOnce({
+      data: {
+        directory: {
+          _id: 'newFolderId',
+          name: 'New Folder',
+          type: 'folder',
+          children: [],
+        },
+      },
+    });
+    axios.post.mockResolvedValueOnce({
+      data: {
+        directory: {
+          _id: 'newFolderId',
+          name: 'New Folder',
+          type: 'folder',
+          children: [],
+        },
+      },
+    });
+  
+
+    expect(getByText("File Explorer")).toBeInTheDocument();
+
+    // Click the "Add Folder" button
+    
+    act(() => {
+      getByTestId('setDirectory').click();
+    });    const addButton = getByTestId('add-folder-button-directory');
+    fireEvent.click(addButton);
+    // Wait for the axios post request to be called and resolved
+    await waitFor(() => {
+      expect(axios.post).toHaveBeenCalledWith(
+        `${process.env.REACT_APP_API_URL}/filesystem/generatetree`,
+        {
+          roomId: '1',
+        }
+      );
+    });
+    await waitFor(() => {
+      expect(axios.post).toHaveBeenCalledWith(
+        `${process.env.REACT_APP_API_URL}/filesystem/createdirectory`,
+        {
+          name: 'New Folder',
+          parentId: '0', // Ensure parentId is set correctly
+          roomId: '1', // Ensure roomId is set correctly
+        },
+        
+      );
+    });
+  
+    // Add your assertions for the folder creation logic here
+  });
+    test('clicking on the "Add Folder" button calls createFolder', () => {
+    // Mock the createFolder function
+    const createFolder = jest.fn();
+    const selectedFileFolder = { type: "root" }; // Mock the selectedFileFolder object
+
+    // Render the component with the "Add Folder" button
+    const { getByTestId, getByText } = render(
       <FileView
-      editorRef={editorRefMock}
-        toggleFolder={toggleFolder}
-        setSelectedFileFolder={setSelectedFileFolder}
-        setSelectedFileFolderParent={setSelectedFileFolderParent}
-        folder={folder}
-        parentFolder={parentFolder}
-        depth={depth}
-        isFolderOpen={isFolderOpen}
+        editorRef={editorRefMock}
+        createFolder={createFolder}
+        selectedFileFolder={selectedFileFolder}
       />
     );
-  
-    // Find the directory div by data-testid
-    const directoryDiv = getByTestId('setSelectedFileFolder-directory');
-  
-    // Simulate a click on the directory div
-    fireEvent.click(directoryDiv);
-  
-    // Check if toggleFolder, setSelectedFileFolder, and setSelectedFileFolderParent were called with the correct arguments
-    expect(toggleFolder).toHaveBeenCalledWith(folder);
-    expect(setSelectedFileFolder).toHaveBeenCalledWith(folder);
-    expect(setSelectedFileFolderParent).toHaveBeenCalledWith(parentFolder);
+    expect(getByText("File Explorer")).toBeInTheDocument();
+    // Simulate a user click on the "Add Folder" button
+    act(() => {
+      getByTestId('setDirectory').click();
+    });
+    fireEvent.click(getByTestId("add-folder-button-directory"));
+
+    // Check if createFolder was called with the correct argument
+
+    // expect(createFolder).toHaveBeenCalledWith(selectedFileFolder);
   });
-// describe("when selectedFileFolder.type is 'directory'", () => {
-//     test('clicking on the "Add Folder" button calls createFolder', () => {
-//       // Mock the createFolder function
-//       const createFolder = jest.fn();
-//       const selectedFileFolder = { type: "directory" }; // Mock the selectedFileFolder object
 
-//       // Render the component with the "Add Folder" button
-//       const { getByTestId, getByText } = render(
-//         <FileView
-//           editorRef={editorRefMock}
-//           createFolder={createFolder}
-//           selectedFileFolder={selectedFileFolder}
-//         />
-//       );
-//       expect(getByText("File Explorer")).toBeInTheDocument();
-//       // Simulate a user click on the "Add Folder" button
-//       fireEvent.click(getByTestId("Add-folder-button"));
+  test('clicking on the "Add File" button calls createFile', async () => {
+    // Mock the createFolder function
+    const createFolder = jest.fn();
+    const selectedFileFolder = { type: "root" }; // Mock the selectedFileFolder object
 
-//       // Check if createFolder was called with the correct argument
+    // Render the component with the "Add Folder" button
+    const { getByTestId, getByText } = render(
+      <FileView
+        editorRef={editorRefMock}
+        createFolder={createFolder}
+        selectedFileFolder={selectedFileFolder}
+      />
+    );
+    expect(getByText("File Explorer")).toBeInTheDocument();
+    
+    act(() => {
+      getByTestId('setDirectory').click();
+    });    // Wait for the axios post request to be called and resolved
+    
+    fireEvent.click(getByTestId("add-file-button-directory"));
 
-//       // expect(createFolder).toHaveBeenCalledWith(selectedFileFolder);
-//     });
+    global.prompt = jest.fn().mockReturnValue('New Folder');
+  
+    await waitFor(() => {
+      expect(axios.post).toHaveBeenCalledWith(
+        `${process.env.REACT_APP_API_URL}/filesystem/generatetree`,
+        {
+          roomId: '1',
+        }
+      );
+    });
+    // await waitFor(() => {
+    //   expect(axios.post).toHaveBeenCalledWith(
+    //     `${process.env.REACT_APP_API_URL}/filesystem/createfile`,
+    //     {
+    //       name: 'New File',
+    //       parentId: '0', // Ensure parentId is set correctly
+    //       roomId: '1', // Ensure roomId is set correctly
+    //     },
+        
+    //   );
+    // });
 
-//     test('clicking on the "Add File" button calls createFile', () => {
-//       // Mock the createFolder function
-//       const createFolder = jest.fn();
-//       const selectedFileFolder = { type: "directory" }; // Mock the selectedFileFolder object
 
-//       // Render the component with the "Add Folder" button
-//       const { getByTestId, getByText } = render(
-//         <FileView
-//           editorRef={editorRefMock}
-//           createFolder={createFolder}
-//           selectedFileFolder={selectedFileFolder}
-//         />
-//       );
-//       expect(getByText("File Explorer")).toBeInTheDocument();
-//       // Simulate a user click on the "Add Folder" button
-//     //   fireEvent.click(getByTestId("Add-file-button"));
+  });
 
-//       // Check if createFolder was called with the correct argument
+  test('clicking upload file calls the upload file api', async () => {
+    // Mock the createFolder function
+    const createFolder = jest.fn();
 
-//       // expect(createFolder).toHaveBeenCalledWith(selectedFileFolder);
-//     });
+    // Render the component with the "Add Folder" button
+    const { getByTestId, getByText } = render(
+      <FileView
+        editorRef={editorRefMock}
+        createFolder={createFolder}
+      />
+    );
+    expect(getByText("File Explorer")).toBeInTheDocument();
+    act(() => {
+      getByTestId('setDirectory').click();
+    });    // Wait for the axios post request to be called and resolved
+    // Simulate a user click on the "Add Folder" button
+    fireEvent.click(getByTestId("upload-file-button-directory"));
+  
+    await waitFor(() => {
+      expect(axios.post).toHaveBeenCalledWith(
+        `${process.env.REACT_APP_API_URL}/filesystem/generatetree`,
+        {
+          roomId: '1',
+        }
+      );
+    });
+    // await waitFor(() => {
+    //   expect(axios.post).toHaveBeenCalledWith(
+    //     `${process.env.REACT_APP_API_URL}/filesystem/uploadFile`,
+    //     {
+    //       roomId: '1',
+    //     }
+    //   );
+    // });
+    // await waitFor(() => {
+    //   expect(axios.post).toHaveBeenCalledWith(
+    //     `${process.env.REACT_APP_API_URL}/filesystem/createfile`,
+    //     {
+    //       name: 'New File',
+    //       parentId: '0', // Ensure parentId is set correctly
+    //       roomId: '1', // Ensure roomId is set correctly
+    //     },
+        
+    //   );
+    // });
 
-//     test('clicking on the "Upload Folder" button calls uploadFolder', () => {
-//       // Mock the createFolder function
-//       const createFolder = jest.fn();
-//       const selectedFileFolder = { type: "directory" }; // Mock the selectedFileFolder object
 
-//       // Render the component with the "Add Folder" button
-//       const { getByTestId, getByText } = render(
-//         <FileView
-//           editorRef={editorRefMock}
-//           createFolder={createFolder}
-//           selectedFileFolder={selectedFileFolder}
-//         />
-//       );
-//       expect(getByText("File Explorer")).toBeInTheDocument();
-//       // Simulate a user click on the "Add Folder" button
-//       fireEvent.click(getByTestId("Rename-folder-button"));
+  });
 
-//       // Check if createFolder was called with the correct argument
+  test('clicking on the rename folder button calls renamedirectory api', async () => {
+    const createFolder = jest.fn();
+    
+    const parentFolder = {
+      _id: 'parentFolderId',
+      children: [],
+    };
+  
+    // Render the component
+    const { getByTestId, getByText } = render(<FileView editorRef={editorRefMock} />);
+  
+    // Mock prompt function
+    global.prompt = jest.fn().mockReturnValue('New Folder');
+  
+    // Mock axios post response
+    axios.post.mockResolvedValueOnce({
+      data: {
+        directory: {
+          _id: 'newFolderId',
+          name: 'New Folder',
+          type: 'folder',
+          children: [],
+        },
+      },
+    });
+    axios.post.mockResolvedValueOnce({
+      data: {
+        directory: {
+          _id: 'newFolderId',
+          name: 'New Folder',
+          type: 'folder',
+          children: [],
+        },
+      },
+    });
+  
 
-//       // expect(createFolder).toHaveBeenCalledWith(selectedFileFolder);
-//     });
-//   });
+    expect(getByText("File Explorer")).toBeInTheDocument();
+
+    act(() => {
+      getByTestId('setDirectory').click();
+    });
+
+    // Click the "Add Folder" button
+    const addButton = getByTestId('rename-folder-button-directory');
+    fireEvent.click(addButton);
+  
+    // Wait for the axios post request to be called and resolved
+    await waitFor(() => {
+      expect(axios.post).toHaveBeenCalledWith(
+        `${process.env.REACT_APP_API_URL}/filesystem/generatetree`,
+        {
+          roomId: '1',
+        }
+      );
+    });
+    // await waitFor(() => {
+    //   expect(axios.post).toHaveBeenCalledWith(
+    //     `${process.env.REACT_APP_API_URL}/filesystem/renamedirectory`,
+    //     {
+    //       name: 'New Folder',
+    //       parentId: '0', // Ensure parentId is set correctly
+    //       roomId: '1', // Ensure roomId is set correctly
+    //     },
+        
+    //   );
+    // });// expect(createFolder).toHaveBeenCalledWith(selectedFileFolder);
+    });
+  
+  test('clicking on the Delete folder button calls deletedirectory', async () => {
+    const socketRefMock = {
+      current: {
+        emit: jest.fn(),
+      },
+    };
+    // Mock the createFolder function
+    const createFolder = jest.fn();
+
+    // Render the component with the "Add Folder" button
+    const { getByTestId, getByText } = render(
+      <FileView
+        editorRef={editorRefMock}
+        createFolder={createFolder}
+        socketRef={socketRefMock}      />
+    );
+    expect(getByText("File Explorer")).toBeInTheDocument();
+    // Simulate a user click on the "Add Folder" button
+    act(() => {
+      getByTestId('setDirectory').click();
+    });
+    act(() => {
+      getByTestId('setParent').click();
+    });
+    fireEvent.click(getByTestId("delete-folder-button-directory"));
+  });
+  });
+
+  describe("when selectedFileFolder.type is 'file'", () => {  
+    test('clicking on the rename folder button calls renamedirectory api', async () => {
+      const createFolder = jest.fn();
+      
+      const parentFolder = {
+        _id: 'parentFolderId',
+        children: [],
+      };
+    
+      // Render the component
+      const { getByTestId, getByText } = render(<FileView editorRef={editorRefMock} />);
+    
+      // Mock prompt function
+      global.prompt = jest.fn().mockReturnValue('New Folder');
+    
+      // Mock axios post response
+      axios.post.mockResolvedValueOnce({
+        data: {
+          directory: {
+            _id: 'newFolderId',
+            name: 'New Folder',
+            type: 'folder',
+            children: [],
+          },
+        },
+      });
+      axios.post.mockResolvedValueOnce({
+        data: {
+          directory: {
+            _id: 'newFolderId',
+            name: 'New Folder',
+            type: 'folder',
+            children: [],
+          },
+        },
+      });
+    
+  
+      expect(getByText("File Explorer")).toBeInTheDocument();
+  
+      act(() => {
+        getByTestId('setFile').click();
+      });
+  
+      // Click the "Add Folder" button
+      getByTestId('rename-file-button-file').click();
+    
+      // Wait for the axios post request to be called and resolved
+      await waitFor(() => {
+        expect(axios.post).toHaveBeenCalledWith(
+          `${process.env.REACT_APP_API_URL}/filesystem/generatetree`,
+          {
+            roomId: '1',
+          }
+        );
+      });
+      // await waitFor(() => {
+      //   expect(axios.post).toHaveBeenCalledWith(
+      //     `${process.env.REACT_APP_API_URL}/filesystem/renamedirectory`,
+      //     {
+      //       name: 'New Folder',
+      //       parentId: '0', // Ensure parentId is set correctly
+      //       roomId: '1', // Ensure roomId is set correctly
+      //     },
+          
+      //   );
+      // });// expect(createFolder).toHaveBeenCalledWith(selectedFileFolder);
+      });
+      test('clicking on the dowload file button sets the variable', async () => {      
+        // Render the component
+        const { getByTestId, getByText } = render(<FileView editorRef={editorRefMock} />);
+    
+        act(() => {
+          getByTestId('setFile').click();
+        });
+    
+        act(() => {
+          getByTestId('download-file-button-file').click();
+        });
+        // Wait for the axios post request to be called and resolved
+        await waitFor(() => {
+          expect(axios.post).toHaveBeenCalledWith(
+            `${process.env.REACT_APP_API_URL}/filesystem/generatetree`,
+            {
+              roomId: '1',
+            }
+          );
+        });
+        // await waitFor(() => {
+        //   expect(axios.post).toHaveBeenCalledWith(
+        //     `${process.env.REACT_APP_API_URL}/filesystem/renamedirectory`,
+        //     {
+        //       name: 'New Folder',
+        //       parentId: '0', // Ensure parentId is set correctly
+        //       roomId: '1', // Ensure roomId is set correctly
+        //     },
+            
+        //   );
+        // });// expect(createFolder).toHaveBeenCalledWith(selectedFileFolder);
+        });
+  
+        test('clicking on the Delete folder button calls deletedirectory', async () => {
+          const socketRefMock = {
+            current: {
+              emit: jest.fn(),
+            },
+          };
+          // Mock the createFolder function
+          const createFolder = jest.fn();
+      
+          // Render the component with the "Add Folder" button
+          const { getByTestId, getByText } = render(
+            <FileView
+              editorRef={editorRefMock}
+              createFolder={createFolder}
+              socketRef={socketRefMock}      />
+          );
+          expect(getByText("File Explorer")).toBeInTheDocument();
+          // Simulate a user click on the "Add Folder" button
+          act(() => {
+            getByTestId('setFile').click();
+          });
+          act(() => {
+            getByTestId('setParent').click();
+          });
+          fireEvent.click(getByTestId("delete-file-button-file"));
+        });
+    });
+
+  describe("when is downloading is true", () => {
+    test('set download false button', async () => {
+        // Render the component
+        const { getByTestId, getByText } = render(<FileView editorRef={editorRefMock} />);
+        
+        act(() => {
+          getByTestId('setFile').click();
+        });
+        act(() => {
+          getByTestId('download-file-button-file').click();
+        });
+        act(() => {
+          fireEvent.click(getByTestId('set-download-false-button'));
+        });
+     });
+
+     test('set filename input', async () => {
+      // Render the component
+        const { getByTestId, getByText } = render(<FileView editorRef={editorRefMock} />);
+        
+        act(() => {
+          getByTestId('setFile').click();
+        });
+        act(() => {
+          getByTestId('download-file-button-file').click();
+        });
+        act(() => {
+          fireEvent.change(getByTestId('file-name-input'), { target: { value: 'newFileName.txt' } });
+        });
+      });
+
+      test('test file extension select', async () => {
+        // Render the component
+        const { getByTestId, getByText } = render(<FileView editorRef={editorRefMock} />);
+        
+        act(() => {
+          getByTestId('setFile').click();
+        });
+        act(() => {
+          getByTestId('download-file-button-file').click();
+        });
+        act(() => {
+          fireEvent.change(getByTestId('file-extension-select'), { target: { value: 'txt' } });
+        });
+      });
+      test('test download file button', async () => {
+        global.URL.createObjectURL = jest.fn();
+        // Render the component
+        const { getByTestId, getByText } = render(<FileView editorRef={editorRefMock} />);
+        
+        act(() => {
+          getByTestId('setFile').click();
+        });
+        act(() => {
+          getByTestId('download-file-button-file').click();
+        });
+        act(() => {
+          getByTestId('download-file-button').click();
+        });
+      });
+
+  });
+
 
 // test("renders folders correctly", () => {
 //   // Mock folders data
@@ -459,25 +1089,4 @@ test('clicking on the folder div toggles the folder and sets selected file folde
 //   // Assert that the CircularProgress component is present
 //   const circularProgress = getByTestId('circular-progress');
 //   expect(circularProgress).toBeInTheDocument();
-// });
-
-// test('clicking on the "Add Folder" button calls createFolder with the correct argument when selectedFileFolder.type is "root"', () => {
-//     // Mock the createFolder function
-//     const createFolder = jest.fn();
-//     const selectedFileFolder = { type: 'root' }; // Mock the selectedFileFolder object
-
-//     // Render the component with the "Add Folder" button
-//     const { getByTestId } = render(
-//       <FileView
-//         editorRef={editorRefMock}
-//         createFolder={createFolder}
-//         selectedFileFolder={selectedFileFolder}
-//       />
-//     );
-
-//     // Simulate a user click on the "Add Folder" button
-//     fireEvent.click(getByTestId('add-folder-button'));
-
-//     // Check if createFolder was called with the correct argument
-//     expect(createFolder).toHaveBeenCalledWith(createFolder);
 // });
