@@ -22,7 +22,18 @@ let transporter = nodemailer.createTransport({
 
 router.use("/auth", authRoute);
 
-// Endpoint to get the number of users in a room
+ /*
+  Handles the POST request for '/rooms/numUsersInRoom' endpoint to get the number of users in a room.
+  Inputs:
+    req (object): The request object containing the room ID in the body.
+    res (object): The response object.
+  Outputs:
+    JSON: Response with the number of users in the room or error message.
+  Implementation:
+    - Retrieves the room ID from the request body.
+    - If room is found, returns the number of users in the room.
+    - If an error occurs during the process, it is caught and a 500 error is returned.
+  */
 router.post("/rooms/numUsersInRoom", async (req, res) => {
   try {
     const { roomId } = req.body;
@@ -44,7 +55,18 @@ router.post("/rooms/numUsersInRoom", async (req, res) => {
   }
 });
 
-// Endpoint to handle receiving code
+  /*
+  Handles the POST request for '/receivecode' endpoint to receive code for a specified room.
+  Inputs:
+    req (object): The request object containing the room ID in the body.
+    res (object): The response object.
+  Outputs:
+    JSON: Response with the code for the specified room or error message.
+  Implementation:
+    - Retrieves the room ID from the request body.
+    - Validates the presence of the room ID.
+    - Retrieves the code associated with the room from the database.
+  */
 router.post("/receivecode", async (req, res) => {
   const { roomId } = req.body;
   if (!roomId) {
@@ -64,19 +86,25 @@ router.post("/receivecode", async (req, res) => {
   }
 });
 
-// Endpoint to handle help request
-// router.post("/help", (req, res) => {
-//   console.log("hi", req.body);
-//   res.status(200).json({ message: "Form submitted" });
-// });
 
-// Endpoint to handle deleting room entry
-// Endpoint to handle deleting room entry
+  /*
+  Handles the POST request for '/delete-entry' endpoint to delete a room entry.
+  Inputs:
+    req (object): The request object containing the room ID and username in the body.
+    res (object): The response object.
+  Outputs:
+    JSON: Response with success message or error message.
+  Implementation:
+    - Retrieves the room ID and username from the request body.
+    - Decrements the user count in the RoomUserCount model for the specified room.
+    - Removes the disconnected user from the room's user list and determines if a new host needs to be assigned.
+    - Updates the RoomUserCount model with the updated users and possibly a new host.
+  */
 router.post("/delete-entry", async (req, res) => {
   const { roomId, username } = req.body;
 
   try {
-    // Decrement userCount in RoomUserCount model
+   
     const room = await RoomUserCount.findOneAndUpdate(
       { roomId },
       { $inc: { userCount: -1 } },
@@ -87,30 +115,30 @@ router.post("/delete-entry", async (req, res) => {
       return res.status(404).json({ message: "Room not found" });
     }
 
-    // Remove the disconnected user from the room's user list
+    
     const index = room.users.findIndex((user) => user.username === username);
     const updatedUsers =
       index !== -1
         ? [...room.users.slice(0, index), ...room.users.slice(index + 1)]
         : room.users;
 
-    // Check if the removed user was the host
+   
     let newHost = null;
     if (room.hostname === username) {
-      // If the removed user was the host, find a new host among the remaining users
+      
       const editor = updatedUsers.find((user) => user.role === "editor");
       if (editor) {
-        // If an editor is available, make them the new host
+        
         newHost = editor.username;
       } else {
-        // If no editor is available, promote a viewer to an editor and make them the host
+        
         const viewerIndex = updatedUsers.findIndex(
           (user) => user.role === "viewer"
         );
         if (viewerIndex !== -1) {
-          // Promote the viewer to an editor
+          
           updatedUsers[viewerIndex].role = "editor";
-          // Set the new host
+          
           newHost = updatedUsers[viewerIndex].username;
         }
       }
@@ -128,7 +156,7 @@ router.post("/delete-entry", async (req, res) => {
       { new: true }
     );
 
-    // If a new host is assigned, emit a socket action for host change
+    
     if (flag == 0) {
       console.log(`Host for room ${roomId} changed to ${newHost}.`);
       io.to(roomId).emit(ACTIONS.HOST_CHANGE, { newHost });
@@ -136,7 +164,7 @@ router.post("/delete-entry", async (req, res) => {
 
     // If userCount becomes 0, delete the room code map entry
     if (room.userCount === 0) {
-      console.log("hi");
+      
       const deletedRoomCodeMap = await RoomCodeMap.findOneAndDelete({ roomId });
       let deletedCount = 0;
       const fileNodes = await FileNode.find({ roomId });
@@ -161,16 +189,16 @@ router.post("/delete-entry", async (req, res) => {
     return res.status(500).json({ error: "Internal server error" });
   }
 });
-
+//Initaialize the newly created room
 router.post("/initialize", async (req, res) => {
   const { roomId, username } = req.body;
 
   try {
-    // Check if the room exists
+   
     const existingRoom = await RoomUserCount.findOne({ roomId });
 
     if (!existingRoom) {
-      // If the room doesn't exist, create a new room document
+     
       const newRoom = new RoomUserCount({
         roomId,
         userCount: 1, // Increment the user count by 1 when initializing the room
@@ -185,8 +213,7 @@ router.post("/initialize", async (req, res) => {
       return res.status(200).json({ message: "Room initialized successfully" });
     }
 
-    // If the room already exists
-    // Check if the user is already present in the room
+    
     const existingUser = existingRoom.users.find(
       (user) => user.username === username
     );
@@ -204,34 +231,46 @@ router.post("/initialize", async (req, res) => {
     return res.status(500).json({ message: "Internal server error" });
   }
 });
-
+  /*
+  Handles the POST request for '/getdetails' endpoint to retrieve room details.
+  Inputs:
+    req (object): The request object containing the room ID in the body.
+    res (object): The response object.
+  Outputs:
+    JSON: Response with user details and hostname or error message.
+  Implementation:
+    - Retrieves the room ID from the request body.
+    - Fetches room details including user list and hostname from the database.
+    - Extracts usernames and roles from the room details.
+    - Responds with user details and hostname.
+  */
 router.post("/getdetails", async (req, res) => {
-  console.log("hi");
-  const { roomId } = req.body; // Assuming roomId is sent as a query parameter
+  
+  const { roomId } = req.body; 
 
   try {
-    // Fetch room details including user list and hostname
+    
     const roomDetails = await RoomUserCount.findOne({ roomId });
 
     if (!roomDetails) {
       return res.status(404).json({ error: "Room not found" });
     }
 
-    // Extract usernames and roles from the room details
+    
     const userRoles = roomDetails.users.map((user) => ({
       name: user.username,
       role: user.role,
     }));
     const host = roomDetails.hostname;
 
-    // Respond with user details and hostname
+    
     return res.status(200).json({ users: userRoles, host });
   } catch (error) {
     console.error("Error fetching room details:", error);
     return res.status(500).json({ error: "Internal server error" });
   }
 });
-
+//Endpoint called to help the user and send the query to administrator.
 router.post("/help", async (req, res) => {
   try {
     const { name, email, message } = req.body;
