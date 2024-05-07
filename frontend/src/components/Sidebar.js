@@ -60,7 +60,7 @@ const Sidebar = ({
       window.URL.revokeObjectURL(url);
 
     } catch (error) {
-      console.error('Error downloading zip file:', error);
+      //console.error('Error downloading zip file:', error);
     }
   };
   const handleUserMenuToggle = (username) => {
@@ -72,7 +72,7 @@ const Sidebar = ({
   const handleChangeRole = (username) => {
     const user = connectedUserRoles.find((user) => user.name === username)
     if (!user) {
-      console.error(`User with id ${username} not found.`)
+      //console.error(`User with id ${username} not found.`)
       return
     }
     const newRole = user.role === 'viewer' ? 'editor' : 'viewer'
@@ -135,7 +135,7 @@ const Sidebar = ({
 
             if (leaveResponse.ok) {
               const data = await leaveResponse.json()
-              console.log(data)
+              //console.log(data)
               reactNavigator('/', { roomId })
             } else {
               reactNavigator('/', { roomId })
@@ -152,7 +152,7 @@ const Sidebar = ({
 
             if (leaveResponse.ok) {
               const data = await leaveResponse.json()
-              console.log(data)
+              //console.log(data)
               reactNavigator('/', { roomId })
             } else {
               reactNavigator('/', { roomId })
@@ -163,7 +163,7 @@ const Sidebar = ({
         throw new Error('Failed to fetch user count from the server')
       }
     } catch (error) {
-      console.error('Error leaving room:', error)
+      ////console.error('Error leaving room:', error)
     }
   }
 
@@ -173,7 +173,7 @@ const Sidebar = ({
       toast.success('Room ID has been copied to your clipboard')
     } catch (err) {
       toast.error('Could not copy the Room ID')
-      console.error(err)
+      //console.error(err)
     }
   }
   const download = async () => { downloadZipFile(roomId) }
@@ -205,6 +205,7 @@ const Sidebar = ({
       />
       <div className='Users z-10 '>
         <div
+          data-testid = "handle-Toggle"
           className='flex justify-between items-center'
           onClick={handleToggle}
         >
@@ -213,6 +214,7 @@ const Sidebar = ({
           {!isConnectedComponentOpen && <ArrowDropDownIcon />}
         </div>
         <div
+          data-testid = "handle-User"
           className='UserListContainer overflow-y-scroll'
           style={{ maxHeight: '60px' }}
         >
@@ -227,6 +229,7 @@ const Sidebar = ({
                   onClick={() => handleUserMenuToggle(user.username)}
                 />
                 <div
+                data-testid = "handle-User-Menu"
                   className='username'
                   onClick={() => handleUserMenuToggle(user.username)}
                   onMouseEnter={(event) =>
@@ -262,6 +265,7 @@ const Sidebar = ({
                     {storedUserData.current.name === host.current &&
                       storedUserData.current.name !== user.username && (
                         <MenuItem
+                          data-testid = "menuitem"
                           onClick={() => handleChangeRole(user.username)}
                         >
                           Change Role
@@ -282,6 +286,7 @@ const Sidebar = ({
         >
           <Tooltip title='Download'>
             <IconButton
+            data-testid="Download-button"
               onClick={download}
               style={{ color: '#e74c3c' }}
             >
@@ -291,6 +296,7 @@ const Sidebar = ({
           <Tooltip title='Chat'>
             <IconButton
               // className='btn chat-btn'
+              data-testid = "Chat-button"
               onClick={toggleChat}
               style={{ color: '#2ecc71' }}
             >
@@ -324,6 +330,7 @@ const Sidebar = ({
           <Tooltip title='Copy ROOM ID'>
             <IconButton
               // className='btn-edit copyBtn'
+              data-testid="copy-button"
               onClick={copyRoomId}
               style={{ color: '#3498db' }}
             >
@@ -333,6 +340,7 @@ const Sidebar = ({
           <Tooltip title='Leave'>
             <IconButton
               //   className='btn-edit leaveBtn'
+              data-testid="leave-button"
               onClick={leaveRoom}
               style={{ color: '#e74c3c' }}
             >
