@@ -194,7 +194,7 @@ const FileView = ({
     setContentChanged(!contentChanged)
     window.localStorage.setItem('contentChanged', contentChanged)
     reader.onload = (e) => {
-      const content = e.target.result
+      const content = e.target.result;
       (async () => {
         try {
           setLoading(true)
@@ -678,7 +678,7 @@ const FileView = ({
   }
   //Handles file upload event, reads file contents asynchronously, and sends data to the server
   const handleUpload = async (event) => {
-    const items = event.target.files
+    const items = event.target.files;
     const entries = await Promise.all(
       Array.from(items).map(async (item) => {
         const path = item.webkitRelativePath || item.name
