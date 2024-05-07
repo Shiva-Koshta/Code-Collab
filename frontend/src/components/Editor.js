@@ -35,6 +35,7 @@ const Editor = ({
   // }, [])
   let editorChanged = false
   const [UserName,setUserName] = useState();
+  const scrollTopRef = useRef(0);
   // const [cursorPositions, setCursorPositions] = useState({})
   window.localStorage.setItem("roomid", roomId);
   useEffect(() => {
@@ -128,6 +129,7 @@ const Editor = ({
 
       editorRef.current.on("change", (instance, changes) => {
         // console.log(changes)
+        scrollTopRef.current = editorRef.current.getScrollInfo().top
         editorChanged = true
         const { origin } = changes
         const code = instance.getValue()
@@ -187,6 +189,7 @@ const Editor = ({
           editorRef.current.setValue(code);
         }
         renderAllCursors(cursorPosition, socketRef.current.id);
+        editorRef.current.scrollTo(null,scrollTopRef.current )
       });
       socketRef.current.on(ACTIONS.CURSOR_CHANGE, ({ cursorData }) => {
         console.log("cursorData retrieved from user: " + cursorData.user.name);
@@ -288,13 +291,16 @@ const Editor = ({
       const cursorMarker = document.createElement("div");
       cursorMarker.className = "cursor-marker";
       cursorMarker.style.position = "absolute";
-      cursorMarker.classList.add("h-8", "w-px");
+      cursorMarker.classList.add("h-8", "w-0.5");
 
       cursorMarker.style.backgroundColor = getRandomColor(); // Assign a random color
       cursorMarker.title = user.name;
 
       // Append cursor marker to CodeMirror editor container
-      editorRef.current.getWrapperElement().appendChild(cursorMarker);
+      // console.log(editorRef.current.getWrapperElement())
+      const editorContainer = document.querySelector(".CodeMirror-scroll");
+      editorContainer.appendChild(cursorMarker);
+      // editorRef.current.getWrapperElement().appendChild(cursorMarker);
       cursorMarker.style.animation = "blinkCursor 1s infinite";
       // }
 
@@ -302,10 +308,20 @@ const Editor = ({
         editorRef.current.charCoords({ line, ch }).left
       -300}px`;
       // cursorMarker.style.left = `${leftPosition}px`;
-      cursorMarker.style.top = `${editorRef.current.charCoords({ line, ch }).top
-        }px`;
+      const cursorPosition1 = editorRef.current.charCoords({ line, ch },"local");
+      const topPosition = cursorPosition1.top 
+      cursorMarker.style.top = `${topPosition}px`;
+      // cursorMarker.style.top = `${editorRef.current.charCoords({ line, ch }).top
+      //   }px`;
       // console.log(editorRef.current.charCoords({ line, ch }).top);
-      // Define CSS keyframes for blinking effect
+
+      const tooltip = document.createElement("div");
+      tooltip.className = "tooltip"
+      tooltip.innerText = user.name.split(" ")[0]
+      tooltip.style.fontSize = "10px"
+      tooltip.style.padding = "2px 4px"
+
+      cursorMarker.appendChild(tooltip);
     }
   };
   // Clean up cursor markers when component unmounts
