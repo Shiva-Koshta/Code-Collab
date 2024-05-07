@@ -37,7 +37,7 @@ const Sidebar = ({
     connectedUserRoles,
     setConnectedUserRoles,
     socketRef,
-    currentFile,
+    currentFile = useRef(null),
     // setCurrentFile,
     menuOpen,
     setMenuOpen
