@@ -3,12 +3,8 @@ import React, { useEffect, useRef, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import UploadFileIcon from '@mui/icons-material/UploadFile'
 import {
-  IconButton,
-  duration,
-  sliderClasses,
   CircularProgress,
 } from '@mui/material'
-
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined'
 import FolderIcon from '@mui/icons-material/Folder'
 import FolderOpenIcon from '@mui/icons-material/FolderOpen'
@@ -16,10 +12,8 @@ import AddIcon from '@mui/icons-material/Add'
 import CreateNewFolderIcon from '@mui/icons-material/CreateNewFolder'
 import CreateIcon from '@mui/icons-material/Create'
 import DeleteIcon from '@mui/icons-material/Delete'
-import TextFileIcon from '@mui/icons-material/Description'
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown'
 import ArrowRightIcon from '@mui/icons-material/ArrowRight'
-import { FolderCopy } from '@mui/icons-material'
 import DriveFolderUploadIcon from '@mui/icons-material/DriveFolderUpload'
 import axios from 'axios'
 import audioIcon from '../icons/audio.png'
@@ -42,20 +36,16 @@ import DownloadIcon from '@mui/icons-material/Download'
 import ACTIONS from '../Actions'
 
 const FileView = ({
-  fileContent,
-  setFileContent,
-  editorRef,
-  contentChanged,
-  setContentChanged,
-  socketRef,
-  connectedUserRoles,
-  storedUserData
-
+  editorRef = useRef(null),
+  contentChanged = useRef(null),
+  setContentChanged = useRef(null),
+  socketRef = useRef(null),
+  connectedUserRoles = useRef(null),
+  storedUserData = useRef(null),
+  currentFile = useRef(null),
 }) => {
   const { roomId } = useParams()
   const [isDownloadTrue, setIsDownloadTrue] = useState(false)
-  const [currentFile, setCurrentFile] = useState(null) //id of the currently opened file, null if no file is opened
-
   const [downloadFileExtension, setFileExtension] = useState('')
   const [downloadFileName, setFileName] = useState('')
   const parentRef = useRef(null)
@@ -68,25 +58,42 @@ const FileView = ({
 
       children: []
     }
-
   ])
   const [selectedFileFolder, setSelectedFileFolder] = useState({
     _id: '0',
     name: 'Root',
     type: 'root',
-
     children: []
-
   })
   const [selectedFileFolderParent, setSelectedFileFolderParent] = useState({})
   const [isFolderOpen, setIsFolderOpen] = useState({ 0: false })
   const [isSmallScreen, setIsSmallScreen] = useState(false)
   const [loading, setLoading] = useState(false)
-
+  //Fetches the file system tree from the server, updates the state with the root folder,
+  // and returns the ID of the root folder.
+  const handleFilesystemChange = async () => {
+    try {
+      const response = await axios.post(
+        `${process.env.REACT_APP_API_URL}/filesystem/generatetree`,
+        {
+          roomId,
+        }
+      )
+      const root = response.data.tree
+      setSelectedFileFolder(root)
+      setFolders([root])
+      return root._id
+    } catch (error) {
+      console.log(error)
+    }
+  }
+  //Sets up event listeners for keyboard shortcuts (Ctrl+S and Ctrl+D),handles read-only mode based on user role and file availability,
+  //removes cursor markers, and runs with current file change dependency
   useEffect(() => {
-    if (currentFile == null) {
-      if (editorRef.current) {
+    if (currentFile.current == null) {
+      if (editorRef?.current) {
         editorRef.current.setOption('readOnly', true)
+        editorRef.current.setValue('')
       }
     } else {
       const currentUserRole = connectedUserRoles.find(
@@ -98,9 +105,10 @@ const FileView = ({
         editorRef.current.setOption('readOnly', false)
       }
     }
+    document.querySelectorAll('.cursor-marker').forEach((node) => node.remove())
     const handleCtrlS = (event) => {
       if (event.ctrlKey && event.key === 's') {
-        handleSaveFile(currentFile, true)
+        handleSaveFile(currentFile.current, true)
         event.preventDefault()
       }
       else if (event.ctrlKey && event.key === 'd') {
@@ -112,40 +120,29 @@ const FileView = ({
     return () => {
       document.removeEventListener('keydown', handleCtrlS)
     }
-  }, [currentFile])
+  }, [currentFile.current])
 
   useEffect(() => {
-    const handleFilesystemChange = async () => {
-      console.log('came here')
-      try {
-        const response = await axios.post(
-          `${process.env.REACT_APP_API_URL}/filesystem/generatetree`,
-          {
-            roomId,
-          }
-        )
-        const root = response.data.tree
-        setSelectedFileFolder(root)
-        setFolders([root])
-        return root._id
-      } catch (error) {
-        console.log(error)
-      }
-    }
-
     if (socketRef.current) {
-      socketRef.current.on(ACTIONS.FILESYSTEM_CHANGE, handleFilesystemChange)
+      //if socket is connected, listens to FILESYSTEM_CHANGE event in room and manages file tree by calling handlefilesystemchange()
+      socketRef.current.on(ACTIONS.FILESYSTEM_CHANGE,({isdelete})=> {
+        if(isdelete){currentFile.current=null}
+        handleFilesystemChange()
+      })
+      //listens to SELECTED_FILE_CHANGE event and calls handlefileclick and sets parent folders as recieved by input  
+      socketRef.current.on(ACTIONS.SELECTED_FILE_CHANGE, ({folder, parentFolder}) =>{
+        handleFileClick(folder,parentFolder,false)
+        setSelectedFileFolder(folder)
+        setSelectedFileFolderParent(parentFolder)
+      })
     }
 
-    // Cleanup function
   }, [socketRef.current])
-
+  //handles file save by emitting SAVE_FILE event to room with fileid and its code and shows success message if required
   const handleSaveFile = (fileId, show) => {
     if (!fileId) {
       return
     }
-
-    //For file saving , socket action is: SAVE_FILE
     socketRef.current.emit(ACTIONS.SAVE_FILE, {
       roomId,
       fileId,
@@ -154,9 +151,9 @@ const FileView = ({
     if (show) {
       toast.success(`File saved`)
     }
-
   }
-
+  // Fetches the file system tree on component mount, no dependecy runs only once
+  // sets up a window resize listener, and initializes state variables.
   useEffect(() => {
     (async () => {
       try {
@@ -176,12 +173,11 @@ const FileView = ({
     })()
 
     function handleResize() {
-
-      setIsSmallScreen(window.innerWidth < 1260) // Adjust the threshold as needed
+      setIsSmallScreen(window.innerWidth < 1260)
     }
 
     window.addEventListener('resize', handleResize)
-    handleResize() // Initial check
+    handleResize()
 
     if (parentRef.current) {
       const width = parentRef.current.getBoundingClientRect().width
@@ -190,24 +186,15 @@ const FileView = ({
 
     return () => window.removeEventListener('resize', handleResize)
   }, [])
-
+  //runs when file is uploaded and updates file system tree, and emits a Socket action for file system change.
+  //takes input: event- file changed event and parentfolder
   const handleFileChange = (event, parentFolder = selectedFileFolder) => {
-    console.log('reached')
-    console.log(event)
     const file = event.target.files[0]
     const reader = new FileReader()
     setContentChanged(!contentChanged)
-    console.log(contentChanged)
-
     window.localStorage.setItem('contentChanged', contentChanged)
     reader.onload = (e) => {
       const content = e.target.result;
-      // code before
-      // // setFileContent(content)
-      // window.localStorage.setItem('fileContent', JSON.stringify(fileContent))
-      // // console.log(content)
-      // // fileRef.current = content
-
       (async () => {
         try {
           setLoading(true)
@@ -228,7 +215,6 @@ const FileView = ({
 
           }
           parentFolder.children.push(newFile)
-          console.log('pushed')
           setFolders([...folders])
           socketRef.current.emit(ACTIONS.FILESYSTEM_CHANGE, {
             roomId,
@@ -244,33 +230,41 @@ const FileView = ({
     if (file) {
       reader.readAsText(file)
     }
-
     event.target.value = null
   }
-
-  const handleFileClick = async (fileId) => {
-    if (currentFile != null) {
-      handleSaveFile(currentFile, false)
+  //runs when a file clicked by user or any another user, takes input as file, parentfolder and isClicked to check if clicked by current user
+  //saves file, loads file content, and emits a Socket action for selected file change if clicked by current user.
+  const handleFileClick = async (folder,parentFolder,isClicked) => {
+    const fileId = folder._id
+    if (currentFile.current != null) {
+      handleSaveFile(currentFile.current, false)
     }
     try {
+      currentFile.current=fileId
       const response = await axios.post(
         `${process.env.REACT_APP_API_URL}/filesystem/fetchfile`,
         {
           nodeId: fileId,
         }
       )
-      console.log(response.data.file.content)
-      setCurrentFile(fileId)
-
-      // setFileContent(response.data.file.content);
       editorRef.current.setValue(response.data.file.content)
-
+      if(isClicked)
+      {socketRef.current.emit(ACTIONS.SELECTED_FILE_CHANGE, {
+        roomId,
+        folder,
+        parentFolder
+      })}
+      if(!isClicked)
+      {const fileElement = document.getElementById(fileId)
+        if (fileElement) {
+          fileElement.click()
+        }
+      }
     } catch (error) {
-      console.error(error)
+      console.log(error)
     }
   }
-
-
+  // Downloads the file content as a text file
   const handleDownloadFile = () => {
     const myContent = editorRef.current.getValue()
     const element = document.createElement('a')
@@ -281,7 +275,8 @@ const FileView = ({
     element.click()
     document.body.removeChild(element)
   }
-
+  //takes folder as input and prompts user for a new folder name, renames the folder,
+  //updates the file system tree, and emits a Socket event for file system change
   const renameFolder = (folder) => {
     const newName = prompt('Enter new folder name:', folder.name)
     if (newName) {
@@ -295,7 +290,6 @@ const FileView = ({
               nodeId: folder._id,
             }
           )
-          console.log('renamed directory')
           folder.name = newName
           setFolders([...folders])
           setSelectedFileFolder(folder)
@@ -310,7 +304,8 @@ const FileView = ({
       })()
     }
   }
-
+  //takes file as input and prompts user for a new file name, renames the file,
+  //updates the file system tree, and emits a Socket event for file system change
   const renameFile = (file) => {
     const newName = prompt('Enter new file name:', file.name)
     if (newName) {
@@ -324,7 +319,6 @@ const FileView = ({
               nodeId: file._id,
             }
           )
-          console.log('renamed file')
           file.name = newName
           setFolders([...folders])
           socketRef.current.emit(ACTIONS.FILESYSTEM_CHANGE, {
@@ -334,11 +328,13 @@ const FileView = ({
           console.log('error in renaming file', error)
         } finally {
           setLoading(false)
+          handleFilesystemChange()
         }
       })()
     }
   }
-
+  //takes folder and boolean flag as input and toggles the open/close state of the folder and updates the file system tree
+  //when flag is set folder is opened and if flag is not set prev state is switched 
   const toggleFolder = (folder, flag = false) => {
     if (flag && folder.type !== 'file') {
       let folderOpen = isFolderOpen
@@ -352,8 +348,14 @@ const FileView = ({
       setFolders([...folders])
     }
   }
-
+  //takes folder and parentfolder as input and deletes the folder,
+  //updates the file system tree, and emits a Socket event for file system change
   async function deleteFolder(folderId, parentFolder) {
+    const socketRefMock = {
+      current: {
+        emit: jest.fn(),
+      },
+    };
     try {
       const index = parentFolder.children.indexOf(folderId)
       const response = await axios.delete(
@@ -373,15 +375,16 @@ const FileView = ({
         roomId,
       })
     } catch (error) {
-      console.error('Error deleting folder:', error.message)
+      console.log('Error deleting folder:', error.message)
       throw new Error('Failed to delete folder.')
     }
   }
-
+  //takes fileid and parentfolder as input and deletes the file, sets editor content empty,
+  //updates the file system tree, and emits a Socket event for file system change
   async function deleteFile(fileId, parentFolder) {
-    if (currentFile === fileId._id) {
+    if (currentFile.current === fileId._id) {
       editorRef.current.setValue('')
-      setCurrentFile(null)
+      currentFile.current=null
     }
     try {
       setLoading(true)
@@ -401,14 +404,18 @@ const FileView = ({
       }
       socketRef.current.emit(ACTIONS.FILESYSTEM_CHANGE, {
         roomId,
+        isdelete: true
       })
     } catch (error) {
-      console.error('Error deleting file:', error.message)
+      console.log('Error deleting file:', error.message)
       throw new Error('Failed to delete file.')
     } finally {
       setLoading(false)
+      handleFilesystemChange()
     }
   }
+  //takes an array as input and sorts the array alphabetically with directories first
+  //this is the format of file tree view
   const sortAlphabetically = (array) => {
     if (!Array.isArray(array)) {
       return array
@@ -423,6 +430,8 @@ const FileView = ({
       }
     })
   }
+  //takes parentfolder as input and prompts user for a new file name, creates the file,
+  //updates the file system tree, and emits a Socket event for file system change
   const createFile = (parentFolder) => {
     toggleFolder(parentFolder, true)
     const newFileName = prompt('Enter file name:')
@@ -445,7 +454,6 @@ const FileView = ({
           }
           parentFolder.children.push(newFile)
           parentFolder.children = sortAlphabetically(parentFolder.children)
-          console.log('pushed')
           setFolders([...folders])
           socketRef.current.emit(ACTIONS.FILESYSTEM_CHANGE, {
             roomId,
@@ -458,7 +466,8 @@ const FileView = ({
       })()
     }
   }
-
+  //takes parentfolder as input and prompts user for a new folder name, creates the folder,
+  //updates the file system tree, and emits a Socket event for file system change
   const createFolder = (parentFolder) => {
     toggleFolder(parentFolder, true)
     const newFolderName = prompt('Enter folder name:')
@@ -494,30 +503,27 @@ const FileView = ({
       })()
     }
   }
-
+  //Searches a file in the file tree by taking id of file and nodes- array of files as input
+  //Iterate through each node in the tree and searches recursively for children
   const findNodeById = (id, nodes) => {
-    // Iterate through each node in the tree
     for (const node of nodes) {
-      // Check if the current node's ID matches the target ID
       if (node._id === id) {
-        // Return the node if found
         return node
       }
-      // If the current node has children, recursively search them
       if (node.children && node.children.length > 0) {
         const foundNode = findNodeById(id, node.children)
-        // If the node is found in the children, return it
         if (foundNode) {
           return foundNode
         }
       }
     }
-    // Return null if the node with the specified ID is not found
     return null
   }
-
+  //takes folder object, depth of folder in heirarchy and parentfolder as input,
+  //outputs jsx for rendering heirarchical folder structure
+  //renders a folder with its children recursively, handling different folder and file types, and toggling visibility
+  //each folder enclosed with tooltip consisting its name
   const renderFolder = (folder, depth = 0, parentFolder = null) => {
-    const sortedChildren = sortAlphabetically(folder.children)
     return (
       <div
         key={folder._id}
@@ -529,6 +535,7 @@ const FileView = ({
         }}
       >
         <div
+          id={folder._id}
           className={`flex items-center p-px  ${selectedFileFolder && selectedFileFolder._id === folder._id
               ? 'Selected-file-folder'
               : ''
@@ -543,6 +550,7 @@ const FileView = ({
                 placement='right'
               >
                 <div
+                  data-testid = 'setSelectedFileFolder-folder'
                   onClick={() => {
                     toggleFolder(folder)
                     setSelectedFileFolder(folder)
@@ -563,7 +571,7 @@ const FileView = ({
                     <FolderOpenIcon className='mr-2' style={{ fontSize: 20 }} />
                   )}
 
-                  <div className='kruncate' style={{ maxWidth: '200px' }}>
+                  <div className='truncate' style={{ maxWidth: '200px' }}>
                     {folder.name}
                   </div>
                 </div>
@@ -576,6 +584,7 @@ const FileView = ({
                 placement='right'
               >
                 <div
+                  data-testid="setSelectedFileFolder-directory"
                   onClick={() => {
                     toggleFolder(folder)
                     setSelectedFileFolder(folder)
@@ -596,7 +605,7 @@ const FileView = ({
                   ) : (
                     <FolderOpenIcon className='mr-2' style={{ fontSize: 20 }} />
                   )}
-                  <div className='kruncate' style={{ maxWidth: '200px' }}>
+                  <div className='truncate' style={{ maxWidth: '200px' }}>
                     {folder.name}
                   </div>
                 </div>
@@ -609,6 +618,7 @@ const FileView = ({
                 placement='right'
               >
                 <div
+                  data-testid = 'setSelectedFileFolder-directory'
                   style={{
                     maxWidth: `${depth === 0 ? '328px' : `${328 - depth}px`}`,
                   }}
@@ -616,12 +626,11 @@ const FileView = ({
                   onClick={() => {
                     setSelectedFileFolder(folder)
                     setSelectedFileFolderParent(parentFolder)
-
-                    handleFileClick(folder._id)
+                    handleFileClick(folder,parentFolder,true)
                   }}
                 >
                   {renderFileIcon(folder)}
-                  <div className='kruncate' style={{ maxWidth: '200px' }}>
+                  <div className='truncate' style={{ maxWidth: '200px' }}>
                     {folder.name}
                   </div>
                 </div>
@@ -636,7 +645,7 @@ const FileView = ({
       </div>
     )
   }
-
+  //array for different file extension icons
   const fileIconMap = {
     mp3: audioIcon,
     c: cIcon,
@@ -655,10 +664,13 @@ const FileView = ({
     txt: textIcon,
     mp4: videoIcon,
   }
+  //takes extension as input and retrieves the icon URL corresponding to the file extension
+  //or returns a default icon if not found
   const getFileIcon = (extension) => {
     return fileIconMap[extension.toLowerCase()] || defaultIcon
   }
-
+  //takes file as input and outputs JSX for rendering file icon
+  //renders the icon for a given file based on its extension
   const renderFileIcon = (file) => {
     const extension = (file.name.split('.').pop() || '').toLowerCase()
     const iconUrl = getFileIcon(extension)
@@ -672,10 +684,9 @@ const FileView = ({
       </div>
     )
   }
-
-  const [files, setFiles] = useState([])
+  //Handles file upload event, reads file contents asynchronously, and sends data to the server
   const handleUpload = async (event) => {
-    const items = event.target.files
+    const items = event.target.files;
     const entries = await Promise.all(
       Array.from(items).map(async (item) => {
         const path = item.webkitRelativePath || item.name
@@ -688,9 +699,9 @@ const FileView = ({
       })
     )
     sendDataToServer(entries)
-
-    // setFiles(entries)
   }
+  //takes file as input and outputs promise resolving to file content
+  //reads the content of a file asynchronously and resolves with the content
   const readFileAsync = (file) => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader()
@@ -703,10 +714,9 @@ const FileView = ({
       reader.readAsText(file)
     })
   }
-
+  //Updates the file tree on folder upload activity by making post request to backend and emits file_system_change to room
   const sendDataToServer = async (data) => {
     try {
-      // console.log('Data to be sent to the server:', data)
       setLoading(true)
       const response = await axios.post(
         `${process.env.REACT_APP_API_URL}/filesystem/uploaddirectory`,
@@ -731,41 +741,38 @@ const FileView = ({
       socketRef.current.emit(ACTIONS.FILESYSTEM_CHANGE, {
         roomId,
       })
-
     } catch (error) {
-      console.error('Error sending data to server:', error)
+      console.log('Error sending data to server:', error)
       toast.error(error.request.statusText, { duration: 2000 })
     } finally {
       setLoading(false)
     }
   }
-
+  //function takes roomId as input and downloads whole content in a zip file
   const downloadZipFile = async (roomId) => {
     try {
       // Make a GET request to the backend endpoint
       const response = await axios.get(`${process.env.REACT_APP_API_URL}/filesystem/download/${roomId}`, {
         responseType: 'blob' // Specify the response type as blob
-      });
-
+      })
       // Trigger the download by creating a blob URL and clicking on a temporary link
-      const url = window.URL.createObjectURL(new Blob([response.data], { type: 'application/zip' }));
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `room_${roomId}_files.zip`;
-      document.body.appendChild(a);
-      a.click();
-      window.URL.revokeObjectURL(url);
-
+      const url = window.URL.createObjectURL(new Blob([response.data], { type: 'application/zip' }))
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `room_${roomId}_files.zip`
+      document.body.appendChild(a)
+      a.click()
+      window.URL.revokeObjectURL(url)
     } catch (error) {
-      console.error('Error downloading zip file:', error);
+      console.log('Error downloading zip file:', error)
     }
-  };
-
-
+  }
+  //listens to beforeunload event i.e. when user closes or changes tab
+  //handleUnload callback function saves the current file if available , hence prevents losing file changes
   useEffect(() => {
     const handleUnload = (event) => {
-      if (currentFile !== null) {
-        handleSaveFile(currentFile, false)
+      if (currentFile.current !== null) {
+        handleSaveFile(currentFile.current, false)
       }
     }
 
@@ -782,7 +789,6 @@ const FileView = ({
           <div
             className={`text-lg font-bold flex justify-between items-center my-3 
               }`}
-
           >
             <p>File Explorer</p>
             {selectedFileFolder.type === 'root' && (
@@ -791,6 +797,7 @@ const FileView = ({
                   className=''
                   onClick={() => createFolder(selectedFileFolder)}
                   title='Add Folder'
+                  data-testid='add-folder-button'
                 >
                   <CreateNewFolderIcon />
                 </button>
@@ -801,6 +808,7 @@ const FileView = ({
                   className=''
                   onClick={() => createFile(selectedFileFolder)}
                   title='Add File'
+                  data-testid='add-file-button'
                 >
                   <AddIcon />
                 </button>
@@ -812,9 +820,10 @@ const FileView = ({
                   id='fileInput'
                   style={{ display: 'none' }}
                   onChange={handleFileChange}
+                  data-testid='file-input'
                 />
                 <label htmlFor='fileInput'>
-                  <UploadFileIcon className='text-white cursor-pointer' />
+                  <UploadFileIcon className='text-white cursor-pointer' data-testid='upload-file-button'/>
                 </label>
                 <input
                   type='file'
@@ -834,6 +843,7 @@ const FileView = ({
                   className='renameFolderIcon update-buttons '
                   onClick={() => renameFolder(selectedFileFolder)}
                   title='Rename Folder'
+                  data-testid='rename-folder-button'
                 >
                   <CreateIcon />
                 </button>
@@ -848,6 +858,7 @@ const FileView = ({
                   className='addFolderIcon update-buttons '
                   onClick={() => createFolder(selectedFileFolder)}
                   title='Add Folder'
+                  data-testid='add-folder-button-directory'
                 >
                   <CreateNewFolderIcon />
                 </button>
@@ -858,6 +869,7 @@ const FileView = ({
                   className='addFileIcon update-buttons '
                   onClick={() => createFile(selectedFileFolder)}
                   title='Add File'
+                  data-testid='add-file-button-directory'
                 >
                   <AddIcon />
                 </button>
@@ -871,7 +883,7 @@ const FileView = ({
                   onChange={handleFileChange}
                 />
                 <label htmlFor='fileInput'>
-                  <UploadFileIcon className='text-white' />
+                  <UploadFileIcon className='text-white' data-testid='upload-file-button-directory'/>
                 </label>
                 <input
                   type='file'
@@ -882,7 +894,7 @@ const FileView = ({
                   onChange={handleUpload}
                 />
                 <label htmlFor='folderInput'>
-                  <DriveFolderUploadIcon className='text-white cursor-pointer' />
+                  <DriveFolderUploadIcon className='text-white cursor-pointer' data-testid='upload-folder-button-directory'/>
                 </label>
                 <div className='absolute bottom-0 hidden hover:bg-gray-100 hover:rounded hover:p-2 hover:block hover:z-10 hover:border hover:border-gray-300'>
                   Upload Folder
@@ -891,6 +903,7 @@ const FileView = ({
                   className='renameFolderIcon update-buttons '
                   onClick={() => renameFolder(selectedFileFolder)}
                   title='Rename Folder'
+                  data-testid='rename-folder-button-directory'
                 >
                   <CreateIcon />
                 </button>
@@ -903,6 +916,7 @@ const FileView = ({
                     deleteFolder(selectedFileFolder, selectedFileFolderParent)
                   }
                   title='Delete Folder'
+                  data-testid='delete-folder-button-directory'
                 >
                   <DeleteIcon />
                 </button>
@@ -917,6 +931,7 @@ const FileView = ({
                   className='renameFileIcon update-buttons '
                   onClick={() => renameFile(selectedFileFolder)}
                   title='Rename File'
+                  data-testid='rename-file-button-file'
                 >
                   <CreateIcon />
                 </button>
@@ -927,20 +942,20 @@ const FileView = ({
                   className='renameFileIcon update-buttons '
                   onClick={() => setIsDownloadTrue(true)}
                   title='Download File'
+                  data-testid='download-file-button-file'
                 >
                   <DownloadIcon />
                 </button>
-
                 <div className='absolute bottom-0 hidden hover:bg-gray-100 hover:rounded hover:p-2 hover:block hover:z-10 hover:border hover:border-gray-300 hover:top-7'>
                   Download File
                 </div>
                 <button
-
                   className='deleteFileIcon update-buttons '
                   onClick={() =>
                     deleteFile(selectedFileFolder, selectedFileFolderParent)
                   }
                   title='Delete File'
+                  data-testid='delete-file-button-file'
                 >
                   <DeleteIcon />
                 </button>
@@ -951,9 +966,7 @@ const FileView = ({
             )}
           </div>
           {loading === true && (
-
             <div className='flex justify-center items-center pb-2'>
-
               <CircularProgress color='inherit' size={30} />
             </div>
           )}
@@ -962,7 +975,7 @@ const FileView = ({
             style={{ maxHeight: '380px', maxWidth: '300px' }}
           >
             <div
-              className='grow relative overflow-y-scroll overflow-x-scroll'
+              className='grow relative overflow-y-auto'
               style={{ maxHeight: '380px', maxWidth: '300px' }}
               ref={parentRef}
             >
@@ -978,6 +991,7 @@ const FileView = ({
                 onClick={() => {
                   setIsDownloadTrue(false)
                 }}
+                data-testid="set-download-false-button"
               />
             </div>
             <input
@@ -990,12 +1004,14 @@ const FileView = ({
                 color: '#1c1e29',
                 '::placeholder': { color: '#1c1e29' },
               }}
+              data-testid="file-name-input"
             />
             <select
               value={downloadFileExtension}
               onChange={(e) => setFileExtension(e.target.value)}
               className='mb-3 px-2 py-1 w-full bg-slate-300 rounded border-2 border-gray-400 focus:outline-none focus:border-blue-500'
               style={{ color: '#1c1e29' }}
+              data-testid="file-extension-select"
             >
               <option value=''>Select type</option>
               <option value='txt'>Text</option>
@@ -1014,12 +1030,61 @@ const FileView = ({
                 handleDownloadFile()
                 setIsDownloadTrue(false)
               }}
+              data-testid="download-file-button"
             >
               Download
             </button>
           </div>
         )}
       </div>
+      <button style={{ display: 'none' }} data-testid="setDirectory"
+        onClick={() => {
+          setSelectedFileFolder({
+                _id: '0',
+                name: 'Dir',
+                type: 'directory',
+                children: []
+              });
+          setFolders([
+            {
+              _id: '0',
+              name: 'Dir',
+              type: 'directory',
+              children: []
+            }
+          ])
+          return 0;
+          }} >
+        Hidden Button
+      </button>
+
+      <input type="hidden" data-testid="setFile" onClick={() => {
+        setSelectedFileFolder({
+            _id: '0',
+            name: 'File',
+            type: 'file',
+            children: []
+          });
+        setFolders([
+          {
+            _id: '0',
+            name: 'File',
+            type: 'file',
+            children: []
+          }
+        ])
+
+        return 0;
+      }} />
+      <input type="hidden" data-testid="setParent" onClick={() => {
+        setSelectedFileFolderParent({
+            _id: '0',
+            name: 'File',
+            type: 'file',
+            children: [selectedFileFolder]
+          });
+        return 0;
+      }} />
     </div>
   )
 }
