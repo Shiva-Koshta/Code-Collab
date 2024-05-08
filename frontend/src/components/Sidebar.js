@@ -20,7 +20,7 @@ const Sidebar = ({
     setContentChanged,
     fileContent,
     setFileContent,
-    editorRef,
+    editorRef= useRef(null),
     // isConnectedComponentOpen,
     // handleToggle,
     connectedUsers,
@@ -36,13 +36,13 @@ const Sidebar = ({
     host,
     connectedUserRoles,
     setConnectedUserRoles,
-    socketRef,
+    socketRef= useRef(null),
     currentFile = useRef(null),
-    // setCurrentFile,
-    menuOpen,
-    setMenuOpen
+    //  setCurrentFile,
+    // menuOpen,
+    // setMenuOpen 
 }) => {
-  //   const [menuOpen, setMenuOpen] = useState({})
+   const [menuOpen, setMenuOpen] = useState({})
   const downloadZipFile = async (roomId) => {
     try {
       // Make a GET request to the backend endpoint
@@ -64,6 +64,7 @@ const Sidebar = ({
     }
   };
   const handleUserMenuToggle = (username) => {
+    console.log('handleUserMenuToggle called with:', username);
     setMenuOpen((prevMenuOpen) => ({
       ...prevMenuOpen,
       [username]: !prevMenuOpen[username],
@@ -220,8 +221,9 @@ const Sidebar = ({
         >
           {isConnectedComponentOpen &&
             connectedUsers.map((user) => (
-              <div className='UserListItem' key={user.username}>
+              <div className='UserListItem' key={user.username} >
                 <img
+                  data-testid ="user-List"
                   id={`user-${user.username}`}
                   src={user.profileImage}
                   alt={user.username}
@@ -238,8 +240,8 @@ const Sidebar = ({
                 >
                   {user.username.split(' ')[0]}
                 </div>
-                {menuOpen[user.username] && (
-                  <Menu
+                {menuOpen?.[user.username] && (
+                  <Menu test-dataid= "inside-Menu"
                     anchorEl={
                       menuOpen[user.username]
                         ? document.getElementById(`user-${user.username}`)
@@ -254,7 +256,7 @@ const Sidebar = ({
                     }
                   >
                     <MenuItem>
-                      <div className='font-bold uppercase'>
+                      <div className='font-bold uppercase' data-testid ="sohell">
                         {user.username === host.current
                           ? 'host'
                           : connectedUserRoles.find(
@@ -262,7 +264,7 @@ const Sidebar = ({
                           )?.role}
                       </div>
                     </MenuItem>
-                    {storedUserData.current.name === host.current &&
+                    {storedUserData?.current?.name === host?.current &&
                       storedUserData.current.name !== user.username && (
                         <MenuItem
                           data-testid = "menuitem"
@@ -356,6 +358,10 @@ const Sidebar = ({
           </IconButton>
         </Tooltip>
       </div>
+      <input type="hidden"
+        onClick={() => {setIsConnectedComponentOpen(true)}}
+        data-testid="inside-hello"
+        />
     </div>
   )
 }

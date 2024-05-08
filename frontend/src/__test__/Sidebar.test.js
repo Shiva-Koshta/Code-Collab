@@ -43,43 +43,6 @@ describe("Sidebar", () => {
   const roomId = "room123";
   const storedUserData = { current: { name: "user1" } };
 
-  it("renders user list correctly", () => {
-    const connectedUsersMap = [
-      { username: "user1", profileImage: "image1.jpg" },
-      { username: "user2", profileImage: "image2.jpg" },
-      // Add more test data as needed
-    ];
-
-    const { getByTestId } = render(
-      <MemoryRouter>
-        <Sidebar
-          connectedUsersMap={connectedUsersMap}
-          connectedUsers={connectedUsers}
-          connectedUserRoles={connectedUserRoles}
-          contentChanged={false}
-          setContentChanged={() => {}}
-          fileContent=""
-          setFileContent={() => {}}
-          editorRef={{}}
-          toggleChat={() => {}}
-          unreadMessages={0}
-          isLeftDivOpen={false}
-          toggleLeftDiv={() => {}}
-          leftIcon={<div />}
-          setConnectedUserRoles={() => {}}
-          socketRef={{ current: null }}
-          menuOpen={{}}
-          setMenuOpen={() => {}}
-          isConnectedComponentOpen={true} // Set isConnectedComponentOpen to true
-        />
-      </MemoryRouter>
-    );
-
-    // Find the div element by its text content
-    getByTestId("handle-User");
-    const toggleElement = getByTestId("handle-User-Menu");
-  });
-
   it("renders correctly", () => {
     render(
       <MemoryRouter>
@@ -546,4 +509,130 @@ describe("Sidebar", () => {
         global.fetch = originalFetch;
         window.confirm = originalConfirm;
     }); */
+});
+const connectedUsers = [
+  {
+    username: "john_doe",
+    profileImage: "/images/john_doe.png",
+  },
+];
+// descsribe("handle User", () => {
+it("finds img elements with correct data-testid and handles clicks", async () => {
+  const setMenuOpen = jest.fn((fn) => {
+    return fn;
+  });
+  const host = {
+    current: "john_doe", // or any other expected value
+  };
+  const storedUserData = {
+    current: {
+      name: "jane_doe", // Set this to an appropriate value
+    },
+  };
+  const handleUserMenuToggle = jest.fn();
+  render(
+    <MemoryRouter>
+      <Sidebar
+        isConnectedComponentOpen={true}
+        connectedUsers={connectedUsers}
+        handleUserMenuToggle={handleUserMenuToggle}
+        sertMenuOpen={setMenuOpen}
+        host={host}
+        storedUserData={storedUserData}
+        //   menuOpen={menuOpen}
+      />
+    </MemoryRouter>
+  );
+  // Simulate a user clicking the hidden input element
+  const hiddenInput = screen.getByTestId("inside-hello");
+  fireEvent.click(hiddenInput);
+  connectedUsers.forEach((user) => {
+    // Verify that the img element with data-testid="user-List" is in the document
+    const imgElement = screen.getByTestId("user-List");
+    expect(imgElement).toBeInTheDocument();
+    fireEvent.click(imgElement);
+  });
+});
+it("finds name elements with correct data-testid and handles clicks", async () => {
+  const setMenuOpen = jest.fn((fn) => {
+    return fn;
+  });
+  const host = {
+    current: "john_doe", // or any other expected value
+  };
+  const storedUserData = {
+    current: {
+      name: "jane_doe", // Set this to an appropriate value
+    },
+  };
+  const handleUserMenuToggle = jest.fn();
+  render(
+    <MemoryRouter>
+      <Sidebar
+        isConnectedComponentOpen={true}
+        connectedUsers={connectedUsers}
+        handleUserMenuToggle={handleUserMenuToggle}
+        sertMenuOpen={setMenuOpen}
+        host={host}
+        storedUserData={storedUserData}
+        //   menuOpen={menuOpen}
+      />
+    </MemoryRouter>
+  );
+  // Simulate a user clicking the hidden input element
+  const hiddenInput = screen.getByTestId("inside-hello");
+  fireEvent.click(hiddenInput);
+  connectedUsers.forEach((user) => {
+    // Verify that the img element with data-testid="user-List" is in the document
+    const imgElement = screen.getByTestId("handle-User-Menu");
+    expect(imgElement).toBeInTheDocument();
+    // const imgElement = screen.getByTestId('user-List');
+
+    // Simulate clicking the img element
+    fireEvent.click(imgElement);
+  });
+});
+it("changes style of cursor to pointer", async () => {
+  const setMenuOpen = jest.fn((fn) => {
+    return fn;
+  });
+  const host = {
+    current: "john_doe", // or any other expected value
+  };
+  const storedUserData = {
+    current: {
+      name: "jane_doe", // Set this to an appropriate value
+    },
+  };
+  const handleUserMenuToggle = jest.fn();
+  render(
+    <MemoryRouter>
+      <Sidebar
+        isConnectedComponentOpen={true}
+        connectedUsers={connectedUsers}
+        handleUserMenuToggle={handleUserMenuToggle}
+        sertMenuOpen={setMenuOpen}
+        host={host}
+        storedUserData={storedUserData}
+        //   menuOpen={menuOpen}
+      />
+    </MemoryRouter>
+  );
+  // Simulate a user clicking the hidden input element
+  const hiddenInput = screen.getByTestId("inside-hello");
+  fireEvent.click(hiddenInput);
+  connectedUsers.forEach((user) => {
+    // Verify that the img element with data-testid="user-List" is in the document
+    const imgElement = screen.getByTestId("handle-User-Menu");
+    expect(imgElement).toBeInTheDocument();
+    // const imgElement = screen.getByTestId('user-List');
+
+    // Simulate clicking the img element
+    fireEvent.click(imgElement);
+    const usernameElement = screen.getByText("john_doe");
+    fireEvent.mouseEnter(usernameElement);
+
+    // Verify the cursor style has been changed to 'pointer'
+    expect(usernameElement.style.cursor).toBe("pointer");
+  });
 });
