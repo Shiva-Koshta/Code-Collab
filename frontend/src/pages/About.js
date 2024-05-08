@@ -34,11 +34,11 @@ const About = () => {
             <div className='flex flex-col'>
               <div className='flex justify-center gap-4'>
                 <p className='text-red-100 poppins-medium-italic font-bold my-1'>Email:</p>
-                <p className='text-red-100 poppins-medium-italic my-1'>xyz@gmail.com</p>
+                <p className='text-red-100 poppins-medium-italic my-1'>softwareteam676@gmail.com</p>
               </div>
               <div className='flex justify-center gap-4'>
                 <p className='text-red-100 poppins-medium-italic font-bold my-1'>Phone no:</p>
-                <p className='text-red-100 poppins-medium-italic my-1'>1234567890</p>
+                <p className='text-red-100 poppins-medium-italic my-1'>xxxx-xxxx-xx</p>
               </div>
             </div>
           </div>
