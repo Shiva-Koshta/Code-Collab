@@ -36,19 +36,19 @@ import DownloadIcon from '@mui/icons-material/Download'
 import ACTIONS from '../Actions'
 
 const FileView = ({
-  contentChanged = useRef(null),
-  setContentChanged = useRef(null),
-  editorRef = useRef(null),
-  socketRef = useRef(null),
-  connectedUserRoles = useRef(null),
-  storedUserData = useRef(null),
-  currentFile = useRef(null),
+  editorRef  ,
+  contentChanged  ,
+  setContentChanged  ,
+  socketRef  ,
+  connectedUserRoles  ,
+  storedUserData  ,
+  currentFile  
 }) => {
   const { roomId } = useParams()
   const [isDownloadTrue, setIsDownloadTrue] = useState(false)
   const [downloadFileExtension, setFileExtension] = useState('')
   const [downloadFileName, setFileName] = useState('')
-  const parentRef = useRef(null)
+  const parentRef  = useRef(null)
   const [parentWidth, setParentWidth] = useState(0)
   const [folders, setFolders] = useState([
     {
@@ -351,11 +351,7 @@ const FileView = ({
   //takes folder and parentfolder as input and deletes the folder,
   //updates the file system tree, and emits a Socket event for file system change
   async function deleteFolder(folderId, parentFolder) {
-    const socketRefMock = {
-      current: {
-        emit: jest.fn(),
-      },
-    };
+    
     try {
       const index = parentFolder.children.indexOf(folderId)
       const response = await axios.delete(
