@@ -280,8 +280,6 @@ const EditorPage = () => {
           <Sidebar
             contentChanged={contentChanged}
             setContentChanged={setContentChanged}
-            fileContent={fileContent}
-            setFileContent={setFileContent}
             editorRef={editorRef}
             connectedUsers={connectedUsers}
             toggleChat={toggleChat}
