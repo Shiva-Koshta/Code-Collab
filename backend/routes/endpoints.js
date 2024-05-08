@@ -1,6 +1,5 @@
 const express = require("express");
 const router = express.Router();
-const RoomCodeMap = require("../models/RoomCodeMap");
 const RoomUserCount = require("../models/RoomUserCount");
 const FileNodeSchema = require("../models/FileNode");
 const authRoute = require("./auth");
@@ -52,37 +51,6 @@ router.post("/rooms/numUsersInRoom", async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Internal Server Error" });
-  }
-});
-
-  /*
-  Handles the POST request for '/receivecode' endpoint to receive code for a specified room.
-  Inputs:
-    req (object): The request object containing the room ID in the body.
-    res (object): The response object.
-  Outputs:
-    JSON: Response with the code for the specified room or error message.
-  Implementation:
-    - Retrieves the room ID from the request body.
-    - Validates the presence of the room ID.
-    - Retrieves the code associated with the room from the database.
-  */
-router.post("/receivecode", async (req, res) => {
-  const { roomId } = req.body;
-  if (!roomId) {
-    return res.status(400).json({ error: "Room ID is required" });
-  }
-
-  try {
-    const roomMap = await RoomCodeMap.findOne({ roomId });
-    if (roomMap) {
-      res.json({ code: roomMap.code });
-    } else {
-      res.status(404).json({ error: "Code not found for the specified room" });
-    }
-  } catch (error) {
-    console.error("Error retrieving code from database:", error);
-    res.status(500).json({ error: "Internal server error" });
   }
 });
 
@@ -165,7 +133,7 @@ router.post("/delete-entry", async (req, res) => {
     // If userCount becomes 0, delete the room code map entry
     if (room.userCount === 0) {
       
-      const deletedRoomCodeMap = await RoomCodeMap.findOneAndDelete({ roomId });
+      
       let deletedCount = 0;
       const fileNodes = await FileNode.find({ roomId });
 
@@ -178,9 +146,7 @@ router.post("/delete-entry", async (req, res) => {
         }
       }
 
-      if (!deletedRoomCodeMap) {
-        return res.status(404).json({ error: "Room code map entry not found" });
-      }
+      
     }
 
     return res.json({ message: "User removed successfully" });

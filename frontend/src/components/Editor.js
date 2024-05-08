@@ -166,33 +166,7 @@ const Editor = ({
     }
   }, [socketRef.current])
   
-  useEffect(() => {
-    // Fetch code from the backend using room ID
-    if (roomId) {
-      async function fetchCode() {
-        try {
-          const response = await fetch(`${process.env.REACT_APP_API_URL}/receivecode`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ roomId }),
-          })
-          if (response.ok) {
-            const { code } = await response.json()
-            if (code !== null) {
-              editorRef.current.setValue(code)
-            }
-          } else {
-            console.log('Failed to fetch code')
-          }
-        } catch (error) {
-          console.log('Error fetching code:', error)
-        }
-      }
-      fetchCode()
-    }
-  }, [roomId])
+
   //function generates random color each time using random()
   //input- none ,output- random generated color number format "#AAAAAA"
   const getRandomColor = () => {

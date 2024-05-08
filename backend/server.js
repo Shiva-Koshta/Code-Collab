@@ -8,7 +8,6 @@ const { Server } = require("socket.io");
 const filesysrouter = require("./routes/filesystem.routes");
 const FileSystemService = require("./services/filesystem.services");
 const middleware = require("./middleware");
-const RoomCodeMap = require("./models/RoomCodeMap");
 const RoomUserCount = require("./models/RoomUserCount");
 const ACTIONS = require("../frontend/src/Actions");
 const { log } = require("console");
