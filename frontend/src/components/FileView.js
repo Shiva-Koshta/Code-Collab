@@ -351,11 +351,7 @@ const FileView = ({
   //takes folder and parentfolder as input and deletes the folder,
   //updates the file system tree, and emits a Socket event for file system change
   async function deleteFolder(folderId, parentFolder) {
-    const socketRefMock = {
-      current: {
-        emit: jest.fn(),
-      },
-    };
+    
     try {
       const index = parentFolder.children.indexOf(folderId)
       const response = await axios.delete(
