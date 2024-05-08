@@ -199,7 +199,7 @@ io.on("connection", (socket) => {
   */
 
   socket.on(ACTIONS.FILESYSTEM_CHANGE, ({ roomId ,isdelete}) => {
-    console.log("ho hioooo");
+    
     // Emit the FILE_CHANGE event to all room members except the current socket
     if(isdelete)
     {
