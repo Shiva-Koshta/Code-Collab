@@ -36,13 +36,13 @@ import DownloadIcon from '@mui/icons-material/Download'
 import ACTIONS from '../Actions'
 
 const FileView = ({
-  editorRef,
-  contentChanged,
-  setContentChanged,
-  socketRef,
-  connectedUserRoles,
-  storedUserData,
-  currentFile,
+  editorRef = useRef(null),
+  contentChanged = useRef(null),
+  setContentChanged = useRef(null),
+  socketRef = useRef(null),
+  connectedUserRoles = useRef(null),
+  storedUserData = useRef(null),
+  currentFile = useRef(null),
 }) => {
   const { roomId } = useParams()
   const [isDownloadTrue, setIsDownloadTrue] = useState(false)
@@ -91,7 +91,7 @@ const FileView = ({
   //removes cursor markers, and runs with current file change dependency
   useEffect(() => {
     if (currentFile.current == null) {
-      if (editorRef.current) {
+      if (editorRef?.current) {
         editorRef.current.setOption('readOnly', true)
         editorRef.current.setValue('')
       }

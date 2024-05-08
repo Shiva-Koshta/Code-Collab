@@ -21,8 +21,16 @@ const editorRefMock = {
   current: {
     setOption: jest.fn(), // Mock the setOption function
     getValue: jest.fn(), // Mock the getValue function if needed
+    setValue: jest.fn()
   },
 };
+const socketRefMock = {
+  current: {
+    emit: jest.fn(),
+    on: jest.fn()
+  },
+};
+const mockCurrentFile = { current: null };
 
 let addEventListenerSpy;
 let removeEventListenerSpy;
@@ -55,7 +63,7 @@ describe("useEffect hook", () => {
 
     // Render the component
     const { unmount } = render(
-      <FileView editorRef={editorRefMock} handleSaveFile={handleSaveFile} />
+      <FileView socketRef={socketRefMock} editorRef={editorRefMock} handleSaveFile={handleSaveFile} currentFile={mockCurrentFile}/>
     );
 
     // Check if the event listener is added when component mounts
@@ -78,15 +86,16 @@ describe("useEffect hook", () => {
 describe("useEffect hook", () => {
   it("sets editor to readOnly when currentFile is null", () => {
     // Mock editorRef
-    const editorRef = { current: { setOption: jest.fn() } };
+    const editorRef = { current: { setOption: jest.fn(), setValue: jest.fn() } };
 
     // Render the component with currentFile as null
     render(
       <FileView
-        currentFile={null}
         editorRef={editorRef}
+        socketRef={socketRefMock}
         connectedUserRoles={[]}
         storedUserData={{ current: { name: "testUser" } }}
+        currentFile={mockCurrentFile}
       />
     );
 
@@ -96,7 +105,7 @@ describe("useEffect hook", () => {
 
   it("sets editor to readOnly based on user role when currentFile is not null", () => {
     // Mock editorRef
-    const editorRef = { current: { setOption: jest.fn() } };
+    const editorRef = { current: { setOption: jest.fn() ,setValue: jest.fn()} };
 
     // Mock connectedUserRoles and storedUserData
     const connectedUserRoles = [{ name: "testUser", role: "viewer" }];
@@ -105,7 +114,8 @@ describe("useEffect hook", () => {
     // Render the component with currentFile not null
     render(
       <FileView
-        currentFile="testFile"
+        currentFile={mockCurrentFile}
+        socketRef={socketRefMock}
         editorRef={editorRef}
         connectedUserRoles={connectedUserRoles}
         storedUserData={storedUserData}
@@ -121,7 +131,7 @@ describe("useEffect hook", () => {
 
     // Render the component
     const { unmount } = render(
-      <FileView currentFile="testFile" handleSaveFile={handleSaveFile} />
+      <FileView currentFile={mockCurrentFile} socketRef={socketRefMock} handleSaveFile={handleSaveFile} />
     );
 
     // Simulate a keydown event for Ctrl + S
@@ -167,7 +177,7 @@ afterEach(() => {
 test('it adds and removes event listener on mount/unmount', () => {
   // Render the component
   act(() => {
-    render(<FileView editorRef={editorRefMock} />, container);
+    render(<FileView socketRef={socketRefMock} editorRef={editorRefMock} />, container);
   });
 
   // Check that the event listener is added
@@ -187,7 +197,7 @@ test('it adds and removes event listener on mount/unmount', () => {
   
 //     // Render the component with mock props
 //     act(() => {
-//       render(<FileView handleSaveFile={mockHandleSaveFile} currentFile={mockCurrentFile} />, container);
+//       render(<FileView handleSaveFile={mockHandleSaveFile} socketRef={socketRefMock} currentFile={mockCurrentFile} />, container);
 //     });
   
 //     // Trigger the beforeunload event
@@ -202,11 +212,16 @@ test('it adds and removes event listener on mount/unmount', () => {
   
 test('it does not call handleSaveFile when beforeunload event is triggered without a current file', () => {
     const mockHandleSaveFile = jest.fn();
-    const mockCurrentFile = null;
-  
+    const mockCurrentFile = { current: null };
+    const socketRefMock = {
+      current: {
+        emit: jest.fn(),
+        on: jest.fn()
+      },
+    };
     // Render the component with mock props
     act(() => {
-      render(<FileView handleSaveFile={mockHandleSaveFile} currentFile={mockCurrentFile} />, container);
+      render(<FileView socketRef={socketRefMock} handleSaveFile={mockHandleSaveFile} currentFile={mockCurrentFile} />, container);
     });
   
     // Trigger the beforeunload event
@@ -219,15 +234,15 @@ test('it does not call handleSaveFile when beforeunload event is triggered witho
   });
 
 test("renders FileView component", () => {
-  render(<FileView editorRef={editorRefMock} />);
+  render(<FileView socketRef={socketRefMock} editorRef={editorRefMock} />);
   // Add assertions to check if the component renders correctly
 });
 
 test("clicking on a folder toggles its visibility", () => {
   const { getByText } = render(
     <FileView
-      editorRef={editorRefMock} // Pass the mock editorRef as a prop
-      // Other props as needed
+    socketRef={socketRefMock}
+      editorRef={editorRefMock} 
     />
   );
   const folderName = getByText("Root"); // Replace 'Root' with the name of the folder you want to test
@@ -244,9 +259,16 @@ describe("when selectedFileFolder.type is 'root'", () => {
       _id: 'parentFolderId',
       children: [],
     };
-  
+    const mockCurrentFile =  { current: null };
+      
+      const socketRefMock = {
+        current: {
+          emit: jest.fn(),
+          on: jest.fn()
+        },
+      };
     // Render the component
-    const { getByTestId, getByText } = render(<FileView editorRef={editorRefMock} />);
+    const { getByTestId, getByText } = render(<FileView socketRef={socketRefMock}editorRef={editorRefMock} />);
   
     // Mock prompt function
     global.prompt = jest.fn().mockReturnValue('New Folder');
@@ -312,6 +334,7 @@ describe("when selectedFileFolder.type is 'root'", () => {
     // Render the component with the "Add Folder" button
     const { getByTestId, getByText } = render(
       <FileView
+      socketRef={socketRefMock} 
         editorRef={editorRefMock}
         createFolder={createFolder}
         selectedFileFolder={selectedFileFolder}
@@ -334,6 +357,7 @@ describe("when selectedFileFolder.type is 'root'", () => {
     // Render the component with the "Add Folder" button
     const { getByTestId, getByText } = render(
       <FileView
+      socketRef={socketRefMock}
         editorRef={editorRefMock}
         createFolder={createFolder}
         selectedFileFolder={selectedFileFolder}
@@ -376,6 +400,7 @@ describe("when selectedFileFolder.type is 'root'", () => {
     const { getByTestId, getByText } = render(
       <FileView
         editorRef={editorRefMock}
+        socketRef={socketRefMock}
         createFolder={createFolder}
       />
     );
@@ -427,7 +452,7 @@ describe("when selectedFileFolder.type is 'root'", () => {
     };
   
     // Render the component
-    const { getByTestId, getByText } = render(<FileView editorRef={editorRefMock} />);
+    const { getByTestId, getByText } = render(<FileView socketRef={socketRefMock} editorRef={editorRefMock} />);
   
     // Mock prompt function
     global.prompt = jest.fn().mockReturnValue('New Folder');
@@ -492,6 +517,7 @@ describe("when selectedFileFolder.type is 'root'", () => {
     // Render the component with the "Add Folder" button
     const { getByTestId, getByText } = render(
       <FileView
+      socketRef={socketRefMock}
         editorRef={editorRefMock}
         createFolder={createFolder}
         setContentChanged={setContentChanged}
@@ -527,6 +553,7 @@ test('clicking on the folder div toggles the folder and sets selected file folde
     const { getByTestId } = render(
       <FileView
         editorRef={editorRefMock}
+        socketRef={socketRefMock}
         toggleFolder={toggleFolder}
         setSelectedFileFolder={setSelectedFileFolder}
         folder={folder}
@@ -561,6 +588,7 @@ test('clicking on the folder div toggles the folder and sets selected file folde
   //   const { getByTestId } = render(
   //     <FileView
   //     editorRef={editorRefMock}
+  //       socketRef={socketRefMock}
   //       toggleFolder={toggleFolder}
   //       setSelectedFileFolder={setSelectedFileFolder}
   //       setSelectedFileFolderParent={setSelectedFileFolderParent}
@@ -591,9 +619,16 @@ describe("when selectedFileFolder.type is 'directory'", () => {
       _id: 'parentFolderId',
       children: [],
     };
-  
+    const mockCurrentFile =  { current: null };
+      
+      const socketRefMock = {
+        current: {
+          emit: jest.fn(),
+          on: jest.fn()
+        },
+      };
     // Render the component
-    const { getByTestId, getByText } = render(<FileView editorRef={editorRefMock} />);
+    const { getByTestId, getByText } = render(<FileView socketRef={socketRefMock} editorRef={editorRefMock} />);
   
     // Mock prompt function
     global.prompt = jest.fn().mockReturnValue('New Folder');
@@ -661,6 +696,7 @@ describe("when selectedFileFolder.type is 'directory'", () => {
     const { getByTestId, getByText } = render(
       <FileView
         editorRef={editorRefMock}
+        socketRef={socketRefMock}
         createFolder={createFolder}
         selectedFileFolder={selectedFileFolder}
       />
@@ -687,6 +723,7 @@ describe("when selectedFileFolder.type is 'directory'", () => {
       <FileView
         editorRef={editorRefMock}
         createFolder={createFolder}
+        socketRef={socketRefMock}
         selectedFileFolder={selectedFileFolder}
       />
     );
@@ -731,6 +768,7 @@ describe("when selectedFileFolder.type is 'directory'", () => {
     const { getByTestId, getByText } = render(
       <FileView
         editorRef={editorRefMock}
+        socketRef={socketRefMock}
         createFolder={createFolder}
       />
     );
@@ -781,7 +819,7 @@ describe("when selectedFileFolder.type is 'directory'", () => {
     };
   
     // Render the component
-    const { getByTestId, getByText } = render(<FileView editorRef={editorRefMock} />);
+    const { getByTestId, getByText } = render(<FileView socketRef={socketRefMock} editorRef={editorRefMock} />);
   
     // Mock prompt function
     global.prompt = jest.fn().mockReturnValue('New Folder');
@@ -842,20 +880,15 @@ describe("when selectedFileFolder.type is 'directory'", () => {
     });
   
   test('clicking on the Delete folder button calls deletedirectory', async () => {
-    const socketRefMock = {
-      current: {
-        emit: jest.fn(),
-      },
-    };
     // Mock the createFolder function
     const createFolder = jest.fn();
 
     // Render the component with the "Add Folder" button
     const { getByTestId, getByText } = render(
       <FileView
+      socketRef={socketRefMock}
         editorRef={editorRefMock}
-        createFolder={createFolder}
-        socketRef={socketRefMock}      />
+        createFolder={createFolder}    />
     );
     expect(getByText("File Explorer")).toBeInTheDocument();
     // Simulate a user click on the "Add Folder" button
@@ -877,9 +910,17 @@ describe("when selectedFileFolder.type is 'directory'", () => {
         _id: 'parentFolderId',
         children: [],
       };
+      const mockCurrentFile =  { current: null };
+      
+      const socketRefMock = {
+        current: {
+          emit: jest.fn(),
+          on: jest.fn()
+        },
+      };
     
       // Render the component
-      const { getByTestId, getByText } = render(<FileView editorRef={editorRefMock} />);
+      const { getByTestId, getByText } = render(<FileView socketRef={socketRefMock} editorRef={editorRefMock} />);
     
       // Mock prompt function
       global.prompt = jest.fn().mockReturnValue('New Folder');
@@ -970,12 +1011,7 @@ describe("when selectedFileFolder.type is 'directory'", () => {
         // });// expect(createFolder).toHaveBeenCalledWith(selectedFileFolder);
         });
   
-        test('clicking on the Delete folder button calls deletedirectory', async () => {
-          const socketRefMock = {
-            current: {
-              emit: jest.fn(),
-            },
-          };
+        test('clicking on the Delete file button calls deletefile', async () => {
           // Mock the createFolder function
           const createFolder = jest.fn();
       
