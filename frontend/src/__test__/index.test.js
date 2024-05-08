@@ -7,32 +7,12 @@ import axios from 'axios';
 
 jest.mock('axios');
 
-// describe("DOMContentLoaded", () => {
-//   it("calls renderApp when DOMContentLoaded event fires", () => {
-//     // Mocking the root element
-//     const root = document.createElement("div");
-//     root.id = "root";
-//     document.body.appendChild(root);
-
-//     // Spy on the renderApp function
-//     const renderAppSpy = jest.spyOn(index, "renderApp");
-
-//     // Create and dispatch the DOMContentLoaded event
-//     const domContentLoadedEvent = new Event('DOMContentLoaded');
-//     document.dispatchEvent(domContentLoadedEvent);
-
-//     // Verifying that renderApp was called
-//     expect(renderAppSpy).toHaveBeenCalled();
-//   });
-// });
-
-
 describe("Index", () => {
   beforeEach(() => {
     jest.clearAllMocks(); 
   });
 
-  it("renders the App component", async () => {
+  test("renders the App component", async () => {
     const root = document.createElement("div");
     root.id = "root";
     document.body.appendChild(root);
@@ -42,7 +22,7 @@ describe("Index", () => {
     expect(document.getElementById("root").textContent).toBe("");
   });
 
-  it("renders without crashing", async () => {
+  test("renders without crashing", async () => {
     const root = document.createElement("div");
     root.id = "root";
     document.body.appendChild(root);
@@ -57,7 +37,7 @@ describe("Index", () => {
     expect(true).toBe(true);
   });
 
-  it("renders renderApp", async () => {
+  test("renders renderApp", async () => {
     const root = document.createElement("div");
     root.id = "root";
     document.body.appendChild(root); // Simulate DOMContentLoaded event
@@ -67,7 +47,7 @@ describe("Index", () => {
     expect(root.innerHTML).toContain("");
   });
 
-  it("handles Axios network error", async () => {
+  test("handles Axios network error", async () => {
     // Mock Axios network error
     jest.spyOn(axios, "get").mockRejectedValueOnce(new Error('Network Error'));
 

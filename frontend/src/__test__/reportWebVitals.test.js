@@ -10,7 +10,7 @@ jest.mock("web-vitals", () => ({
 }));
 
 describe("reportWebVitals", () => {
-  it("should call all web vitals functions with the provided onPerfEntry callback", () => {
+  test("should call all web vitals functions with the provided onPerfEntry callback", () => {
     // Mock onPerfEntry callback function
     const onPerfEntry = jest.fn();
 
@@ -38,7 +38,7 @@ describe("reportWebVitals", () => {
     expect(mockGetTTFB).toHaveBeenCalledWith(onPerfEntry);
   });
 
-  it("should not call any web vitals function if onPerfEntry is not provided", () => {
+  test("should not call any web vitals function if onPerfEntry is not provided", () => {
     // Call the function under test without providing onPerfEntry
     reportWebVitals();
 

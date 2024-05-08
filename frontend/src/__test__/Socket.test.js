@@ -8,7 +8,7 @@ describe('initSocket', () => {
     jest.clearAllMocks(); // Clear mock function call history after each test
   });
 
-  it('initializes socket connection with provided options', async () => {
+  test('initializes socket connection with provided options', async () => {
     const mockSocket = {
       on: jest.fn(),
     };
@@ -43,7 +43,7 @@ describe('initSocket', () => {
     expect(mockSocket.on).toHaveBeenCalledWith('connect_error', expect.any(Function));
   });
 
-  it('handles connection errors', async () => {
+  test('handles connection errors', async () => {
     const mockSocket = {
       on: jest.fn(),
     };

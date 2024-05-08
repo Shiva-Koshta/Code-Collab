@@ -1,7 +1,7 @@
 import React from "react";
 import { render, fireEvent } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom"; // Import MemoryRouter
-import Faq from "../pages/Faq"; // Adjust the path as per your project structure
+import Faq from "../pages/Faq"; 
 import faqData from "../pages/faqdata.json";
 
 // Mock the entire react-router-dom module
@@ -15,7 +15,7 @@ jest.mock("react-router-dom", () => {
 });
 
 describe("Faq component", () => {
-  it("renders without crashing", () => {
+  test("renders without crashing", () => {
     render(
       <MemoryRouter>
         <Faq />
@@ -23,7 +23,7 @@ describe("Faq component", () => {
     );
   });
 
-  it('HomeOutlinedIcon navigates to "/" when clicked', () => {
+  test('HomeOutlinedIcon navigates to "/" when clicked', () => {
     const { useNavigate } = require("react-router-dom");
     const navigate = jest.fn();
     useNavigate.mockReturnValue(navigate); // Mock useNavigate
@@ -38,7 +38,7 @@ describe("Faq component", () => {
     expect(navigate).toHaveBeenCalledWith("/");
   });
 
-  it("renders categories, questions, and toggles answers", () => {
+  test("renders categories, questions, and toggles answers", () => {
     const { getByText, queryByText } = render(<Faq />);
 
     // Check if categories are rendered

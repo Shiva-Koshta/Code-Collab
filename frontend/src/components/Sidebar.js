@@ -51,7 +51,7 @@ const Sidebar = ({
       a.click()
       window.URL.revokeObjectURL(url)
     } catch (error) {
-      console.log('Error downloading zip file:', error)
+      // console.log('Error downloading zip file:', error)
     }
   }
   //takes username as input and toggles Menu open/close corresponding to that username 
@@ -147,7 +147,7 @@ const Sidebar = ({
         throw new Error('Failed to fetch user count from the server')
       }
     } catch (error) {
-      console.log('Error leaving room:', error)
+      // console.log('Error leaving room:', error)
     }
   }
   //Asynchronously copies the roomId to the user's clipboard

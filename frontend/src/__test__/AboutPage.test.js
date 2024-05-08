@@ -14,7 +14,7 @@ jest.mock("react-router-dom", () => {
   });
 
 describe('About component', () => {
-  it('renders without crashing', () => {
+  test('renders without crashing', () => {
     render(
       <MemoryRouter> {/* Wrap About component with MemoryRouter */}
         <About />
@@ -22,7 +22,7 @@ describe('About component', () => {
     );
   });
 
-  it('displays correct contact information', () => {
+  test('displays correct contact information', () => {
     const { getByText } = render(
       <MemoryRouter> {/* Wrap About component with MemoryRouter */}
         <About />
@@ -35,7 +35,7 @@ describe('About component', () => {
 
 
 describe("Button functionality", () => {
-      it('HomeOutlinedIcon navigates to "/" when clicked', () => {
+      test('HomeOutlinedIcon navigates to "/" when clicked', () => {
         const { useNavigate } = require("react-router-dom");
         const navigate = jest.fn();
         useNavigate.mockReturnValue(navigate); // Mock useNavigate
