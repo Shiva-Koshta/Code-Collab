@@ -201,34 +201,7 @@ const Editor = ({
       });
     }
   }, [socketRef.current]);
-  useEffect(() => {
-    // Fetch code from the backend using room ID
-    if (roomId) {
-      console.log(JSON.stringify({ roomId }));
-      async function fetchCode() {
-        try {
-          const response = await fetch("http://localhost:8080/receivecode", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ roomId }),
-          });
-          if (response.ok) {
-            const { code } = await response.json();
-            if (code !== null) {
-              editorRef.current.setValue(code);
-            }
-          } else {
-            console.error("Failed to fetch code");
-          }
-        } catch (error) {
-          console.error("Error fetching code:", error);
-        }
-      }
-      fetchCode();
-    }
-  }, [roomId]);
+
 
   // useEffect(() => {
   //   console.log(newusernameRef.current)
