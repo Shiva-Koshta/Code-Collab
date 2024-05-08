@@ -25,6 +25,20 @@ jest.mock("react-toastify", () => ({
     error: jest.fn(),
   },
 }));
+let currentFileMock;
+let socketRefMock;
+let editorRefMock;
+let connectedUserRolesMock;
+beforeEach(() => {
+  currentFileMock = { current: jest.fn() };
+  socketRefMock = {
+    current: { setOption: jest.fn(), emit: jest.fn(), on: jest.fn() },
+    setOption: jest.fn(),
+    getOption: jest.fn(),
+  };
+  editorRefMock = { current: { setOption: jest.fn() } };
+  connectedUserRolesMock = { find: jest.fn() };
+});
 test("Menu opens when user image or username is clicked", async () => {
   // Mock user data and functions
   const connectedUsers = [{ username: "user1", profileImage: "image1.png" }];
@@ -55,6 +69,8 @@ test("Menu opens when user image or username is clicked", async () => {
         handleChangeRole={handleChangeRole}
         setConnectedUserRoles={setConnectedUserRoles}
         socketRef={socketRefMock}
+        currentFile={currentFileMock}
+        editorRef={editorRefMock}
       />
     </MemoryRouter>
   );
@@ -107,7 +123,6 @@ describe("Sidebar", () => {
           setContentChanged={() => {}}
           fileContent=""
           setFileContent={() => {}}
-          editorRef={{}}
           connectedUsers={[]}
           toggleChat={() => {}}
           unreadMessages={0}
@@ -117,11 +132,13 @@ describe("Sidebar", () => {
           leftIcon={<div />}
           storedUserData={{ current: { name: "" } }}
           host={{ current: "" }}
-          connectedUserRoles={[]}
           setConnectedUserRoles={() => {}}
-          socketRef={{ current: null }}
           menuOpen={{}}
           setMenuOpen={() => {}}
+          currentFile={currentFileMock}
+          socketRef={socketRefMock}
+          editorRef={editorRefMock}
+          connectedUserRoles={connectedUserRolesMock}
         />
       </MemoryRouter>
     );
@@ -142,7 +159,6 @@ describe("Sidebar", () => {
             setContentChanged={() => {}}
             fileContent=""
             setFileContent={() => {}}
-            editorRef={{}}
             connectedUsers={[]}
             toggleChat={() => {}}
             unreadMessages={0}
@@ -152,11 +168,13 @@ describe("Sidebar", () => {
             leftIcon={<div />}
             storedUserData={{ current: { name: "" } }}
             host={{ current: "" }}
-            connectedUserRoles={[]}
             setConnectedUserRoles={() => {}}
-            socketRef={{ current: null }}
             menuOpen={{}}
             setMenuOpen={() => {}}
+            currentFile={currentFileMock}
+            socketRef={socketRefMock}
+            editorRef={editorRefMock}
+            connectedUserRoles={connectedUserRolesMock}
           />
         </MemoryRouter>
       );
@@ -192,7 +210,6 @@ describe("Sidebar", () => {
             setContentChanged={() => {}}
             fileContent=""
             setFileContent={() => {}}
-            editorRef={{}}
             connectedUsers={[]}
             toggleChat={() => {}}
             unreadMessages={0}
@@ -202,11 +219,13 @@ describe("Sidebar", () => {
             leftIcon={<div />}
             storedUserData={{ current: { name: "" } }}
             host={{ current: "" }}
-            connectedUserRoles={[]}
             setConnectedUserRoles={() => {}}
-            socketRef={{ current: null }}
             menuOpen={{}}
             setMenuOpen={() => {}}
+            currentFile={currentFileMock}
+            socketRef={socketRefMock}
+            editorRef={editorRefMock}
+            connectedUserRoles={connectedUserRolesMock}
           />
         </MemoryRouter>
       );
@@ -254,7 +273,6 @@ describe("Sidebar", () => {
             setContentChanged={() => {}}
             fileContent=""
             setFileContent={() => {}}
-            editorRef={{}}
             connectedUsers={[]}
             toggleChat={() => {}}
             unreadMessages={0}
@@ -264,11 +282,13 @@ describe("Sidebar", () => {
             leftIcon={<div />}
             storedUserData={{ current: { name: "" } }}
             host={{ current: "" }}
-            connectedUserRoles={[]}
             setConnectedUserRoles={() => {}}
-            socketRef={{ current: null }}
             menuOpen={{}}
             setMenuOpen={() => {}}
+            currentFile={currentFileMock}
+            socketRef={socketRefMock}
+            editorRef={editorRefMock}
+            connectedUserRoles={connectedUserRolesMock}
             reactNavigator={reactNavigator}
           />
         </MemoryRouter>
@@ -348,7 +368,6 @@ describe("Sidebar", () => {
             setContentChanged={() => {}}
             fileContent=""
             setFileContent={() => {}}
-            editorRef={{}}
             connectedUsers={[]}
             toggleChat={() => {}}
             unreadMessages={0}
@@ -358,11 +377,13 @@ describe("Sidebar", () => {
             leftIcon={<div />}
             storedUserData={{ current: { name: "" } }}
             host={{ current: "" }}
-            connectedUserRoles={[]}
             setConnectedUserRoles={() => {}}
-            socketRef={{ current: null }}
             menuOpen={{}}
             setMenuOpen={() => {}}
+            currentFile={currentFileMock}
+            socketRef={socketRefMock}
+            editorRef={editorRefMock}
+            connectedUserRoles={connectedUserRolesMock}
             reactNavigator={reactNavigator}
           />
         </MemoryRouter>
@@ -415,7 +436,7 @@ describe("Sidebar", () => {
       global.fetch = originalFetch;
       window.confirm = originalConfirm;
     });
-    
+
     it("downloads a zip file when download button is clicked", async () => {
       const mockedResponse = {
         data: new Blob(),
@@ -440,7 +461,6 @@ describe("Sidebar", () => {
             setContentChanged={() => {}}
             fileContent=""
             setFileContent={() => {}}
-            editorRef={{}}
             connectedUsers={[]}
             toggleChat={() => {}}
             unreadMessages={0}
@@ -450,11 +470,13 @@ describe("Sidebar", () => {
             leftIcon={<div />}
             storedUserData={{ current: { name: "" } }}
             host={{ current: "" }}
-            connectedUserRoles={[]}
             setConnectedUserRoles={() => {}}
-            socketRef={{ current: null }}
             menuOpen={{}}
             setMenuOpen={() => {}}
+            currentFile={currentFileMock}
+            socketRef={socketRefMock}
+            editorRef={editorRefMock}
+            connectedUserRoles={connectedUserRolesMock}
             reactNavigator={reactNavigator}
           />
         </MemoryRouter>
@@ -485,7 +507,6 @@ describe("Sidebar", () => {
           setContentChanged={() => {}}
           fileContent=""
           setFileContent={() => {}}
-          editorRef={{}}
           connectedUsers={[]}
           toggleChat={() => {}}
           unreadMessages={0}
@@ -495,9 +516,11 @@ describe("Sidebar", () => {
           leftIcon={<div />}
           storedUserData={{ current: { name: "" } }}
           host={{ current: "" }}
-          connectedUserRoles={[]}
           setConnectedUserRoles={() => {}}
-          socketRef={{ current: null }}
+          currentFile={currentFileMock}
+          socketRef={socketRefMock}
+          editorRef={editorRefMock}
+          connectedUserRoles={connectedUserRolesMock}
           menuOpen={{}}
           setMenuOpen={() => {}}
         />
@@ -690,7 +713,11 @@ it("finds img elements with correct data-testid and handles clicks", async () =>
         sertMenuOpen={setMenuOpen}
         host={host}
         storedUserData={storedUserData}
-        //   menuOpen={menuOpen}
+        currentFile={currentFileMock}
+        socketRef={socketRefMock}
+        editorRef={editorRefMock}
+        connectedUserRoles={connectedUserRolesMock}
+        // menuOpen={menuOpen}
       />
     </MemoryRouter>
   );
@@ -726,6 +753,10 @@ it("finds name elements with correct data-testid and handles clicks", async () =
         sertMenuOpen={setMenuOpen}
         host={host}
         storedUserData={storedUserData}
+        currentFile={currentFileMock}
+        socketRef={socketRefMock}
+        editorRef={editorRefMock}
+        connectedUserRoles={connectedUserRolesMock}
         //   menuOpen={menuOpen}
       />
     </MemoryRouter>
@@ -765,7 +796,10 @@ it("changes style of cursor to pointer", async () => {
         sertMenuOpen={setMenuOpen}
         host={host}
         storedUserData={storedUserData}
-        //   menuOpen={menuOpen}
+        currentFile={currentFileMock}
+        socketRef={socketRefMock}
+        editorRef={editorRefMock}
+        connectedUserRoles={connectedUserRolesMock}
       />
     </MemoryRouter>
   );
