@@ -1,6 +1,7 @@
 import React from "react";
 import { render, fireEvent } from "@testing-library/react";
 import Chat from "../components/Chat";
+jest.spyOn(console, "log").mockImplementation(() => {});
 // test('calls handleMessageSend when Enter key is pressed', () => {
 //     // Mock function for handleMessageSend
 //     const handleMessageSend = jest.fn();

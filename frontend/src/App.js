@@ -31,7 +31,7 @@ function App () {
         if (err.response && err.response.status === 401) {
           setUser(null); // User is not authenticated
         } else {
-          console.log(err);
+          // console.log(err);
         }
       }
     };

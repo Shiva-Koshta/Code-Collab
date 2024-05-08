@@ -36,13 +36,13 @@ import DownloadIcon from '@mui/icons-material/Download'
 import ACTIONS from '../Actions'
 
 const FileView = ({
-  editorRef,
-  contentChanged,
-  setContentChanged,
-  socketRef,
-  connectedUserRoles,
-  storedUserData,
-  currentFile,
+  editorRef = useRef(null),
+  contentChanged = useRef(null),
+  setContentChanged = useRef(null),
+  socketRef = useRef(null),
+  connectedUserRoles = useRef(null),
+  storedUserData = useRef(null),
+  currentFile = useRef(null),
 }) => {
   const { roomId } = useParams()
   const [isDownloadTrue, setIsDownloadTrue] = useState(false)
@@ -91,7 +91,7 @@ const FileView = ({
   //removes cursor markers, and runs with current file change dependency
   useEffect(() => {
     if (currentFile.current == null) {
-      if (editorRef.current) {
+      if (editorRef?.current) {
         editorRef.current.setOption('readOnly', true)
         editorRef.current.setValue('')
       }
@@ -351,6 +351,11 @@ const FileView = ({
   //takes folder and parentfolder as input and deletes the folder,
   //updates the file system tree, and emits a Socket event for file system change
   async function deleteFolder(folderId, parentFolder) {
+    const socketRefMock = {
+      current: {
+        emit: jest.fn(),
+      },
+    };
     try {
       const index = parentFolder.children.indexOf(folderId)
       const response = await axios.delete(
@@ -545,6 +550,7 @@ const FileView = ({
                 placement='right'
               >
                 <div
+                  data-testid = 'setSelectedFileFolder-folder'
                   onClick={() => {
                     toggleFolder(folder)
                     setSelectedFileFolder(folder)
@@ -578,6 +584,7 @@ const FileView = ({
                 placement='right'
               >
                 <div
+                  data-testid="setSelectedFileFolder-directory"
                   onClick={() => {
                     toggleFolder(folder)
                     setSelectedFileFolder(folder)
@@ -611,6 +618,7 @@ const FileView = ({
                 placement='right'
               >
                 <div
+                  data-testid = 'setSelectedFileFolder-directory'
                   style={{
                     maxWidth: `${depth === 0 ? '328px' : `${328 - depth}px`}`,
                   }}
@@ -789,6 +797,7 @@ const FileView = ({
                   className=''
                   onClick={() => createFolder(selectedFileFolder)}
                   title='Add Folder'
+                  data-testid='add-folder-button'
                 >
                   <CreateNewFolderIcon />
                 </button>
@@ -799,6 +808,7 @@ const FileView = ({
                   className=''
                   onClick={() => createFile(selectedFileFolder)}
                   title='Add File'
+                  data-testid='add-file-button'
                 >
                   <AddIcon />
                 </button>
@@ -810,9 +820,10 @@ const FileView = ({
                   id='fileInput'
                   style={{ display: 'none' }}
                   onChange={handleFileChange}
+                  data-testid='file-input'
                 />
                 <label htmlFor='fileInput'>
-                  <UploadFileIcon className='text-white cursor-pointer' />
+                  <UploadFileIcon className='text-white cursor-pointer' data-testid='upload-file-button'/>
                 </label>
                 <input
                   type='file'
@@ -832,6 +843,7 @@ const FileView = ({
                   className='renameFolderIcon update-buttons '
                   onClick={() => renameFolder(selectedFileFolder)}
                   title='Rename Folder'
+                  data-testid='rename-folder-button'
                 >
                   <CreateIcon />
                 </button>
@@ -846,6 +858,7 @@ const FileView = ({
                   className='addFolderIcon update-buttons '
                   onClick={() => createFolder(selectedFileFolder)}
                   title='Add Folder'
+                  data-testid='add-folder-button-directory'
                 >
                   <CreateNewFolderIcon />
                 </button>
@@ -856,6 +869,7 @@ const FileView = ({
                   className='addFileIcon update-buttons '
                   onClick={() => createFile(selectedFileFolder)}
                   title='Add File'
+                  data-testid='add-file-button-directory'
                 >
                   <AddIcon />
                 </button>
@@ -869,7 +883,7 @@ const FileView = ({
                   onChange={handleFileChange}
                 />
                 <label htmlFor='fileInput'>
-                  <UploadFileIcon className='text-white' />
+                  <UploadFileIcon className='text-white' data-testid='upload-file-button-directory'/>
                 </label>
                 <input
                   type='file'
@@ -880,7 +894,7 @@ const FileView = ({
                   onChange={handleUpload}
                 />
                 <label htmlFor='folderInput'>
-                  <DriveFolderUploadIcon className='text-white cursor-pointer' />
+                  <DriveFolderUploadIcon className='text-white cursor-pointer' data-testid='upload-folder-button-directory'/>
                 </label>
                 <div className='absolute bottom-0 hidden hover:bg-gray-100 hover:rounded hover:p-2 hover:block hover:z-10 hover:border hover:border-gray-300'>
                   Upload Folder
@@ -889,6 +903,7 @@ const FileView = ({
                   className='renameFolderIcon update-buttons '
                   onClick={() => renameFolder(selectedFileFolder)}
                   title='Rename Folder'
+                  data-testid='rename-folder-button-directory'
                 >
                   <CreateIcon />
                 </button>
@@ -901,6 +916,7 @@ const FileView = ({
                     deleteFolder(selectedFileFolder, selectedFileFolderParent)
                   }
                   title='Delete Folder'
+                  data-testid='delete-folder-button-directory'
                 >
                   <DeleteIcon />
                 </button>
@@ -915,6 +931,7 @@ const FileView = ({
                   className='renameFileIcon update-buttons '
                   onClick={() => renameFile(selectedFileFolder)}
                   title='Rename File'
+                  data-testid='rename-file-button-file'
                 >
                   <CreateIcon />
                 </button>
@@ -925,6 +942,7 @@ const FileView = ({
                   className='renameFileIcon update-buttons '
                   onClick={() => setIsDownloadTrue(true)}
                   title='Download File'
+                  data-testid='download-file-button-file'
                 >
                   <DownloadIcon />
                 </button>
@@ -937,6 +955,7 @@ const FileView = ({
                     deleteFile(selectedFileFolder, selectedFileFolderParent)
                   }
                   title='Delete File'
+                  data-testid='delete-file-button-file'
                 >
                   <DeleteIcon />
                 </button>
@@ -972,6 +991,7 @@ const FileView = ({
                 onClick={() => {
                   setIsDownloadTrue(false)
                 }}
+                data-testid="set-download-false-button"
               />
             </div>
             <input
@@ -984,12 +1004,14 @@ const FileView = ({
                 color: '#1c1e29',
                 '::placeholder': { color: '#1c1e29' },
               }}
+              data-testid="file-name-input"
             />
             <select
               value={downloadFileExtension}
               onChange={(e) => setFileExtension(e.target.value)}
               className='mb-3 px-2 py-1 w-full bg-slate-300 rounded border-2 border-gray-400 focus:outline-none focus:border-blue-500'
               style={{ color: '#1c1e29' }}
+              data-testid="file-extension-select"
             >
               <option value=''>Select type</option>
               <option value='txt'>Text</option>
@@ -1008,12 +1030,61 @@ const FileView = ({
                 handleDownloadFile()
                 setIsDownloadTrue(false)
               }}
+              data-testid="download-file-button"
             >
               Download
             </button>
           </div>
         )}
       </div>
+      <button style={{ display: 'none' }} data-testid="setDirectory"
+        onClick={() => {
+          setSelectedFileFolder({
+                _id: '0',
+                name: 'Dir',
+                type: 'directory',
+                children: []
+              });
+          setFolders([
+            {
+              _id: '0',
+              name: 'Dir',
+              type: 'directory',
+              children: []
+            }
+          ])
+          return 0;
+          }} >
+        Hidden Button
+      </button>
+
+      <input type="hidden" data-testid="setFile" onClick={() => {
+        setSelectedFileFolder({
+            _id: '0',
+            name: 'File',
+            type: 'file',
+            children: []
+          });
+        setFolders([
+          {
+            _id: '0',
+            name: 'File',
+            type: 'file',
+            children: []
+          }
+        ])
+
+        return 0;
+      }} />
+      <input type="hidden" data-testid="setParent" onClick={() => {
+        setSelectedFileFolderParent({
+            _id: '0',
+            name: 'File',
+            type: 'file',
+            children: [selectedFileFolder]
+          });
+        return 0;
+      }} />
     </div>
   )
 }
