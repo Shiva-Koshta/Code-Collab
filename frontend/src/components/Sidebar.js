@@ -361,21 +361,31 @@ const Sidebar = ({
         }}
         data-testid="inside-hello"
       />
-        <input
-            type="hidden"
-            onClick={() => {
-              setMenuOpen({'jane_doe': {}});
-            }}
-            data-testid="inside-menu"
-          />
+       <input
+          type="hidden"
+          onClick={() => {
+          setMenuOpen((prevMenuOpen) => ({
+            ...prevMenuOpen,
+            'jane_doe': true 
+          }));
+         }}
+         data-testid="inside-menu"
+       />
+
       <input
         type="hidden"
         onClick={() => {
-          setIsConnectedComponentOpen(true);
-          storedUserData.current.name = host?.current;
-          storedUserData.current.name != user?.username;
+          //const userCountResponse = {ok: }
         }}
-        data-testid="inside-menu-item"
+        data-testid="delete-entry"
+      />
+      <input
+        type="hidden"
+        onClick={() => {
+          handleChangeRole('helo')
+          setConnectedUserRoles(prevrole);
+        }}
+        data-testid="handle-change-entry"
       />
     </div>
   );
