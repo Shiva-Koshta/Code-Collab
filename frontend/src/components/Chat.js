@@ -10,11 +10,13 @@ const Chat = ({
   socketRef,
   storedUserData
 }) => {
-  const CHAT_LIMIT = 50
+
+  const CHAT_LIMIT = 50 // There is a chat limit of 50
   const [inputText, setInputText] = useState('')
   //Checks if the inputText state variable is not empty, creates a message object,
   //emits a Socket event to send the message along with sender information to room and sets the inputText state variable to empty
   const handleMessageSend = () => {
+
     if (inputText.trim() !== '') {
       const message = { text: inputText }
       socketRef.current.emit(ACTIONS.MESSAGE_SEND, {
@@ -26,14 +28,16 @@ const Chat = ({
       setInputText('')
     }
   }
-  //Checks if the pressed key is Enter and calls handleMessageSend function if true
+  // Function which will send message automatically on clicking key enter
   const handleKeyPress = (e) => {
     if (e.key === 'Enter') {
       handleMessageSend()
     }
   }
+
   return (
     <div className='chat-container' style={{backgroundColor: '#1c1e29'}}>
+
       <div className='chat-popup' style={{backgroundColor: '#1c1e29'}}>
         <div className='chat-header' >
           Chat
