@@ -1,33 +1,28 @@
-import React, { useState, useRef } from 'react'
+import React, { useState} from 'react'
 import logo from '../images/Logo.png'
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown'
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp'
 import FileView from './FileView'
 import toast from 'react-hot-toast'
-import { useNavigate, useParams } from 'react-router-dom'
-import MoreVertSharpIcon from '@mui/icons-material/MoreVertSharp'
+import { useNavigate } from 'react-router-dom'
 import { MenuItem, Menu, IconButton } from '@mui/material'
 import ACTIONS from '../Actions'
-import { Tooltip } from '@mui/material' // Import IconButton component from Material-UI
-import ChatIcon from '@mui/icons-material/Chat' // Import ChatIcon from Material-UI
-import FileCopyIcon from '@mui/icons-material/FileCopy' // Import FileCopyIcon from Material-UI
-import ExitToAppIcon from '@mui/icons-material/ExitToApp' // Import ExitToAppIcon from Material-UI
+import { Tooltip } from '@mui/material'
+import ChatIcon from '@mui/icons-material/Chat'
+import FileCopyIcon from '@mui/icons-material/FileCopy'
+import ExitToAppIcon from '@mui/icons-material/ExitToApp'
 import DownloadIcon from '@mui/icons-material/Download'
 import axios from 'axios'
 
 const Sidebar = ({
     contentChanged,
     setContentChanged,
-    fileContent,
-    setFileContent,
     editorRef= useRef(null),
     // isConnectedComponentOpen,
     // handleToggle,
     connectedUsers,
     toggleChat,
     unreadMessages,
-    // copyRoomId,
-    // leaveRoom,
     roomId,
     isLeftDivOpen,
     toggleLeftDiv,
@@ -38,31 +33,29 @@ const Sidebar = ({
     setConnectedUserRoles,
     socketRef= useRef(null),
     currentFile = useRef(null),
-    //  setCurrentFile,
-    // menuOpen,
-    // setMenuOpen 
 }) => {
    const [menuOpen, setMenuOpen] = useState({})
+  onst [isConnectedComponentOpen, setIsConnectedComponentOpen] = useState(false)
+  const reactNavigator = useNavigate()
   const downloadZipFile = async (roomId) => {
     try {
       // Make a GET request to the backend endpoint
       const response = await axios.get(`${process.env.REACT_APP_API_URL}/filesystem/download/${roomId}`, {
         responseType: 'blob' // Specify the response type as blob
-      });
-
+      })
       // Trigger the download by creating a blob URL and clicking on a temporary link
-      const url = window.URL.createObjectURL(new Blob([response.data], { type: 'application/zip' }));
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `room_${roomId}_files.zip`;
-      document.body.appendChild(a);
-      a.click();
-      window.URL.revokeObjectURL(url);
-
+      const url = window.URL.createObjectURL(new Blob([response.data], { type: 'application/zip' }))
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `room_${roomId}_files.zip`
+      document.body.appendChild(a)
+      a.click()
+      window.URL.revokeObjectURL(url)
     } catch (error) {
-      //console.error('Error downloading zip file:', error);
+      console.log('Error downloading zip file:', error)
     }
-  };
+  }
+  //takes username as input and toggles Menu open/close corresponding to that username 
   const handleUserMenuToggle = (username) => {
     console.log('handleUserMenuToggle called with:', username);
     setMenuOpen((prevMenuOpen) => ({
@@ -70,14 +63,14 @@ const Sidebar = ({
       [username]: !prevMenuOpen[username],
     }))
   }
+  //takes username as input and sets newrole of user to viewer if previously editor and to editor if previously viewer,
+  //emits socket event with username and newrole to room
   const handleChangeRole = (username) => {
     const user = connectedUserRoles.find((user) => user.name === username)
     if (!user) {
-      //console.error(`User with id ${username} not found.`)
       return
     }
     const newRole = user.role === 'viewer' ? 'editor' : 'viewer'
-
     setConnectedUserRoles((prevRoles) =>
       prevRoles.map((prevUser) => {
         if (prevUser.name === username) {
@@ -86,24 +79,22 @@ const Sidebar = ({
         return prevUser
       })
     )
-
     socketRef.current.emit(ACTIONS.ROLE_CHANGE, {
       roomId,
       username,
       newRole,
     })
   }
-  const [isConnectedComponentOpen, setIsConnectedComponentOpen] =
-    useState(false)
+  //toggles the connected component state to open/close
   const handleToggle = () => {
     setIsConnectedComponentOpen(!isConnectedComponentOpen)
   }
-
-  const reactNavigator = useNavigate()
+  //Handles leaving the room by fetching user count, prompting confirming leave
+  //if user is last one in room prompts for downloading project else simply deletes room entry and navigates to home page
   const leaveRoom = async () => {
     try {
       const userData = JSON.parse(localStorage.getItem('userData'))
-      const userCountResponse = await fetch('http://localhost:8080/rooms/numUsersInRoom', {
+      const userCountResponse = await fetch(`${process.env.REACT_APP_API_URL}/rooms/numUsersInRoom`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -120,40 +111,34 @@ const Sidebar = ({
             const confirmDownload = window.confirm(
               'Changes are not saved.\nContinue downloading project?'
             )
-
             if (confirmDownload) {
               downloadZipFile(roomId)
             }
-
             // Regardless of download confirmation, proceed with leaving the room
-            const leaveResponse = await fetch('http://localhost:8080/delete-entry', {
+            const leaveResponse = await fetch(`${process.env.REACT_APP_API_URL}/delete-entry`, {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
               },
               body: JSON.stringify({ roomId, username: userData.name }),
             })
-
             if (leaveResponse.ok) {
               const data = await leaveResponse.json()
-              //console.log(data)
               reactNavigator('/', { roomId })
             } else {
               reactNavigator('/', { roomId })
             }
           } else {
             // Not the last user, simply leave the room
-            const leaveResponse = await fetch('http://localhost:8080/delete-entry', {
+            const leaveResponse = await fetch(`${process.env.REACT_APP_API_URL}/delete-entry`, {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
               },
               body: JSON.stringify({ roomId, username: userData.name }),
             })
-
             if (leaveResponse.ok) {
               const data = await leaveResponse.json()
-              //console.log(data)
               reactNavigator('/', { roomId })
             } else {
               reactNavigator('/', { roomId })
@@ -164,19 +149,20 @@ const Sidebar = ({
         throw new Error('Failed to fetch user count from the server')
       }
     } catch (error) {
-      ////console.error('Error leaving room:', error)
+      console.log('Error leaving room:', error)
     }
   }
-
+  //Asynchronously copies the roomId to the user's clipboard
+  //Displays a success message if successful, or an error message if copying fails
   async function copyRoomId() {
     try {
       await navigator.clipboard.writeText(roomId)
       toast.success('Room ID has been copied to your clipboard')
     } catch (err) {
       toast.error('Could not copy the Room ID')
-      //console.error(err)
     }
   }
+  //Asynchronously calls downloadzipfile function
   const download = async () => { downloadZipFile(roomId) }
   return (
     <div
@@ -195,18 +181,15 @@ const Sidebar = ({
       <FileView
         contentChanged={contentChanged}
         setContentChanged={setContentChanged}
-        fileContent={fileContent}
-        setFileContent={setFileContent}
         editorRef={editorRef}
         socketRef={socketRef}
         connectedUserRoles={connectedUserRoles}
         storedUserData={storedUserData}
         currentFile={currentFile}
-        // setCurrentFile={setCurrentFile}
       />
       <div className='Users z-10 '>
         <div
-          data-testid = "handle-Toggle"
+          data-testid = 'handle-Toggle'
           className='flex justify-between items-center'
           onClick={handleToggle}
         >
@@ -215,7 +198,7 @@ const Sidebar = ({
           {!isConnectedComponentOpen && <ArrowDropDownIcon />}
         </div>
         <div
-          data-testid = "handle-User"
+          data-testid = 'handle-User'
           className='UserListContainer overflow-y-scroll'
           style={{ maxHeight: '60px' }}
         >
@@ -231,7 +214,7 @@ const Sidebar = ({
                   onClick={() => handleUserMenuToggle(user.username)}
                 />
                 <div
-                data-testid = "handle-User-Menu"
+                data-testid = 'handle-User-Menu'
                   className='username'
                   onClick={() => handleUserMenuToggle(user.username)}
                   onMouseEnter={(event) =>
@@ -267,7 +250,7 @@ const Sidebar = ({
                     {storedUserData?.current?.name === host?.current &&
                       storedUserData.current.name !== user.username && (
                         <MenuItem
-                          data-testid = "menuitem"
+                          data-testid = 'menuitem'
                           onClick={() => handleChangeRole(user.username)}
                         >
                           Change Role
@@ -279,8 +262,6 @@ const Sidebar = ({
             ))}
         </div>
       </div>
-
-      {/* Chat and Room ID buttons */}
       <div className='p-4'>
         <div
           className='flex gap-2'
@@ -288,7 +269,7 @@ const Sidebar = ({
         >
           <Tooltip title='Download'>
             <IconButton
-            data-testid="Download-button"
+            data-testid='Download-button'
               onClick={download}
               style={{ color: '#e74c3c' }}
             >
@@ -297,8 +278,7 @@ const Sidebar = ({
           </Tooltip>
           <Tooltip title='Chat'>
             <IconButton
-              // className='btn chat-btn'
-              data-testid = "Chat-button"
+              data-testid = 'Chat-button'
               onClick={toggleChat}
               style={{ color: '#2ecc71' }}
             >
@@ -331,8 +311,7 @@ const Sidebar = ({
           </Tooltip>
           <Tooltip title='Copy ROOM ID'>
             <IconButton
-              // className='btn-edit copyBtn'
-              data-testid="copy-button"
+              data-testid='copy-button'
               onClick={copyRoomId}
               style={{ color: '#3498db' }}
             >
@@ -341,8 +320,7 @@ const Sidebar = ({
           </Tooltip>
           <Tooltip title='Leave'>
             <IconButton
-              //   className='btn-edit leaveBtn'
-              data-testid="leave-button"
+              data-testid='leave-button'
               onClick={leaveRoom}
               style={{ color: '#e74c3c' }}
             >
