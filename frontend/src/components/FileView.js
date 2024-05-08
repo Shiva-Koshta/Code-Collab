@@ -36,9 +36,9 @@ import DownloadIcon from '@mui/icons-material/Download'
 import ACTIONS from '../Actions'
 
 const FileView = ({
-  editorRef = useRef(null),
   contentChanged = useRef(null),
   setContentChanged = useRef(null),
+  editorRef = useRef(null),
   socketRef = useRef(null),
   connectedUserRoles = useRef(null),
   storedUserData = useRef(null),
