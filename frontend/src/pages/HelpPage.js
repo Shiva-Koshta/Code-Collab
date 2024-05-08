@@ -1,98 +1,106 @@
-import React, { useState } from "react";
-import "../styles/helpPage.css";
-import { useNavigate } from "react-router-dom";
-import LoginDemo from "../images/LoginDemo.png";
-import SignUp from "../images/SignUp.png";
-import Password from "../images/Password.png";
-import Room from "../images/Room.png";
-import RoomCreation from "../images/RoomCreation.png";
-import ChatBox from "../images/ChatBox.png";
-import toast, { Toaster } from "react-hot-toast";
-import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import React, { useState } from 'react'
+import '../styles/helpPage.css'
+import { useNavigate } from 'react-router-dom'
+import LoginDemo from '../images/LoginDemo.png'
+import SignUp from '../images/SignUp.png'
+import Password from '../images/Password.png'
+import Room from '../images/Room.png'
+import RoomCreation from '../images/RoomCreation.png'
+import ChatBox from '../images/ChatBox.png'
+import toast, { Toaster } from 'react-hot-toast'
+import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined'
+import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 const HelpPage = () => {
+  // For storing Form Data
   const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    message: "",
-  });
+    name: '',
+    email: '',
+    message: '',
+  })
 
+  // Function to handle form input changes
   const handleChange = (e) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
-    });
-  };
-  const [isSubmitting, setIsSubmitting] = useState(false);
+    })
+  }
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
+  // Function to handle form submission
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setIsSubmitting(true);
+    e.preventDefault()
+    setIsSubmitting(true)
     try {
-      const response = await fetch("http://localhost:8080/help", {
-        method: "POST",
+      const response = await fetch('http://localhost:8080/help', {
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify(formData),
-      });
+      })
 
+      // Toasters for appropriate Response.
       if (response.ok) {
-        toast.success("Form submitted successfully");
+        toast.success('Form submitted successfully')
       } else {
-        toast.error("Form submission failed");
+        toast.error('Form submission failed')
       }
 
+      // Reset form data after submission
       setFormData({
-        name: "",
-        email: "",
-        message: "",
-      });
+        name: '',
+        email: '',
+        message: '',
+      })
     } catch (error) {
-      // console.error("Error:", error);
-      toast.error("An error occurred while submitting the form");
+      // console.error('Error:', error)
+      toast.error('An error occurred while submitting the form')
     } finally {
-      setIsSubmitting(false);
+      setIsSubmitting(false)
     }
-  };
-  const navigate = useNavigate();
+  }
+  const navigate = useNavigate()
+  
+  // Function to navigate to the login page
   const goToLoginPage = () => {
-    navigate("/login");
-  };
+    navigate('/login')
+  }
   return (
     <>
-      <div className="bigger-container">
-        <div className="inner-container">
+      <div className='bigger-container'>
+        <div className='inner-container'>
           <HomeOutlinedIcon
-            className="text-slate-200 cursor-pointer mt-3"
-            fontSize="large"
-            onClick={() => navigate("/")}
+            className='text-slate-200 cursor-pointer mt-3'
+            fontSize='large'
+            onClick={() => navigate('/')}
           />
-          <h1 className="heading  text-red-300 text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-8 text-center">
+          <h1 className='heading  text-red-300 text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-8 text-center'>
             <u>USER MANUAL</u>
           </h1>
-          <div className="step">
-            <div className="stepcontent flex flex-col lg:flex-row items-center">
-              <div className="stepinfo lg:w-1/2 lg:text-left">
-                <h2 className="text-red-200">Step 1: Login</h2>
+          <div className='step'>
+            <div className='stepcontent flex flex-col lg:flex-row items-center'>
+              <div className='stepinfo lg:w-1/2 lg:text-left'>
+                <h2 className='text-red-200'>Step 1: Login</h2>
                 <p>
                   On the login screen, you will see an option to sign in with
                   your Google account.
                 </p>
-                <p>Click on the "Sign in with Google" button.</p>
+                <p>Click on the 'Sign in with Google' button.</p>
               </div>
-              <div className="stepimage lg:w-1/2">
-                <img src={LoginDemo} alt="Login Demo" />
+              <div className='stepimage lg:w-1/2'>
+                <img src={LoginDemo} alt='Login Demo' />
               </div>
             </div>
           </div>
 
-          <div className="step">
-            <div className="stepcontent flex flex-col lg:flex-row items-center">
-              <div className="stepimage lg:w-1/2">
-                <img src={SignUp} alt="Authenticate Demo" />
+          <div className='step'>
+            <div className='stepcontent flex flex-col lg:flex-row items-center'>
+              <div className='stepimage lg:w-1/2'>
+                <img src={SignUp} alt='Authenticate Demo' />
               </div>
-              <div className="stepinfo lg:w-1/2 lg:text-left">
-                <h2 className="text-red-200">Step 2: Authenticate with Google</h2>
+              <div className='stepinfo lg:w-1/2 lg:text-left'>
+                <h2 className='text-red-200'>Step 2: Authenticate with Google</h2>
                 <p>
                   You will be redirected to Google's authentication page.
                   (Please refer to the image attached for your reference)
@@ -104,35 +112,35 @@ const HelpPage = () => {
             </div>
           </div>
 
-          <div className="step">
-            <div className="stepcontent flex flex-col lg:flex-row items-center">
-              <div className="stepinfo lg:w-1/2 lg:text-left">
-                <h2 className="text-red-200">Step 3: Password verification</h2>
+          <div className='step'>
+            <div className='stepcontent flex flex-col lg:flex-row items-center'>
+              <div className='stepinfo lg:w-1/2 lg:text-left'>
+                <h2 className='text-red-200'>Step 3: Password verification</h2>
                 <p>
                   Enter your password and click on ‘Next’ to continue with the
                   sign-in process.
                 </p>
                 <p>
                   If you don’t remember your password, click on the forgot
-                  password option and rest follows like the "Forgot password"
+                  password option and rest follows like the 'Forgot password'
                   option in Gmail.
                 </p>
               </div>
-              <div className="stepimage lg:w-1/2">
-                <img src={Password} alt="Password Demo" />
+              <div className='stepimage lg:w-1/2'>
+                <img src={Password} alt='Password Demo' />
               </div>
             </div>
           </div>
 
-          <div className="step">
-            <div className="stepcontent flex flex-col lg:flex-row items-center">
-              <div className="stepimage lg:w-1/2">
-                <img src={RoomCreation} alt="Room Demo" />
+          <div className='step'>
+            <div className='stepcontent flex flex-col lg:flex-row items-center'>
+              <div className='stepimage lg:w-1/2'>
+                <img src={RoomCreation} alt='Room Demo' />
               </div>
-              <div className="stepinfo lg:w-1/2 lg:text-left">
-                <h2 className="text-red-200">Step 4: Room creation and Joining</h2>
+              <div className='stepinfo lg:w-1/2 lg:text-left'>
+                <h2 className='text-red-200'>Step 4: Room creation and Joining</h2>
                 <p>
-                  If you have a room ID available, enter it in the "Room ID”
+                  If you have a room ID available, enter it in the 'Room ID”
                   option and click on ‘Join’.
                 </p>
                 <p>
@@ -141,16 +149,16 @@ const HelpPage = () => {
                 </p>
                 <p>
                   This will prompt a new room ID which will be visible to you in
-                  the "Room ID” option. Now, click on “Join”.
+                  the 'Room ID” option. Now, click on “Join”.
                 </p>
               </div>
             </div>
           </div>
 
-          <div className="step">
-            <div className="stepcontent flex flex-col lg:flex-row items-center">
-              <div className="stepinfo lg:w-1/2 lg:text-left">
-                <h2 className="text-red-200">Step 5: Code editor</h2>
+          <div className='step'>
+            <div className='stepcontent flex flex-col lg:flex-row items-center'>
+              <div className='stepinfo lg:w-1/2 lg:text-left'>
+                <h2 className='text-red-200'>Step 5: Code editor</h2>
                 <p>
                   <b>UPLOAD FILE:</b> This option allows you to upload any file
                   from your local device to your editor screen. All users
@@ -180,92 +188,92 @@ const HelpPage = () => {
                   communicate with other users in the same room as you.
                 </p>
               </div>
-              <div className="stepimage lg:w-1/2">
-                <div className="stepimage">
-                  <img src={Room} alt="Editor Demo" />
+              <div className='stepimage lg:w-1/2'>
+                <div className='stepimage'>
+                  <img src={Room} alt='Editor Demo' />
                 </div>
 
-                <div className="stepimage">
-                  <img src={ChatBox} alt="Editor Demo" />
+                <div className='stepimage'>
+                  <img src={ChatBox} alt='Editor Demo' />
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="contact-form lg:flex lg:justify-between lg:items-center">
-            <div className="w-full lg:w-1/2">
-              <p className="text-5xl text-red-300 text-center lg:text-left satisfy-regular font-bold p-3">
+          <div className='contact-form lg:flex lg:justify-between lg:items-center'>
+            <div className='w-full lg:w-1/2'>
+              <p className='text-5xl text-red-300 text-center lg:text-left satisfy-regular font-bold p-3'>
                 Contact Us
               </p>
-              <p className="text-xl text-center lg:text-left satisfy-regular text-red-200 p-3">
+              <p className='text-xl text-center lg:text-left satisfy-regular text-red-200 p-3'>
                 Great things are not done by impulse, but by a series of small
                 things brought together.
               </p>
             </div>
-            <div className="w-full lg:w-1/2">
+            <div className='w-full lg:w-1/2'>
               <form
                 onSubmit={handleSubmit}
-                className="flex flex-col"
-                method="POST"
+                className='flex flex-col'
+                method='POST'
               >
-                <div className="mb-5">
-                  <label className="text-lg mb-2" htmlFor="name">
+                <div className='mb-5'>
+                  <label className='text-lg mb-2' htmlFor='name'>
                     Name
                   </label>
                   <input
-                    className="w-full text-gray-700 p-2.5 text-lg border-2 border-solid rounded-md outline-none border-stone-300"
-                    type="text"
-                    id="name"
-                    name="name"
+                    className='w-full text-gray-700 p-2.5 text-lg border-2 border-solid rounded-md outline-none border-stone-300'
+                    type='text'
+                    id='name'
+                    name='name'
                     value={formData.name}
                     onChange={handleChange}
                     required
                   />
                 </div>
-                <div className="formgroup">
-                  <label className="text-lg mb-2" htmlFor="email">
+                <div className='formgroup'>
+                  <label className='text-lg mb-2' htmlFor='email'>
                     Email
                   </label>
                   <input
-                    className="w-full text-gray-700 p-2.5 text-lg border-2 border-solid rounded-md outline-none border-stone-300"
-                    type="email"
-                    id="email"
-                    name="email"
+                    className='w-full text-gray-700 p-2.5 text-lg border-2 border-solid rounded-md outline-none border-stone-300'
+                    type='email'
+                    id='email'
+                    name='email'
                     value={formData.email}
                     onChange={handleChange}
                     required
                   />
                 </div>
-                <div className="formgroup">
-                  <label className="text-lg mb-2" htmlFor="message">
+                <div className='formgroup'>
+                  <label className='text-lg mb-2' htmlFor='message'>
                     Message
                   </label>
                   <textarea
-                    className="w-full text-gray-700 p-2.5 text-lg border-2 border-solid rounded-md outline-none border-stone-300"
-                    id="message"
-                    name="message"
+                    className='w-full text-gray-700 p-2.5 text-lg border-2 border-solid rounded-md outline-none border-stone-300'
+                    id='message'
+                    name='message'
                     value={formData.message}
                     onChange={handleChange}
                     required
                   ></textarea>
                 </div>
-                <div className="flex justify-center">
+                <div className='flex justify-center'>
                   <button
-                    type="submit"
-                    className="relative max-w-xs h-12 bg-blue-600 text-white text-lg mr-3 border-none rounded-md cursor-pointer outline-none mb-6 hover:bg-blue-700 flex items-center justify-center w-full"
+                    type='submit'
+                    className='relative max-w-xs h-12 bg-blue-600 text-white text-lg mr-3 border-none rounded-md cursor-pointer outline-none mb-6 hover:bg-blue-700 flex items-center justify-center w-full'
                   >
                     {isSubmitting ? (
-                      <span className="flex items-center">
-                        <span className="loading-spinner mr-2"></span>
+                      <span className='flex items-center'>
+                        <span className='loading-spinner mr-2'></span>
                         Submitting...
                       </span>
                     ) : (
-                      "Submit"
+                      'Submit'
                     )}
                   </button>
                   <button
                     onClick={goToLoginPage}
-                    className="relative max-w-xs h-12 bg-blue-600 text-white ml-3 text-lg border-none rounded-md cursor-pointer outline-none mb-6 hover:bg-blue-700 flex items-center justify-center w-full"
+                    className='relative max-w-xs h-12 bg-blue-600 text-white ml-3 text-lg border-none rounded-md cursor-pointer outline-none mb-6 hover:bg-blue-700 flex items-center justify-center w-full'
                   >
                     Back to Login
                   </button>
@@ -277,7 +285,7 @@ const HelpPage = () => {
       </div>
       <Toaster />
     </>
-  );
-};
+  )
+}
 
-export default HelpPage;
+export default HelpPage

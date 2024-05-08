@@ -18,6 +18,7 @@ import axios from 'axios'
 
 
 function App () {
+  // This is App in which we have differents route
   const [user, setUser] = useState(null)
 
   useEffect(() => {
@@ -29,14 +30,14 @@ function App () {
         window.localStorage.setItem('userData', JSON.stringify(data.user._json))
       } catch (err) {
         if (err.response && err.response.status === 401) {
-          setUser(null); // User is not authenticated
+          setUser(null) // User is not authenticated
         } else {
-          // console.log(err);
+          // console.log(err)
         }
       }
-    };
-    getUser();
-  }, []);
+    }
+    getUser()
+  }, [])
   
 
   return (

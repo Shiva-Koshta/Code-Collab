@@ -45,7 +45,7 @@ function getAllConnectedClients(roomId) {
 }
 // Define socket.io logic for handling client connections
 io.on("connection", (socket) => {
-  console.log("Socket connected", socket.id);
+  // console.log("Socket connected", socket.id);
    /*
     Handles the JOIN event when a user joins a room.
     Inputs:
@@ -143,7 +143,7 @@ io.on("connection", (socket) => {
 
   socket.on(ACTIONS.JOIN, ({ roomId }) => {
     socket.join(roomId);
-    console.log(`User joined room ${roomId}`);
+    // console.log(`User joined room ${roomId}`);
   });
 
  /*
@@ -178,8 +178,8 @@ io.on("connection", (socket) => {
 
 //This action is triggered when a message is to be sent to all users of the room.
   socket.on(ACTIONS.MESSAGE_SEND, ({ roomId, message, sender, sendname }) => {
-    console.log(sender);
-    console.log(sendname);
+    // console.log(sender);
+    // console.log(sendname);
     io.to(roomId).emit(ACTIONS.MESSAGE_RECEIVE, {
       text: message.text,
       sender,
@@ -199,7 +199,6 @@ io.on("connection", (socket) => {
   */
 
   socket.on(ACTIONS.FILESYSTEM_CHANGE, ({ roomId ,isdelete}) => {
-    
     // Emit the FILE_CHANGE event to all room members except the current socket
     if(isdelete)
     {
@@ -226,7 +225,7 @@ app.use(endpoints);
 mongoose
   .connect(process.env.MONGO_URL)
   .then(() => {
-    console.log("Connected to database");
+    // console.log("Connected to database");
     server.listen(port, () => console.log(`Listening on port ${port}...`));
   })
   .catch((error) => {
