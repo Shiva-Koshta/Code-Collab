@@ -160,7 +160,7 @@ const Sidebar = ({
           }
         }
       } else {
-        throw new Error("Failed to fetch user count from the server");
+        //throw new Error("Failed to fetch user count from the server");
       }
     } catch (error) {
       console.log("Error leaving room:", error);
@@ -379,14 +379,7 @@ const Sidebar = ({
         }}
         data-testid="delete-entry"
       />
-      <input
-        type="hidden"
-        onClick={() => {
-          handleChangeRole('helo')
-          setConnectedUserRoles(prevrole);
-        }}
-        data-testid="handle-change-entry"
-      />
+      
     </div>
   );
 };

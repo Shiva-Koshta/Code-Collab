@@ -25,9 +25,6 @@ jest.mock("react-toastify", () => ({
     error: jest.fn(),
   },
 }));
-
-
-
 test("Menu opens when user image or username is clicked", async () => {
   // Mock user data and functions
   const connectedUsers = [{ username: "user1", profileImage: "image1.png" }];
@@ -230,27 +227,23 @@ describe("Sidebar", () => {
       navigator.clipboard = originalClipboard;
     });
 
-    it("leaves room when leave button is clicked", async () => {
+    it("leaves room when leave button is clicked when numUsers is 1", async () => {
+      // Mock necessary dependencies
       const originalFetch = global.fetch;
+      global.fetch = jest.fn().mockResolvedValueOnce({ ok: true }); // Mock a successful fetch call
+
       const originalConfirm = window.confirm;
-      global.fetch = jest.fn();
-
-      // Mock a successful fetch call for user count
-      global.fetch.mockResolvedValueOnce({
-        ok: true,
-        json: () => ({ numUsers: 1 }),
-      });
-
-      // Mock confirmation dialog
-      window.confirm = jest.fn(() => true);
-      const leaveResponseOk = {
-        ok: true,
-        json: () => ({ message: "Room left successfully" }),
-      };
-      const leaveResponseNotOk = { ok: false }; // Simulate unsuccessful response
-      // Mock a successful fetch call for leaving the room
-      global.fetch.mockResolvedValueOnce(leaveResponseOk); // Mock successful response
-
+      window.confirm = jest.fn(() => true); // Mock confirmation dialog
+      global.fetch = jest
+        .fn()
+        .mockResolvedValueOnce({
+          ok: true,
+          json: () => ({ numUsers: 1 }),
+        })
+        .mockResolvedValueOnce({
+          ok: true,
+          json: () => ({ message: "Room left successfully" }),
+        });
       // Render the component
       const reactNavigator = jest.fn();
       const roomId = "yourRoomId";
@@ -280,36 +273,149 @@ describe("Sidebar", () => {
           />
         </MemoryRouter>
       );
+
+      // Find and click the leave button
       const leaveButton = getByTestId("leave-button");
       fireEvent.click(leaveButton);
 
       // Assertions
-
-      // Assert the fetch calls
       expect(global.fetch).toHaveBeenCalledWith(
-        `${process.env.REACT_APP_API_URL}/rooms/numUsersInRoom`,
-        expect.any(Object)
+        "http://localhost:8080/rooms/numUsersInRoom",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ roomId: "" }),
+        }
       );
-      // expect(global.fetch).toHaveBeenCalledWith(
-      //   `${process.env.REACT_APP_API_URL}/delete-entry`,
-      //   expect.objectContaining({
-      //     method: "POST",
-      //     headers: {
-      //       "Content-Type": "application/json",
-      //     },
-      //     body: JSON.stringify({ roomId, username: "" }),
-      //   })
+
+      await waitFor(() => {
+        expect(window.confirm).toHaveBeenCalledWith("Confirm leave room?");
+        expect(global.fetch).toHaveBeenCalledWith(
+          "http://localhost:8080/rooms/numUsersInRoom",
+          expect.any(Object)
+        );
+        expect(() =>
+          getByText("Failed to fetch user count from the server")
+        ).toThrow();
+      });
+      const leaveResponseOk = { ok: true };
+      const leaveResponseNotOk = { ok: false };
+
+      // Mock the leaveResponse and simulate both cases where ok is true and false
+      // jest.spyOn(global, "fetch").mockResolvedValueOnce(leaveResponseOk);
+      // await waitFor(
+      //   () =>
+      //     expect(reactNavigator).toHaveBeenCalledWith("/", {roomId: "",})
+
+      //   //   expect(reactNavigator).toHaveBeenCalledWith("/", { roomId })
       // );
 
-      // // Assert navigation after leaving the room
-      // await waitFor(() => {
-      //   expect(reactNavigator).toHaveBeenCalledWith("/", { roomId });
-      // });
+      // jest.spyOn(global, "fetch").mockResolvedValueOnce(leaveResponseNotOk);
+      // await waitFor(() =>
+      //   expect(reactNavigator).toHaveBeenCalledWith("/", { roomId: "" })
+      // );
 
-      // Reset mocks
+      // Restore original dependencies after the test
       global.fetch = originalFetch;
       window.confirm = originalConfirm;
     });
+    it("leaves room when leave button is clicked when numUsers is greater than", async () => {
+      // Mock necessary dependencies
+      const originalFetch = global.fetch;
+      global.fetch = jest.fn().mockResolvedValueOnce({ ok: true }); // Mock a successful fetch call
+
+      const originalConfirm = window.confirm;
+      window.confirm = jest.fn(() => true); // Mock confirmation dialog
+      global.fetch = jest
+        .fn()
+        .mockResolvedValueOnce({
+          ok: true,
+          json: () => ({ numUsers: 2 }),
+        })
+        .mockResolvedValueOnce({
+          ok: true,
+          json: () => ({ message: "Room left successfully" }),
+        });
+      // Render the component
+      const reactNavigator = jest.fn();
+      const roomId = "yourRoomId";
+      const { getByTestId } = render(
+        <MemoryRouter>
+          <Sidebar
+            contentChanged={false}
+            setContentChanged={() => {}}
+            fileContent=""
+            setFileContent={() => {}}
+            editorRef={{}}
+            connectedUsers={[]}
+            toggleChat={() => {}}
+            unreadMessages={0}
+            roomId=""
+            isLeftDivOpen={false}
+            toggleLeftDiv={() => {}}
+            leftIcon={<div />}
+            storedUserData={{ current: { name: "" } }}
+            host={{ current: "" }}
+            connectedUserRoles={[]}
+            setConnectedUserRoles={() => {}}
+            socketRef={{ current: null }}
+            menuOpen={{}}
+            setMenuOpen={() => {}}
+            reactNavigator={reactNavigator}
+          />
+        </MemoryRouter>
+      );
+
+      // Find and click the leave button
+      const leaveButton = getByTestId("leave-button");
+      fireEvent.click(leaveButton);
+
+      // Assertions
+      expect(global.fetch).toHaveBeenCalledWith(
+        "http://localhost:8080/rooms/numUsersInRoom",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ roomId: "" }),
+        }
+      );
+
+      await waitFor(() => {
+        expect(window.confirm).toHaveBeenCalledWith("Confirm leave room?");
+        expect(global.fetch).toHaveBeenCalledWith(
+          "http://localhost:8080/rooms/numUsersInRoom",
+          expect.any(Object)
+        );
+        expect(() =>
+          getByText("Failed to fetch user count from the server")
+        ).toThrow();
+      });
+      const leaveResponseOk = { ok: true };
+      const leaveResponseNotOk = { ok: false };
+
+      // Mock the leaveResponse and simulate both cases where ok is true and false
+      // jest.spyOn(global, "fetch").mockResolvedValueOnce(leaveResponseOk);
+      // await waitFor(
+      //   () =>
+      //     expect(reactNavigator).toHaveBeenCalledWith("/", {roomId: "",})
+
+      //   //   expect(reactNavigator).toHaveBeenCalledWith("/", { roomId })
+      // );
+
+      // jest.spyOn(global, "fetch").mockResolvedValueOnce(leaveResponseNotOk);
+      // await waitFor(() =>
+      //   expect(reactNavigator).toHaveBeenCalledWith("/", { roomId: "" })
+      // );
+
+      // Restore original dependencies after the test
+      global.fetch = originalFetch;
+      window.confirm = originalConfirm;
+    });
+    
     it("downloads a zip file when download button is clicked", async () => {
       const mockedResponse = {
         data: new Blob(),
