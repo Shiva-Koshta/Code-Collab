@@ -4,8 +4,9 @@ import GoogleButton from 'react-google-button'
 import { Link } from 'react-router-dom'
 
 const Login = () => {
+  // Authorization function for Google Login.
   const googleAuth = () => {
-    window.open(`${process.env.REACT_APP_API_URL}/auth/google`, '_self')
+    window.open(`${process.env.REACT_APP_BACKEND_URL}/auth/google`, '_self')
   }
 
   return (

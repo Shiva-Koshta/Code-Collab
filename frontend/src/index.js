@@ -6,13 +6,13 @@ import reportWebVitals from './reportWebVitals'
 
 
 export function renderApp() {
-  const root = ReactDOM.createRoot(document.getElementById('root'));
-  root.render(<App />);
+  const root = ReactDOM.createRoot(document.getElementById('root'))
+  root.render(<App />)
 }
 
-window.addEventListener("DOMContentLoaded", function (e) {
-  renderApp();
-});
+window.addEventListener('DOMContentLoaded', function (e) {
+  renderApp()
+})
 
-reportWebVitals();
+reportWebVitals()
 

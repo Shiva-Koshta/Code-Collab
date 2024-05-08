@@ -42,7 +42,7 @@ const FileView = ({
   socketRef  ,
   connectedUserRoles  ,
   storedUserData  ,
-  currentFile  ,
+  currentFile  
 }) => {
   const { roomId } = useParams()
   const [isDownloadTrue, setIsDownloadTrue] = useState(false)
