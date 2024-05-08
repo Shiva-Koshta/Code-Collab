@@ -220,7 +220,7 @@ const RoomCreation = () => {
               JOIN
             </button>
             <span className='mt-5'>
-              If you don't have an invite, click on &nbsp
+              If you don't have an invite, click on &nbsp;
               <a
                 onClick={createNewRoom}
                 href=''
