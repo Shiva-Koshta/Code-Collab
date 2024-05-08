@@ -36,19 +36,19 @@ import DownloadIcon from '@mui/icons-material/Download'
 import ACTIONS from '../Actions'
 
 const FileView = ({
-  editorRef = useRef(null),
-  contentChanged = useRef(null),
-  setContentChanged = useRef(null),
-  socketRef = useRef(null),
-  connectedUserRoles = useRef(null),
-  storedUserData = useRef(null),
-  currentFile = useRef(null),
+  editorRef  ,
+  contentChanged  ,
+  setContentChanged  ,
+  socketRef  ,
+  connectedUserRoles  ,
+  storedUserData  ,
+  currentFile  ,
 }) => {
   const { roomId } = useParams()
   const [isDownloadTrue, setIsDownloadTrue] = useState(false)
   const [downloadFileExtension, setFileExtension] = useState('')
   const [downloadFileName, setFileName] = useState('')
-  const parentRef = useRef(null)
+  const parentRef  = useRef(null)
   const [parentWidth, setParentWidth] = useState(0)
   const [folders, setFolders] = useState([
     {
