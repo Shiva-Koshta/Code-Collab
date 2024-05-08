@@ -19,7 +19,7 @@ const Chat = ({
   //17 to 36
   const [inputText, setInputText] = useState("");
   const handleMessageSend = () => {
-    console.log(storedUserData.current);
+    // console.log(storedUserData.current);
     if (inputText.trim() !== "") {
       const message = { text: inputText };
       socketRef.current.emit(ACTIONS.MESSAGE_SEND, {
