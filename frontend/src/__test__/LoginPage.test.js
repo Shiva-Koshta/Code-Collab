@@ -7,7 +7,7 @@ import Faq from "../pages/Faq";
 import HelpPage from "../pages/HelpPage";
 
 describe("Login component", () => {
-  it("renders without crashing", () => {
+  test("renders without crashing", () => {
     render(
       <MemoryRouter>
         <Login />
@@ -15,7 +15,7 @@ describe("Login component", () => {
     );
   });
 
-  it("calls googleAuth function when GoogleButton is clicked", () => {
+  test("calls googleAuth function when GoogleButton is clicked", () => {
     const googleAuthMock = jest.fn();
     window.open = googleAuthMock;
 
@@ -30,7 +30,7 @@ describe("Login component", () => {
 
     expect(googleAuthMock).toHaveBeenCalled();
   });
-  it("renders About component when '/about-us' URL is called", () => {
+  test("renders About component when '/about-us' URL is called", () => {
     const { getByText } = render(
       <MemoryRouter initialEntries={['/about-us']}>
         <Routes>
@@ -39,7 +39,7 @@ describe("Login component", () => {
       </MemoryRouter>
     );
   });
-  it("renders Faq component when /Faq URL is called", () => {
+  test("renders Faq component when /Faq URL is called", () => {
     const { getByText } = render(
       <MemoryRouter initialEntries={["/Faq"]}>
         <Routes>
@@ -48,7 +48,7 @@ describe("Login component", () => {
       </MemoryRouter>
     );
   });
-  it("renders HelpPage component when /help URL is called", () => {
+  test("renders HelpPage component when /help URL is called", () => {
     const { getByText } = render(
       <MemoryRouter initialEntries={["/help"]}>
         <Routes>

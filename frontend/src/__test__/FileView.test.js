@@ -8,7 +8,7 @@ import {
 } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import { CircularProgress } from "@mui/material";
-import FileView from "../components/FileView"; // Update the path according to your file structure
+import FileView from "../components/FileView";
 import { unmountComponentAtNode } from "react-dom";
 import { act } from "react-dom/test-utils";
 const axios = require("axios");
@@ -70,8 +70,6 @@ jest.mock("react-router-dom", () => ({
 }));
 
 describe("FileView useEffect tests", () => {
-  
-  
   const mockEditor = {
     setOption: jest.fn(),
   };
@@ -80,7 +78,7 @@ describe("FileView useEffect tests", () => {
   const editorRef = { current: mockEditor };
   const connectedUserRoles = ["role1", "role2"];
   const storedUserData = { current: { name: "user1" } };
-  it("should call handleSaveFile when beforeunload event is triggered", () => {
+  test("should call handleSaveFile when beforeunload event is triggered", () => {
     const { unmount } = render(
       <FileView
         handleSaveFile={mockHandleSaveFile}
@@ -92,25 +90,14 @@ describe("FileView useEffect tests", () => {
       />
     );
 
-    // Update the currentFile prop to simulate it not being null
-    act(() => {
-      // You might use a React state hook in your component
-      // In that case, you should use the appropriate method to update the state
-    });
-
-    // Simulate the beforeunload event
     act(() => {
       fireEvent(window, new Event("beforeunload"));
     });
 
-    // Assert handleSaveFile was called
-    // expect(mockHandleSaveFile).toHaveBeenCalledWith("file", false);
-
-    // Clean up by unmounting the component
     unmount();
   });
 
-  it("should remove the event listener on component unmount", () => {
+  test("should remove the event listener on component unmount", () => {
     // Create a spy for removeEventListener
     const removeEventListenerSpy = jest.spyOn(window, "removeEventListener");
 
@@ -138,7 +125,7 @@ describe("FileView useEffect tests", () => {
     // Cleanup
     removeEventListenerSpy.mockRestore();
   });
-  it("should set editor options and handle Ctrl + S and Ctrl + D keydowns", () => {
+  test("should set editor options and handle Ctrl + S and Ctrl + D keydowns", () => {
     // Mock current file and connected user roles
     const currentFile = { current: jest.fn() };
     const connectedUserRoles = [
@@ -175,16 +162,11 @@ describe("FileView useEffect tests", () => {
       key: "d",
     });
     fireEvent.keyDown(window, ctrlDEvent);
-
-    // Verify that downloadZipFile was called with expected room ID
-    // expect(mockDownloadZipFile).toHaveBeenCalledWith(0);
-
-    // Cleanup by unmounting the component
     unmount();
   });
 });
 describe("useEffect hook", () => {
-  it("adds and removes event listener correctly", () => {
+  test("adds and removes event listener correctly", () => {
     // Mock the handleSaveFile function
     const handleSaveFile = jest.fn();
 
@@ -217,7 +199,7 @@ describe("useEffect hook", () => {
 });
 
 describe("useEffect hook", () => {
-  it("sets editor to readOnly when currentFile is null", () => {
+  test("sets editor to readOnly when currentFile is null", () => {
     // Mock editorRef
     const editorRef = {
       current: { setOption: jest.fn(), setValue: jest.fn() },
@@ -238,7 +220,7 @@ describe("useEffect hook", () => {
     expect(editorRef.current.setOption).toHaveBeenCalledWith("readOnly", false);
   });
 
-  it("sets editor to readOnly based on user role when currentFile is not null", () => {
+  test("sets editor to readOnly based on user role when currentFile is not null", () => {
     // Mock editorRef
     const editorRef = {
       current: { setOption: jest.fn(), setValue: jest.fn() },
@@ -262,7 +244,7 @@ describe("useEffect hook", () => {
     // Check if editorRef.setOption is called with readOnly true for viewer role
     expect(editorRef.current.setOption).toHaveBeenCalledWith("readOnly", true);
   });
-  it("adds and removes event listener for Ctrl + S when the component mounts and unmounts", () => {
+  test("adds and removes event listener for Ctrl + S when the component mounts and unmounts", () => {
     // Mock handleSaveFile function
     const handleSaveFile = jest.fn();
 
@@ -343,28 +325,7 @@ test("it adds and removes event listener on mount/unmount", () => {
   act(() => {
     unmountComponentAtNode(container);
   });
-
-  // Check that the event listener is removed
-  //expect(window.removeEventListener).toHaveBeenCalledWith('beforeunload', expect.any(Function));
 });
-// test('it calls handleSaveFile when beforeunload event is triggered with a current file', () => {
-//     const mockHandleSaveFile = jest.fn();
-//     const mockCurrentFile = 'example.txt';
-
-//     // Render the component with mock props
-//     act(() => {
-//       render(<FileView handleSaveFile={mockHandleSaveFile} socketRef={socketRefMock} currentFile={mockCurrentFile} />, container);
-//     });
-
-//     // Trigger the beforeunload event
-//     act(() => {
-//       fireEvent(window, new Event('beforeunload'));
-//     });
-
-//     // Check that handleSaveFile is called with the correct arguments
-//     expect(mockHandleSaveFile).toHaveBeenCalled(0);
-//     expect(mockHandleSaveFile).toHaveBeenCalledWith(mockCurrentFile, false);
-//   });
 
 test("it does not call handleSaveFile when beforeunload event is triggered without a current file", () => {
   const mockHandleSaveFile = jest.fn();
@@ -410,7 +371,6 @@ test("renders FileView component", () => {
       socketRef={socketRefMock}
     />
   );
-  // Add assertions to check if the component renders correctly
 });
 
 test("clicking on a folder toggles its visibility", () => {
@@ -426,11 +386,10 @@ test("clicking on a folder toggles its visibility", () => {
   );
   const folderName = getByText("Root"); // Replace 'Root' with the name of the folder you want to test
   fireEvent.click(folderName);
-  // Add assertions to check if the folder's visibility is toggled
 });
 
 describe("when selectedFileFolder.type is 'root'", () => {
-  it("Testing createFolder function when the add folder button is clicked", async () => {
+  test("Testing createFolder function when the add folder button is clicked", async () => {
     // Mock parentFolder
     const createFolder = jest.fn();
 
@@ -507,10 +466,6 @@ describe("when selectedFileFolder.type is 'root'", () => {
         }
       );
     });
-    // await waitFor(() => {
-    //   expect(getByText("New Folder")).toBeInTheDocument();
-    // });
-    // Add your assertions for the folder creation logic here
   });
   test('clicking on the "Add Folder" button calls createFolder', () => {
     // Mock the createFolder function
@@ -531,10 +486,6 @@ describe("when selectedFileFolder.type is 'root'", () => {
     expect(getByText("File Explorer")).toBeInTheDocument();
     // Simulate a user click on the "Add Folder" button
     fireEvent.click(getByTestId("add-folder-button"));
-
-    // Check if createFolder was called with the correct argument
-
-    // expect(createFolder).toHaveBeenCalledWith(selectedFileFolder);
   });
 
   test('clicking on the "Add File" button calls createFile', async () => {
@@ -567,17 +518,6 @@ describe("when selectedFileFolder.type is 'root'", () => {
         }
       );
     });
-    // await waitFor(() => {
-    //   expect(axios.post).toHaveBeenCalledWith(
-    //     `${process.env.REACT_APP_API_URL}/filesystem/createfile`,
-    //     {
-    //       name: 'New File',
-    //       parentId: '0', // Ensure parentId is set correctly
-    //       roomId: '1', // Ensure roomId is set correctly
-    //     },
-
-    //   );
-    // });
   });
 
   test("clicking upload file calls the upload file api", async () => {
@@ -610,25 +550,6 @@ describe("when selectedFileFolder.type is 'root'", () => {
         }
       );
     });
-    // await waitFor(() => {
-    //   expect(axios.post).toHaveBeenCalledWith(
-    //     `${process.env.REACT_APP_API_URL}/filesystem/uploadFile`,
-    //     {
-    //       roomId: '1',
-    //     }
-    //   );
-    // });
-    // await waitFor(() => {
-    //   expect(axios.post).toHaveBeenCalledWith(
-    //     `${process.env.REACT_APP_API_URL}/filesystem/createfile`,
-    //     {
-    //       name: 'New File',
-    //       parentId: '0', // Ensure parentId is set correctly
-    //       roomId: '1', // Ensure roomId is set correctly
-    //     },
-
-    //   );
-    // });
   });
 
   test("clicking on the rename folder button calls renamedirectory api", async () => {
@@ -693,17 +614,6 @@ describe("when selectedFileFolder.type is 'root'", () => {
         }
       );
     });
-    // await waitFor(() => {
-    //   expect(axios.post).toHaveBeenCalledWith(
-    //     `${process.env.REACT_APP_API_URL}/filesystem/renamedirectory`,
-    //     {
-    //       name: 'New Folder',
-    //       parentId: '0', // Ensure parentId is set correctly
-    //       roomId: '1', // Ensure roomId is set correctly
-    //     },
-
-    //   );
-    // });// expect(createFolder).toHaveBeenCalledWith(selectedFileFolder);
   });
 
   test("clicking file input uploads file", async () => {
@@ -763,7 +673,7 @@ test("clicking on the folder div toggles the folder and sets selected file folde
       depth={depth}
       isFolderOpen={isFolderOpen}
       currentFile={mockCurrentFile}
-        connectedUserRoles={connectedUserRolesMock}
+      connectedUserRoles={connectedUserRolesMock}
     />
   );
 
@@ -772,51 +682,10 @@ test("clicking on the folder div toggles the folder and sets selected file folde
 
   // Simulate a click on the folder div
   fireEvent.click(folderDiv);
-
-  // Check if toggleFolder and setSelectedFileFolder were called with the correct arguments
-  // expect(toggleFolder).toHaveBeenCalledWith(folder);
-  // expect(setSelectedFileFolder).toHaveBeenCalledWith(folder);
 });
-// test('clicking on the directory div toggles the folder, sets selected file folder, and sets selected file folder parent', () => {
-//   // Mock necessary functions
-//   const toggleFolder = jest.fn();
-//   const setSelectedFileFolder = jest.fn();
-//   const setSelectedFileFolderParent = jest.fn();
 
-//   // Mock folder data
-//   const folder = { _id: 'folder_id', name: 'Folder Name', type: 'directory' }; // Mock folder object
-//   const parentFolder = { _id: 'parent_folder_id', name: 'Parent Folder Name' }; // Mock parent folder object
-//   const depth = 0;
-//   const isFolderOpen = { folder_id: false }; // Assuming initial state is closed
-
-//   // Render the component with mock props and data
-//   const { getByTestId } = render(
-//     <FileView
-//     editorRef={editorRefMock}
-//       socketRef={socketRefMock}
-//       toggleFolder={toggleFolder}
-//       setSelectedFileFolder={setSelectedFileFolder}
-//       setSelectedFileFolderParent={setSelectedFileFolderParent}
-//       folder={folder}
-//       parentFolder={parentFolder}
-//       depth={depth}
-//       isFolderOpen={isFolderOpen}
-//     />
-//   );
-
-//   // Find the directory div by data-testid
-//   const directoryDiv = getByTestId('setSelectedFileFolder-directory');
-
-//   // Simulate a click on the directory div
-//   fireEvent.click(directoryDiv);
-
-//   // Check if toggleFolder, setSelectedFileFolder, and setSelectedFileFolderParent were called with the correct arguments
-//   expect(toggleFolder).toHaveBeenCalledWith(folder);
-//   expect(setSelectedFileFolder).toHaveBeenCalledWith(folder);
-//   expect(setSelectedFileFolderParent).toHaveBeenCalledWith(parentFolder);
-// });
 describe("when selectedFileFolder.type is 'directory'", () => {
-  it("Testing createFolder function when the add button is clicked", async () => {
+  test("Testing createFolder function when the add button is clicked", async () => {
     // Mock parentFolder
     const createFolder = jest.fn();
 
@@ -920,10 +789,6 @@ describe("when selectedFileFolder.type is 'directory'", () => {
       getByTestId("setDirectory").click();
     });
     fireEvent.click(getByTestId("add-folder-button-directory"));
-
-    // Check if createFolder was called with the correct argument
-
-    // expect(createFolder).toHaveBeenCalledWith(selectedFileFolder);
   });
 
   test('clicking on the "Add File" button calls createFile', async () => {
@@ -960,17 +825,6 @@ describe("when selectedFileFolder.type is 'directory'", () => {
         }
       );
     });
-    // await waitFor(() => {
-    //   expect(axios.post).toHaveBeenCalledWith(
-    //     `${process.env.REACT_APP_API_URL}/filesystem/createfile`,
-    //     {
-    //       name: 'New File',
-    //       parentId: '0', // Ensure parentId is set correctly
-    //       roomId: '1', // Ensure roomId is set correctly
-    //     },
-
-    //   );
-    // });
   });
 
   test("clicking upload file calls the upload file api", async () => {
@@ -1002,25 +856,6 @@ describe("when selectedFileFolder.type is 'directory'", () => {
         }
       );
     });
-    // await waitFor(() => {
-    //   expect(axios.post).toHaveBeenCalledWith(
-    //     `${process.env.REACT_APP_API_URL}/filesystem/uploadFile`,
-    //     {
-    //       roomId: '1',
-    //     }
-    //   );
-    // });
-    // await waitFor(() => {
-    //   expect(axios.post).toHaveBeenCalledWith(
-    //     `${process.env.REACT_APP_API_URL}/filesystem/createfile`,
-    //     {
-    //       name: 'New File',
-    //       parentId: '0', // Ensure parentId is set correctly
-    //       roomId: '1', // Ensure roomId is set correctly
-    //     },
-
-    //   );
-    // });
   });
 
   test("clicking on the rename folder button calls renamedirectory api", async () => {
@@ -1085,17 +920,7 @@ describe("when selectedFileFolder.type is 'directory'", () => {
         }
       );
     });
-    // await waitFor(() => {
-    //   expect(axios.post).toHaveBeenCalledWith(
-    //     `${process.env.REACT_APP_API_URL}/filesystem/renamedirectory`,
-    //     {
-    //       name: 'New Folder',
-    //       parentId: '0', // Ensure parentId is set correctly
-    //       roomId: '1', // Ensure roomId is set correctly
-    //     },
-
-    //   );
-    // });// expect(createFolder).toHaveBeenCalledWith(selectedFileFolder);
+    
   });
 
   test("clicking on the Delete folder button calls deletedirectory", async () => {
@@ -1193,17 +1018,6 @@ describe("when selectedFileFolder.type is 'file'", () => {
         }
       );
     });
-    // await waitFor(() => {
-    //   expect(axios.post).toHaveBeenCalledWith(
-    //     `${process.env.REACT_APP_API_URL}/filesystem/renamedirectory`,
-    //     {
-    //       name: 'New Folder',
-    //       parentId: '0', // Ensure parentId is set correctly
-    //       roomId: '1', // Ensure roomId is set correctly
-    //     },
-
-    //   );
-    // });// expect(createFolder).toHaveBeenCalledWith(selectedFileFolder);
   });
   test("clicking on the download file button sets the variable", async () => {
     // Render the component
@@ -1232,17 +1046,6 @@ describe("when selectedFileFolder.type is 'file'", () => {
         }
       );
     });
-    // await waitFor(() => {
-    //   expect(axios.post).toHaveBeenCalledWith(
-    //     `${process.env.REACT_APP_API_URL}/filesystem/renamedirectory`,
-    //     {
-    //       name: 'New Folder',
-    //       parentId: '0', // Ensure parentId is set correctly
-    //       roomId: '1', // Ensure roomId is set correctly
-    //     },
-
-    //   );
-    // });// expect(createFolder).toHaveBeenCalledWith(selectedFileFolder);
   });
 
   test("clicking on the Delete file button calls deletefile", async () => {
@@ -1364,32 +1167,3 @@ describe("when is downloading is true", () => {
     });
   });
 });
-
-// test("renders folders correctly", () => {
-//   // Mock folders data
-//   const folders = [
-//     { id: 1, name: "Folder 1" },
-//     { id: 2, name: "Folder 2" },
-//     // Add more folders as needed
-//   ];
-
-//   // Render the component with folders
-//   render(<FileView editorRef={editorRefMock} folders={folders} />);
-
-//   folders.forEach((folder) => {
-//     const folderRegExp = new RegExp(folder.name, 'i'); // 'i' flag for case-insensitive matching
-//     const folderElement = screen.getByText(folderRegExp);
-//     expect(folderElement).toBeInTheDocument();
-//   });
-// });
-
-// test('renders CircularProgress when loading is true', () => {
-//   // Render the component with loading set to true
-//   const { getByTestId } = render(<FileView
-//     editorRef={editorRefMock}
-//    loading={true} />);
-
-//   // Assert that the CircularProgress component is present
-//   const circularProgress = getByTestId('circular-progress');
-//   expect(circularProgress).toBeInTheDocument();
-// });
