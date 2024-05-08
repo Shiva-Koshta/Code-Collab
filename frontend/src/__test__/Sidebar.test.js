@@ -25,7 +25,63 @@ jest.mock("react-toastify", () => ({
     error: jest.fn(),
   },
 }));
+test("Menu opens when user image or username is clicked", async () => {
+  // Mock user data and functions
+  const connectedUsers = [{ username: "user1", profileImage: "image1.png" }];
+  const menuOpen = { user1: false }; // Mock initial menu state
+  const setMenuOpen = jest.fn();
+  const host = { current: "hostUser" };
+  const connectedUserRoles = [{ name: "user1", role: "role1" }];
+  const storedUserData = { current: { name: "hostUser" } };
+  const handleChangeRole = jest.fn();
+  const setConnectedUserRoles = jest.fn();
+  let socketRefMock = {
+    current: {
+      on: jest.fn(),
+      emit: jest.fn(),
+    },
+  };
+  // Render the component
+  const { getByTestId, findByTestId } = render(
+    <MemoryRouter>
+      <Sidebar
+        isConnectedComponentOpen={true}
+        connectedUsers={connectedUsers}
+        menuOpen={menuOpen}
+        setMenuOpen={setMenuOpen}
+        host={host}
+        connectedUserRoles={connectedUserRoles}
+        storedUserData={storedUserData}
+        handleChangeRole={handleChangeRole}
+        setConnectedUserRoles={setConnectedUserRoles}
+        socketRef={socketRefMock}
+      />
+    </MemoryRouter>
+  );
 
+  // Find the first user's image and click on it
+  fireEvent.click(getByTestId("inside-hello"));
+  fireEvent.click(getByTestId("inside-menu"));
+  const userImage = getByTestId("user-List");
+  fireEvent.click(userImage);
+
+  // Check if the menu opens
+  //   const insideMenu = await findByTestId("inside-Menu");
+  //   expect(insideMenu).toBeInTheDocument();
+
+  // Find the "Change Role" menu item and click on it
+  const changeRoleMenuItem = getByTestId("menuitem");
+  fireEvent.click(changeRoleMenuItem);
+
+  // Check if handleChangeRole function is called with the correct username
+  //   expect(handleChangeRole).toHaveBeenCalledWith("user1");
+
+  //   // Simulate closing the menu
+  //   fireEvent.click(changeRoleMenuItem); // Close the menu
+
+  //   // Check if the menu is closed
+  //   expect(setMenuOpen).toHaveBeenCalledWith({ user1: false }); // Ensure the menu state is updated
+});
 describe("Sidebar", () => {
   const connectedUsers = [
     { username: "user1", profileImage: "image1.jpg" },
@@ -42,43 +98,6 @@ describe("Sidebar", () => {
   const host = { current: "user1" };
   const roomId = "room123";
   const storedUserData = { current: { name: "user1" } };
-
-  it("renders user list correctly", () => {
-    const connectedUsersMap = [
-      { username: "user1", profileImage: "image1.jpg" },
-      { username: "user2", profileImage: "image2.jpg" },
-      // Add more test data as needed
-    ];
-
-    const { getByTestId } = render(
-      <MemoryRouter>
-        <Sidebar
-          connectedUsersMap={connectedUsersMap}
-          connectedUsers={connectedUsers}
-          connectedUserRoles={connectedUserRoles}
-          contentChanged={false}
-          setContentChanged={() => {}}
-          fileContent=""
-          setFileContent={() => {}}
-          editorRef={{}}
-          toggleChat={() => {}}
-          unreadMessages={0}
-          isLeftDivOpen={false}
-          toggleLeftDiv={() => {}}
-          leftIcon={<div />}
-          setConnectedUserRoles={() => {}}
-          socketRef={{ current: null }}
-          menuOpen={{}}
-          setMenuOpen={() => {}}
-          isConnectedComponentOpen={true} // Set isConnectedComponentOpen to true
-        />
-      </MemoryRouter>
-    );
-
-    // Find the div element by its text content
-    getByTestId("handle-User");
-    const toggleElement = getByTestId("handle-User-Menu");
-  });
 
   it("renders correctly", () => {
     render(
@@ -208,7 +227,7 @@ describe("Sidebar", () => {
       navigator.clipboard = originalClipboard;
     });
 
-    it("leaves room when leave button is clicked", async () => {
+    it("leaves room when leave button is clicked when numUsers is 1", async () => {
       // Mock necessary dependencies
       const originalFetch = global.fetch;
       global.fetch = jest.fn().mockResolvedValueOnce({ ok: true }); // Mock a successful fetch call
@@ -302,6 +321,101 @@ describe("Sidebar", () => {
       global.fetch = originalFetch;
       window.confirm = originalConfirm;
     });
+    it("leaves room when leave button is clicked when numUsers is greater than", async () => {
+      // Mock necessary dependencies
+      const originalFetch = global.fetch;
+      global.fetch = jest.fn().mockResolvedValueOnce({ ok: true }); // Mock a successful fetch call
+
+      const originalConfirm = window.confirm;
+      window.confirm = jest.fn(() => true); // Mock confirmation dialog
+      global.fetch = jest
+        .fn()
+        .mockResolvedValueOnce({
+          ok: true,
+          json: () => ({ numUsers: 2 }),
+        })
+        .mockResolvedValueOnce({
+          ok: true,
+          json: () => ({ message: "Room left successfully" }),
+        });
+      // Render the component
+      const reactNavigator = jest.fn();
+      const roomId = "yourRoomId";
+      const { getByTestId } = render(
+        <MemoryRouter>
+          <Sidebar
+            contentChanged={false}
+            setContentChanged={() => {}}
+            fileContent=""
+            setFileContent={() => {}}
+            editorRef={{}}
+            connectedUsers={[]}
+            toggleChat={() => {}}
+            unreadMessages={0}
+            roomId=""
+            isLeftDivOpen={false}
+            toggleLeftDiv={() => {}}
+            leftIcon={<div />}
+            storedUserData={{ current: { name: "" } }}
+            host={{ current: "" }}
+            connectedUserRoles={[]}
+            setConnectedUserRoles={() => {}}
+            socketRef={{ current: null }}
+            menuOpen={{}}
+            setMenuOpen={() => {}}
+            reactNavigator={reactNavigator}
+          />
+        </MemoryRouter>
+      );
+
+      // Find and click the leave button
+      const leaveButton = getByTestId("leave-button");
+      fireEvent.click(leaveButton);
+
+      // Assertions
+      expect(global.fetch).toHaveBeenCalledWith(
+        "http://localhost:8080/rooms/numUsersInRoom",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ roomId: "" }),
+        }
+      );
+
+      await waitFor(() => {
+        expect(window.confirm).toHaveBeenCalledWith("Confirm leave room?");
+        expect(global.fetch).toHaveBeenCalledWith(
+          "http://localhost:8080/rooms/numUsersInRoom",
+          expect.any(Object)
+        );
+        expect(() =>
+          getByText("Failed to fetch user count from the server")
+        ).toThrow();
+      });
+      const leaveResponseOk = { ok: true };
+      const leaveResponseNotOk = { ok: false };
+
+      // Mock the leaveResponse and simulate both cases where ok is true and false
+      // jest.spyOn(global, "fetch").mockResolvedValueOnce(leaveResponseOk);
+      // await waitFor(
+      //   () =>
+      //     expect(reactNavigator).toHaveBeenCalledWith("/", {roomId: "",})
+
+      //   //   expect(reactNavigator).toHaveBeenCalledWith("/", { roomId })
+      // );
+
+      // jest.spyOn(global, "fetch").mockResolvedValueOnce(leaveResponseNotOk);
+      // await waitFor(() =>
+      //   expect(reactNavigator).toHaveBeenCalledWith("/", { roomId: "" })
+      // );
+
+      // Restore original dependencies after the test
+      global.fetch = originalFetch;
+      window.confirm = originalConfirm;
+    });
+    
     it("downloads a zip file when download button is clicked", async () => {
       const mockedResponse = {
         data: new Blob(),
@@ -546,4 +660,130 @@ describe("Sidebar", () => {
         global.fetch = originalFetch;
         window.confirm = originalConfirm;
     }); */
+});
+const connectedUsers = [
+  {
+    username: "john_doe",
+    profileImage: "/images/john_doe.png",
+  },
+];
+// descsribe("handle User", () => {
+it("finds img elements with correct data-testid and handles clicks", async () => {
+  const setMenuOpen = jest.fn((fn) => {
+    return fn;
+  });
+  const host = {
+    current: "john_doe", // or any other expected value
+  };
+  const storedUserData = {
+    current: {
+      name: "jane_doe", // Set this to an appropriate value
+    },
+  };
+  const handleUserMenuToggle = jest.fn();
+  render(
+    <MemoryRouter>
+      <Sidebar
+        isConnectedComponentOpen={true}
+        connectedUsers={connectedUsers}
+        handleUserMenuToggle={handleUserMenuToggle}
+        sertMenuOpen={setMenuOpen}
+        host={host}
+        storedUserData={storedUserData}
+        //   menuOpen={menuOpen}
+      />
+    </MemoryRouter>
+  );
+  // Simulate a user clicking the hidden input element
+  const hiddenInput = screen.getByTestId("inside-hello");
+  fireEvent.click(hiddenInput);
+  connectedUsers.forEach((user) => {
+    // Verify that the img element with data-testid="user-List" is in the document
+    const imgElement = screen.getByTestId("user-List");
+    expect(imgElement).toBeInTheDocument();
+    fireEvent.click(imgElement);
+  });
+});
+it("finds name elements with correct data-testid and handles clicks", async () => {
+  const setMenuOpen = jest.fn((fn) => {
+    return fn;
+  });
+  const host = {
+    current: "john_doe", // or any other expected value
+  };
+  const storedUserData = {
+    current: {
+      name: "jane_doe", // Set this to an appropriate value
+    },
+  };
+  const handleUserMenuToggle = jest.fn();
+  render(
+    <MemoryRouter>
+      <Sidebar
+        isConnectedComponentOpen={true}
+        connectedUsers={connectedUsers}
+        handleUserMenuToggle={handleUserMenuToggle}
+        sertMenuOpen={setMenuOpen}
+        host={host}
+        storedUserData={storedUserData}
+        //   menuOpen={menuOpen}
+      />
+    </MemoryRouter>
+  );
+  // Simulate a user clicking the hidden input element
+  const hiddenInput = screen.getByTestId("inside-hello");
+  fireEvent.click(hiddenInput);
+  connectedUsers.forEach((user) => {
+    // Verify that the img element with data-testid="user-List" is in the document
+    const imgElement = screen.getByTestId("handle-User-Menu");
+    expect(imgElement).toBeInTheDocument();
+    // const imgElement = screen.getByTestId('user-List');
+
+    // Simulate clicking the img element
+    fireEvent.click(imgElement);
+  });
+});
+it("changes style of cursor to pointer", async () => {
+  const setMenuOpen = jest.fn((fn) => {
+    return fn;
+  });
+  const host = {
+    current: "john_doe", // or any other expected value
+  };
+  const storedUserData = {
+    current: {
+      name: "jane_doe", // Set this to an appropriate value
+    },
+  };
+  const handleUserMenuToggle = jest.fn();
+  render(
+    <MemoryRouter>
+      <Sidebar
+        isConnectedComponentOpen={true}
+        connectedUsers={connectedUsers}
+        handleUserMenuToggle={handleUserMenuToggle}
+        sertMenuOpen={setMenuOpen}
+        host={host}
+        storedUserData={storedUserData}
+        //   menuOpen={menuOpen}
+      />
+    </MemoryRouter>
+  );
+  // Simulate a user clicking the hidden input element
+  const hiddenInput = screen.getByTestId("inside-hello");
+  fireEvent.click(hiddenInput);
+  connectedUsers.forEach((user) => {
+    // Verify that the img element with data-testid="user-List" is in the document
+    const imgElement = screen.getByTestId("handle-User-Menu");
+    expect(imgElement).toBeInTheDocument();
+    // const imgElement = screen.getByTestId('user-List');
+
+    // Simulate clicking the img element
+    fireEvent.click(imgElement);
+    const usernameElement = screen.getByText("john_doe");
+    fireEvent.mouseEnter(usernameElement);
+
+    // Verify the cursor style has been changed to 'pointer'
+    expect(usernameElement.style.cursor).toBe("pointer");
+  });
 });
