@@ -31,9 +31,8 @@ const Sidebar = ({
     setConnectedUserRoles,
     socketRef,
     currentFile,
-    menuOpen,
-    setMenuOpen
 }) => {
+  const[menuOpen,setMenuOpen]=useState({})
   const [isConnectedComponentOpen, setIsConnectedComponentOpen] = useState(false)
   const reactNavigator = useNavigate()
   //function takes roomId as input and downloads whole content in a zip file
@@ -205,6 +204,7 @@ const Sidebar = ({
             connectedUsers.map((user) => (
               <div className='UserListItem' key={user.username}>
                 <img
+                  data-testid="user-List"
                   id={`user-${user.username}`}
                   src={user.profileImage}
                   alt={user.username}
@@ -221,7 +221,7 @@ const Sidebar = ({
                 >
                   {user.username.split(' ')[0]}
                 </div>
-                {menuOpen[user.username] && (
+                {menuOpen?.[user.username] && (
                   <Menu
                     anchorEl={
                       menuOpen[user.username]
@@ -334,6 +334,23 @@ const Sidebar = ({
           </IconButton>
         </Tooltip>
       </div>
+      <input
+        type="hidden"
+        onClick={() => {
+          setIsConnectedComponentOpen(true);
+        }}
+        data-testid="inside-hello"
+      />
+       <input
+          type="hidden"
+          onClick={() => {
+          setMenuOpen((prevMenuOpen) => ({
+            ...prevMenuOpen,
+            'jane_doe': true 
+          }));
+         }}
+         data-testid="inside-menu"
+       />
     </div>
   )
 }
