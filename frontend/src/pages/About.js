@@ -1,21 +1,21 @@
-import React from 'react';
-import Logo from '../images/Logo.png';
-import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
-import { useNavigate } from 'react-router-dom';
-import '../styles/About.css';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import React from 'react'
+import Logo from '../images/Logo.png'
+import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined'
+import { useNavigate } from 'react-router-dom'
+import '../styles/About.css'
+import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 
 const About = () => {
-  const navigate = useNavigate();
+  const navigate = useNavigate()
   
   return (
 
     <div className='bigCont'>
       <div className='mt-5 ml-5'>
           <HomeOutlinedIcon
-            className="text-slate-200 cursor-pointer mt-3 ml-5"
-            fontSize="large"
-            onClick={() => navigate("/")}
+            className='text-slate-200 cursor-pointer mt-3 ml-5'
+            fontSize='large'
+            onClick={() => navigate('/')}
           />
 
       </div>
@@ -34,11 +34,11 @@ const About = () => {
             <div className='flex flex-col'>
               <div className='flex justify-center gap-4'>
                 <p className='text-red-100 poppins-medium-italic font-bold my-1'>Email:</p>
-                <p className='text-red-100 poppins-medium-italic my-1'>xyz@gmail.com</p>
+                <p className='text-red-100 poppins-medium-italic my-1'>softwareteam676@gmail.com</p>
               </div>
               <div className='flex justify-center gap-4'>
                 <p className='text-red-100 poppins-medium-italic font-bold my-1'>Phone no:</p>
-                <p className='text-red-100 poppins-medium-italic my-1'>1234567890</p>
+                <p className='text-red-100 poppins-medium-italic my-1'>xxxx-xxxx-xx</p>
               </div>
             </div>
           </div>
@@ -49,7 +49,7 @@ const About = () => {
       </div>
     </div>
     </div>
-  );
+  )
 }
 
-export default About;
+export default About

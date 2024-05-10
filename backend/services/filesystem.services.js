@@ -4,20 +4,45 @@ const fs = require('fs');
 const archiver = require('archiver');
 const FileNode = mongoose.model('FileNode', FileNodeSchema);
 
-// Function to upload a file
+/**
+ * Uploads a file to the file system.
+ * 
+ * @param {string} name - The name of the file.
+ * @param {Buffer} content - The content of the file.
+ * @param {string} parentId - The ID of the parent directory.
+ * @param {string} roomId - The ID of the room.
+ * @returns {Promise<Object>} The uploaded file node.
+ */
 async function uploadFile(name, content, parentId, roomId) {
     const fileNode = new FileNode({ name, type: 'file', content, parent: parentId, roomId });
     await fileNode.save();
     return fileNode;
 }
 
-// Function to create a directory
+/**
+ * Creates a directory in the file system.
+ * 
+ * @param {string} name - The name of the directory.
+ * @param {string} parentId - The ID of the parent directory.
+ * @param {string} roomId - The ID of the room.
+ * @param {string} [type='directory'] - The type of the directory.
+ * @returns {Promise<Object>} The created directory node.
+ */
 async function createDirectory(name, parentId, roomId, type='directory') {
     const directoryNode = new FileNode({ name, type: type, parent: parentId, roomId });
     await directoryNode.save();
     return directoryNode;
 }
 
+/**
+ * Uploads a directory structure to the file system.
+ * 
+ * @param {string} parentId - The ID of the parent directory.
+ * @param {Array<Object>} inputArray - The array containing directory structure data.
+ * @param {string} roomId - The ID of the room.
+ * @returns {Promise<Object>} The uploaded directory node.
+ * Implementation: Iterates over all the uploaded files and directories similar to DFS and creates a new file or directory node for the same
+ */
 async function uploadDirectory(parentId, inputArray, roomId) {
 
     // helper function
@@ -124,7 +149,13 @@ async function uploadDirectory(parentId, inputArray, roomId) {
     return await getFolderStructure(topmostFolderId);
 }
 
-// Function to download a file
+/**
+ * Fetches a file from the file system.
+ * 
+ * @param {string} nodeId - The ID of the file node.
+ * @returns {Promise<Object>} The requested file node and its content.
+ * @throws {Error} If the node is not found or is not a file.
+ */
 async function fetchFile(nodeId) {
     const fileNode = await FileNode.findById(nodeId);
     if (!fileNode || fileNode.type !== 'file') {
@@ -133,6 +164,13 @@ async function fetchFile(nodeId) {
     return fileNode;
 }
 
+/**
+ * Saves content to a file in the file system.
+ * 
+ * @param {string} nodeId - The ID of the file node.
+ * @param {Buffer} content - The content to be saved.
+ * @returns {Promise<Object>} The result of the operation (success or failure). Updates the file content in the database.
+ */
 async function saveFile(nodeId, content)
 {
     try {
@@ -144,11 +182,16 @@ async function saveFile(nodeId, content)
         }
         return { success: true, message: 'File saved successfully.'};
     } catch (error) {
-        console.error('Error saving file:', error.message);
         return { success: false, message: 'Failed to save file.' };
     }
 }
-// Add a function to create a root directory for a room
+
+/**
+ * Creates a root directory for a room in the file system.
+ * 
+ * @param {string} roomId - The ID of the room.
+ * @returns {Promise<Object>} The created root directory node for a given roomId.
+ */
 async function createRootDirectory(roomId) {
     // Check if the root directory already exists for the room
     const existingRootDirectory = await FileNode.findOne({ name: 'Root', type: 'root', parent: null, roomId });
@@ -162,7 +205,14 @@ async function createRootDirectory(roomId) {
     return rootDirectory;
 }
 
-// get tree structure for the file system of a room
+/**
+ * Generates a tree structure representing the file system of a room.
+ * 
+ * @param {string} roomId - The ID of the room.
+ * @returns {Promise<Object>} The generated tree structure.
+ * @throws {Error} If the root directory is not found.
+ * Implementation: Retrives all the file or directory nodes for a given roomId. Applying DFS over the file structure, it generates a tree for the file structure
+ */
 async function generateTree(roomId) {
     // Find the root directory node
     const rootDirectory = await FileNode.findOne({type: 'root', parent: null, roomId });
@@ -204,7 +254,12 @@ async function generateTree(roomId) {
     return tree;
 }
 
-// Function to delete a file
+/**
+ * Deletes a file from the file system.
+ * 
+ * @param {string} nodeId - The ID of the file node.
+ * @returns {Promise<Object>} The result of the operation (success or failure).
+ */
 async function deleteFile(nodeId) {
     try {
         const deletedNode = await FileNode.findOneAndDelete({ _id: nodeId });
@@ -214,12 +269,16 @@ async function deleteFile(nodeId) {
         }
         return { success: true, message: 'File deleted successfully.', deletedNode };
     } catch (error) {
-        console.error('Error deleting file:', error.message);
         return { success: false, message: 'Failed to delete file.' };
     }
 }
 
-// Function to delete a directory
+/**
+ * Deletes a directory from the file system.
+ * 
+ * @param {string} nodeId - The ID of the directory node.
+ * @returns {Promise<Object>} The result of the operation (success or failure).
+ */
 async function deleteDirectory(nodeId) {
     try {
         const deletedNode = await FileNode.findOneAndDelete({ _id: nodeId });
@@ -229,11 +288,17 @@ async function deleteDirectory(nodeId) {
         }
         return { success: true, message: 'File deleted successfully.', deletedNode };
     } catch (error) {
-        console.error('Error deleting file:', error.message);
         return { success: false, message: 'Failed to delete file.' };
     }
 }
 
+/**
+ * Renames a file in the file system.
+ * 
+ * @param {string} nodeId - The ID of the file node.
+ * @param {string} newName - The new name for the file.
+ * @returns {Promise<Object>} The result of the operation (success or failure).
+ */
 async function renameFile(nodeId, newName) {
     try {
         // Find the file node by ID and update its name
@@ -250,11 +315,17 @@ async function renameFile(nodeId, newName) {
         return { success: true, message: 'File renamed successfully.', updatedNode };
 
     } catch (error) {
-        console.error('Error renaming file:', error.message);
         return { success: false, message: 'Failed to rename file.' };
     }
 }
 
+/**
+ * Renames a directory in the file system.
+ * 
+ * @param {string} nodeId - The ID of the directory node.
+ * @param {string} newName - The new name for the directory.
+ * @returns {Promise<Object>} The result of the operation (success or failure).
+ */
 async function renameDirectory(nodeId, newName) {
     try {
         // Find the Directory node by ID and update its name
@@ -271,12 +342,21 @@ async function renameDirectory(nodeId, newName) {
         return { success: true, message: 'Directory renamed successfully.', updatedNode };
 
     } catch (error) {
-        console.error('Error renaming Directory:', error.message);
         return { success: false, message: 'Failed to rename file.' };
     }
 }
 
-// Function to create a zip file with folder structure
+/**
+ * Creates a zip file containing the contents of a room's file system.
+ * 
+ * @param {string} roomId - The ID of the room.
+ * @param {Archiver} archive - The Archiver instance for creating the zip file.
+ * @returns {Promise<Archiver>} The Archiver instance with the zip file data.
+ * @throws {Error} If there is an error creating the zip file.
+ * Implementation: 
+        Retrives all the files for a given roomId.
+        Iterates over all of them similar to DFS and then adds them to the archive output stream.
+ */
 async function createZipFile(roomId, archive, ) {
     try {
         // Find all folders and files belonging to the specified room ID
@@ -313,7 +393,6 @@ async function createZipFile(roomId, archive, ) {
         return archive;
 
     } catch (error) {
-        console.error(`Error creating zip file: ${error}`);
         throw error;
     }
 }

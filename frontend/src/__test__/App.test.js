@@ -15,7 +15,6 @@ describe('App', () => {
             // Mock user data
             name: 'Test User',
             email: 'test@example.com'
-            // Add any other necessary user data here
           }
         }
       }

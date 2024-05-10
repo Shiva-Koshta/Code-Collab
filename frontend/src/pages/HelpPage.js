@@ -48,7 +48,7 @@ const HelpPage = () => {
         message: "",
       });
     } catch (error) {
-      // console.error("Error:", error);
+      console.error("Error:", error);
       toast.error("An error occurred while submitting the form");
     } finally {
       setIsSubmitting(false);
@@ -62,18 +62,23 @@ const HelpPage = () => {
     <>
       <div className="bigger-container">
         <div className="inner-container">
+          <ArrowBackIcon
+            className="text-slate-300 cursor-pointer mt-3"
+            fontSize="large"
+            onClick={() => navigate("/")}
+          />
           <HomeOutlinedIcon
             className="text-slate-200 cursor-pointer mt-3"
             fontSize="large"
             onClick={() => navigate("/")}
           />
-          <h1 className="heading  text-red-300 text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-8 text-center">
+          <h1 className="heading text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-8 text-center">
             <u>USER MANUAL</u>
           </h1>
           <div className="step">
             <div className="stepcontent flex flex-col lg:flex-row items-center">
               <div className="stepinfo lg:w-1/2 lg:text-left">
-                <h2 className="text-red-200">Step 1: Login</h2>
+                <h2>Step 1: Login</h2>
                 <p>
                   On the login screen, you will see an option to sign in with
                   your Google account.
@@ -92,7 +97,7 @@ const HelpPage = () => {
                 <img src={SignUp} alt="Authenticate Demo" />
               </div>
               <div className="stepinfo lg:w-1/2 lg:text-left">
-                <h2 className="text-red-200">Step 2: Authenticate with Google</h2>
+                <h2>Step 2: Authenticate with Google</h2>
                 <p>
                   You will be redirected to Google's authentication page.
                   (Please refer to the image attached for your reference)
@@ -107,7 +112,7 @@ const HelpPage = () => {
           <div className="step">
             <div className="stepcontent flex flex-col lg:flex-row items-center">
               <div className="stepinfo lg:w-1/2 lg:text-left">
-                <h2 className="text-red-200">Step 3: Password verification</h2>
+                <h2>Step 3: Password verification</h2>
                 <p>
                   Enter your password and click on ‘Next’ to continue with the
                   sign-in process.
@@ -130,7 +135,7 @@ const HelpPage = () => {
                 <img src={RoomCreation} alt="Room Demo" />
               </div>
               <div className="stepinfo lg:w-1/2 lg:text-left">
-                <h2 className="text-red-200">Step 4: Room creation and Joining</h2>
+                <h2>Step 4: Room creation and Joining</h2>
                 <p>
                   If you have a room ID available, enter it in the "Room ID”
                   option and click on ‘Join’.
@@ -150,7 +155,7 @@ const HelpPage = () => {
           <div className="step">
             <div className="stepcontent flex flex-col lg:flex-row items-center">
               <div className="stepinfo lg:w-1/2 lg:text-left">
-                <h2 className="text-red-200">Step 5: Code editor</h2>
+                <h2>Step 5: Code editor</h2>
                 <p>
                   <b>UPLOAD FILE:</b> This option allows you to upload any file
                   from your local device to your editor screen. All users
@@ -194,10 +199,10 @@ const HelpPage = () => {
 
           <div className="contact-form lg:flex lg:justify-between lg:items-center">
             <div className="w-full lg:w-1/2">
-              <p className="text-5xl text-red-300 text-center lg:text-left satisfy-regular font-bold p-3">
+              <p className="text-5xl text-center lg:text-left satisfy-regular font-bold p-3">
                 Contact Us
               </p>
-              <p className="text-xl text-center lg:text-left satisfy-regular text-red-200 p-3">
+              <p className="text-xl text-center lg:text-left satisfy-regular p-3">
                 Great things are not done by impulse, but by a series of small
                 things brought together.
               </p>

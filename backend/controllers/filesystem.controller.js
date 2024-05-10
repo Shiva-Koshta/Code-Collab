@@ -3,7 +3,13 @@ const filesys = require('../services/filesystem.services');
 const fs = require('fs');
 const archiver = require('archiver');
 
-
+/**
+ * Controller function to create a file.
+ * 
+ * @param {Object} req - The HTTP request object containing the file details in the body.
+ * @param {Object} res - The HTTP response object.
+ * @returns {JSON} Response with the newly created file node or error message.
+ */
 createfile = async(req, res) => {
     if (!req.body.name || !req.body.parentId || !req.body.roomId) 
     return res.status(400).json({ message: 'Please provide all required fields' })
@@ -20,10 +26,17 @@ createfile = async(req, res) => {
         }     
         res.status(200).json(responseJSON);
     } catch (error) {
-        console.log(error)
         res.status(500).json({ message: 'Error creating file' })
     }
 }
+
+/**
+ * Controller function to upload a file.
+ * 
+ * @param {Object} req - The HTTP request object containing the file details in the body.
+ * @param {Object} res - The HTTP response object.
+ * @returns {JSON} Response with the uploaded file node or error message.
+ */
 uploadfile = async(req, res) => {
     if (!req.body.name || !req.body.content || !req.body.parentId || !req.body.roomId) 
     return res.status(400).json({ message: 'Please provide all required fields' })
@@ -40,10 +53,17 @@ uploadfile = async(req, res) => {
         }     
         res.status(200).json(responseJSON);
     } catch (error) {
-        console.log(error)
         res.status(500).json({ message: 'Error uploading file' })
     }
 }
+
+/**
+ * Controller function to create a directory.
+ * 
+ * @param {Object} req - The HTTP request object containing the directory details in the body.
+ * @param {Object} res - The HTTP response object.
+ * @returns {JSON} Response with the newly created directory node or error message.
+ */
 createdirectory = async(req, res) => {
     if (!req.body.name || !req.body.parentId || !req.body.roomId)
     return res.status(400).json({ message: 'Please provide all required fields' })
@@ -61,10 +81,17 @@ createdirectory = async(req, res) => {
         }     
         res.status(200).json(responseJSON);
     } catch (error) {
-        console.log(error)
         res.status(500).json({ message: 'Error creating directory' })
     }
 }
+
+/**
+ * Controller function to upload a directory.
+ * 
+ * @param {Object} req - The HTTP request object containing the directory details in the body.
+ * @param {Object} res - The HTTP response object.
+ * @returns {JSON} Response with the uploaded directory node or error message.
+ */
 uploaddirectory = async(req, res) => {
     try {
         const treeDir = await filesys.uploadDirectory(req.body.parentId, req.body.data, req.body.roomId);
@@ -74,9 +101,17 @@ uploaddirectory = async(req, res) => {
         }    
         res.status(200).json(responseJSON);
     } catch (error) {
-        console.log(error)
+        res.status(500).json({ message: 'Error uploading directory' })
     }
 }
+
+/**
+ * Controller function to create a root directory.
+ * 
+ * @param {Object} req - The HTTP request object containing the room ID in the body.
+ * @param {Object} res - The HTTP response object.
+ * @returns {JSON} Response with the newly created root directory node for the particular room or error message.
+ */
 createrootdirectory = async(req, res) => {
     if (!req.body.roomId)
     return res.status(400).json({ message: 'Please provide all required fields' })
@@ -93,11 +128,18 @@ createrootdirectory = async(req, res) => {
         }    
         res.status(200).json(responseJSON);
     } catch (error) {
-        console.log(error)
         res.status(500).json({ message: 'Error creating root directory' })
     }
 
 }
+
+/**
+ * Controller function to fetch a file.
+ * 
+ * @param {Object} req - The HTTP request object containing the file ID in the body.
+ * @param {Object} res - The HTTP response object.
+ * @returns {JSON} Response with the content of the file requested by the frontend or error message.
+ */
 fetchfile = async(req, res) => {
     if (!req.body.nodeId) 
     return res.status(400).json({ message: 'Please provide all required fields' })
@@ -113,13 +155,19 @@ fetchfile = async(req, res) => {
                 content: file.content.toString()
             } 
         }    
-        // console.log(file.content.toString());
         res.status(200).json(responseJSON);
     } catch (error) {
-        console.log(error)
         res.status(500).json({ message: 'Error fetching file' })
     }
 }
+
+/**
+ * Controller function to generate a directory tree.
+ * 
+ * @param {Object} req - The HTTP request object containing the room ID in the body.
+ * @param {Object} res - The HTTP response object.
+ * @returns {JSON} Response with the directory tree of the particular room or error message.
+ */
 generatetree = async(req, res) => {
     if (!req.body.roomId)
     return res.status(400).json({ message: 'Please provide all required fields' })
@@ -131,11 +179,17 @@ generatetree = async(req, res) => {
         }    
         res.status(200).json(responseJSON);
     } catch (error) {
-        console.log(error)
         res.status(500).json({ message: 'Error fetching file' })
     }
 }
 
+/**
+ * Controller function to delete a file.
+ * 
+ * @param {Object} req - The HTTP request object containing the file ID in the body.
+ * @param {Object} res - The HTTP response object.
+ * @returns {JSON} Response with success message on deleting the requested file node from the database or error message.
+ */
 deletefile = async(req, res) => {
     if(!req.body.nodeId) 
         return res.status(400).json({ message: 'Please provide all required fields' })
@@ -146,6 +200,14 @@ deletefile = async(req, res) => {
         res.status(500).json({ success: false, error: error.message });
     }
 }
+
+/**
+ * Controller function to delete a directory.
+ * 
+ * @param {Object} req - The HTTP request object containing the directory ID in the body.
+ * @param {Object} res - The HTTP response object.
+ * @returns {JSON} Response with success message on deleting the requested directory node from the database or error message.
+ */
 deletedirectory = async(req, res) => {
     if(!req.body.nodeId) 
         return res.status(400).json({ message: 'Please provide all required fields' })
@@ -153,10 +215,17 @@ deletedirectory = async(req, res) => {
         dir = await filesys.deleteDirectory(req.body.nodeId);  
         res.status(200).json({ success: true, message: 'Directory deleted successfully.', dir });
     } catch (error) {
-        console.log(error)
+        res.status(500).json({ message: 'Error deleting directory' })
     }
 }
 
+/**
+ * Controller function to rename a file.
+ * 
+ * @param {Object} req - The HTTP request object containing the file ID and new name in the body.
+ * @param {Object} res - The HTTP response object.
+ * @returns {JSON} Response with success message on updating the name field of the requested file node or error message.
+ */
 renamefile = async(req, res) => {
     if(!req.body.nodeId || !req.body.name) 
         return res.status(400).json({ message: 'Please provide all required fields' })
@@ -167,10 +236,17 @@ renamefile = async(req, res) => {
         }     
         res.status(200).json(responseJSON);
     } catch (error) {
-        console.log(error)
         res.status(500).json({ message: 'Error renaming file' })
     }
 }
+
+/**
+ * Controller function to rename a directory.
+ * 
+ * @param {Object} req - The HTTP request object containing the directory ID and new name in the body.
+ * @param {Object} res - The HTTP response object.
+ * @returns {JSON} Response with success message on updating the name field of the requested directory node or error message.
+ */
 renamedirectory = async(req, res) => {
     if(!req.body.nodeId || !req.body.name) 
         return res.status(400).json({ message: 'Please provide all required fields' })
@@ -181,11 +257,17 @@ renamedirectory = async(req, res) => {
         }     
         res.status(200).json(responseJSON);
     } catch (error) {
-        console.log(error)
         res.status(500).json({ message: 'Error renaming directory' })
     }
 }
 
+/**
+ * Controller function to download a zip file of the room's contents.
+ * 
+ * @param {Object} req - The HTTP request object containing the room ID in the params.
+ * @param {Object} res - The HTTP response object.
+ * @returns {JSON} Response with the created zip file containing all the files and directories of the particular roomId or error message.
+ */
 downloadFile = async (req, res) => {
     const roomId = req.params.roomId;
 
@@ -210,7 +292,7 @@ downloadFile = async (req, res) => {
             // Send the zip file to the client
             res.download(zipFilePath, (err) => {
                 if (err) {
-                    console.error('Error downloading zip file:', err);
+                    // console.error('Error downloading zip file:', err);
                 } else {
                     // Delete the zip file after downloading
                     fs.unlinkSync(zipFilePath);
@@ -219,7 +301,7 @@ downloadFile = async (req, res) => {
         });
         
     } catch (error) {
-        console.error('Error creating zip file:', error);
+        // console.error('Error creating zip file:', error);
         res.status(500).send('Internal Server Error');
     }
 }

@@ -2,7 +2,7 @@ import React from "react";
 import { render, fireEvent, waitFor, act } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter, Routes, Route, useNavigate } from "react-router-dom";
-import HelpPage from "../pages/HelpPage"; // Assuming this is your HelpPage component
+import HelpPage from "../pages/HelpPage";
 import LoginDemo from "../images/LoginDemo.png";
 import SignUp from "../images/SignUp.png";
 import Password from "../images/Password.png";
@@ -17,9 +17,8 @@ Object.defineProperty(window, "matchMedia", {
     matches: false,
     media: query,
     onchange: null,
-    addListener: jest.fn(), // Deprecated, but still used by some libraries
-    removeListener: jest.fn(), // Deprecated, but still used by some libraries
-    addEventListener: jest.fn(),
+    addListener: jest.fn(),
+    removeListener: jest.fn(), 
     removeEventListener: jest.fn(),
     dispatchEvent: jest.fn(),
   })),
@@ -29,7 +28,7 @@ Object.defineProperty(window, "matchMedia", {
 const navigate = jest.fn();
 
 describe("Routing", () => {
-  it("renders HelpPage component when /help URL is called", () => {
+  test("renders HelpPage component when /help URL is called", () => {
     const { getByText } = render(
       <MemoryRouter initialEntries={["/help"]}>
         <Routes>
@@ -45,32 +44,32 @@ describe("Routing", () => {
 });
 
 describe("Image rendering", () => {
-  it("renders LoginDemo image", () => {
+  test("renders LoginDemo image", () => {
     const { getByAltText } = render(<img src={LoginDemo} alt="Login Demo" />);
     expect(getByAltText("Login Demo")).toBeInTheDocument();
   });
 
-  it("renders Password image", () => {
+  test("renders Password image", () => {
     const { getByAltText } = render(<img src={Password} alt="Sign Up" />);
     expect(getByAltText("Sign Up")).toBeInTheDocument();
   });
 
-  it("renders Room image", () => {
+  test("renders Room image", () => {
     const { getByAltText } = render(<img src={Room} alt="Sign Up" />);
     expect(getByAltText("Sign Up")).toBeInTheDocument();
   });
 
-  it("renders RoomCreation image", () => {
+  test("renders RoomCreation image", () => {
     const { getByAltText } = render(<img src={RoomCreation} alt="Sign Up" />);
     expect(getByAltText("Sign Up")).toBeInTheDocument();
   });
 
-  it("renders Chatbox image", () => {
+  test("renders Chatbox image", () => {
     const { getByAltText } = render(<img src={ChatBox} alt="Sign Up" />);
     expect(getByAltText("Sign Up")).toBeInTheDocument();
   });
 
-  it("renders SignUp image", () => {
+  test("renders SignUp image", () => {
     const { getByAltText } = render(<img src={SignUp} alt="Sign Up" />);
     expect(getByAltText("Sign Up")).toBeInTheDocument();
   });
@@ -87,7 +86,7 @@ jest.mock("react-router-dom", () => {
 });
 
 describe("Button functionality", () => {
-  it("navigates to login page on button click", () => {
+  test("navigates to login page on button click", () => {
     const { useNavigate } = require("react-router-dom");
     const navigate = jest.fn();
     useNavigate.mockReturnValue(navigate); // Mock useNavigate
@@ -104,7 +103,7 @@ describe("Button functionality", () => {
     expect(navigate).toHaveBeenCalledWith("/login");
   });
 
-  it("renders Submit button when not submitting", () => {
+  test("renders Submit button when not submitting", () => {
     const { useNavigate } = require("react-router-dom");
     const navigate = jest.fn();
     useNavigate.mockReturnValue(navigate); // Mock useNavigate
@@ -118,7 +117,7 @@ describe("Button functionality", () => {
     expect(submitButton).toBeInTheDocument();
   });
 
-  it('HomeOutlinedIcon navigates to "/" when clicked', () => {
+  test('HomeOutlinedIcon navigates to "/" when clicked', () => {
     const { useNavigate } = require("react-router-dom");
     const navigate = jest.fn();
     useNavigate.mockReturnValue(navigate); // Mock useNavigate
@@ -135,7 +134,7 @@ describe("Button functionality", () => {
 });
 
 describe("Form functionality", () => {
-  it("submits the form successfully", async () => {
+  test("submits the form successfully", async () => {
     // Mock fetch to return a successful response
     jest.spyOn(global, "fetch").mockResolvedValueOnce({
       ok: true,
@@ -175,7 +174,7 @@ describe("Form functionality", () => {
     });
   });
 
-  it("handles form submission failure", async () => {
+  test("handles form submission failure", async () => {
     // Mock fetch to return a failed response
     jest.spyOn(global, "fetch").mockResolvedValueOnce({
       ok: false,
@@ -204,7 +203,7 @@ describe("Form functionality", () => {
     );
   });
 
-  it("handles form submission error", async () => {
+  test("handles form submission error", async () => {
     // Mock fetch to throw an error
     jest
       .spyOn(global, "fetch")

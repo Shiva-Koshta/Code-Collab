@@ -9,8 +9,6 @@ import {
 import { MemoryRouter } from "react-router-dom";
 import RoomCreation from "../pages/RoomCreation";
 import { getRoomUsersCount } from "../pages/RoomCreation";
-import { useState } from "react";
-import { useEffect } from "react"; // Import useEffect from 'react' for mocking
 
 const axios = require("axios");
 
@@ -27,38 +25,6 @@ describe("RoomCreation component", () => {
     // Reset mocks before each test
     jest.clearAllMocks();
   });
-
-//   test("sets user name and image from local storage", () => {
-//     // Mock user data stored in local storage
-//     const userData = {
-//       name: "John Doe",
-//       picture: "example.jpg",
-//     };
-//     const storedUserData = JSON.stringify(userData);
-
-//     // Mock window.localStorage.getItem to return stored user data
-//     const getItemMock = jest.spyOn(window.localStorage.__proto__, "getItem");
-//     // Mock the implementation of getItem
-//     getItemMock.mockReturnValue(storedUserData);
-
-//     // Mock window.localStorage.setItem to avoid setting data
-//     const setItemMock = jest.spyOn(window.localStorage.__proto__, "setItem");
-//     setItemMock.mockImplementation(() => {});
-
-//     // Render the component
-//     const { getByText, getByAltText } = render(<RoomCreation />);
-
-//     // Assert that the component state is set correctly with the user data
-//     expect(getItemMock).toHaveBeenCalledWith("userData");
-//     expect(getByText(userData.name)).toBeInTheDocument();
-//     expect(getByAltText(userData.picture)).toBeInTheDocument();
-
-//     // Clean up
-//     getItemMock.mockRestore();
-//     setItemMock.mockRestore();
-// });
-
-
 
   test("renders RoomCreation component", () => {
     const { getByText } = render(
@@ -96,10 +62,6 @@ describe("RoomCreation component", () => {
         roomId: "exampleRoomId",
       }
     );
-
-    // Check if user is navigated to editor page
-    // await screen.findByText(/Editor Page/i); // Assuming 'Editor Page' text exists on editor page
-    // expect(screen.getByText(/Editor Page/i)).toBeInTheDocument();
   });
 
   test("navigates to About Us page when 'About Us' button is clicked", () => {
@@ -238,7 +200,7 @@ describe("getRoomUsersCount", () => {
     jest.clearAllMocks();
   });
 
-  it("returns number of users in the room on successful API call", async () => {
+  test("returns number of users in the room on successful API call", async () => {
     const mockResponse = {
       status: 200,
       data: {
@@ -257,7 +219,7 @@ describe("getRoomUsersCount", () => {
     );
   });
 
-  it("returns -1 on unsuccessful API call", async () => {
+  test("returns -1 on unsuccessful API call", async () => {
     const mockResponse = {
       status: 400, // Or any other non-200 status code
     };
@@ -273,7 +235,7 @@ describe("getRoomUsersCount", () => {
     );
   });
 
-  it("returns -1 on error", async () => {
+  test("returns -1 on error", async () => {
     axios.post.mockRejectedValue(new Error("Network Error"));
 
     const roomId = "roomId";
@@ -318,30 +280,6 @@ describe("createNewRoom", () => {
           username: expect.any(String),
         }
       );
-      // expect(navigateMock).toHaveBeenCalledWith(/editor/uniqueRoomId, {
-      //   state: {
-      //     userName: expect.any(String),
-      //   },
-      // });
     });
   });
-  // test("calls joinRoom when Enter key is pressed on input elements", async () => {
-  //   const joinRoomMock = jest.fn();
-
-  //   render(
-  //     <>
-  //       <input type="text" placeholder="ROOM ID" onKeyUp={handleInputEnter} />
-  //       <input type="text" placeholder="USERNAME" onKeyUp={handleInputEnter} />
-  //     </>
-  //   );
-
-  //   // Wait for the inputs to appear
-  //   const roomIdInput = await screen.findByPlaceholderText("ROOM ID");
-  //   const userNameInput = await screen.findByPlaceholderText("USERNAME");
-
-  //   fireEvent.keyUp(roomIdInput, { key: "Enter" });
-  //   fireEvent.keyUp(userNameInput, { key: "Enter" });
-
-  //   expect(joinRoomMock).toHaveBeenCalledTimes(2);
-  // });
 });
