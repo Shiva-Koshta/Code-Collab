@@ -273,7 +273,7 @@ describe("Sidebar", () => {
 
       // Assertions
       expect(global.fetch).toHaveBeenCalledWith(
-        "http://localhost:8080/rooms/numUsersInRoom",
+        `${process.env.REACT_APP_API_URL}/rooms/numUsersInRoom`,
         {
           method: "POST",
           headers: {
@@ -286,7 +286,7 @@ describe("Sidebar", () => {
       await waitFor(() => {
         expect(window.confirm).toHaveBeenCalledWith("Confirm leave room?");
         expect(global.fetch).toHaveBeenCalledWith(
-          "http://localhost:8080/rooms/numUsersInRoom",
+          `${process.env.REACT_APP_API_URL}/rooms/numUsersInRoom`,
           expect.any(Object)
         );
         expect(() =>
@@ -354,7 +354,7 @@ describe("Sidebar", () => {
 
       // Assertions
       expect(global.fetch).toHaveBeenCalledWith(
-        "http://localhost:8080/rooms/numUsersInRoom",
+        `${process.env.REACT_APP_API_URL}/rooms/numUsersInRoom`,
         {
           method: "POST",
           headers: {
@@ -367,7 +367,7 @@ describe("Sidebar", () => {
       await waitFor(() => {
         expect(window.confirm).toHaveBeenCalledWith("Confirm leave room?");
         expect(global.fetch).toHaveBeenCalledWith(
-          "http://localhost:8080/rooms/numUsersInRoom",
+          `${process.env.REACT_APP_API_URL}/rooms/numUsersInRoom`,
           expect.any(Object)
         );
         expect(() =>
