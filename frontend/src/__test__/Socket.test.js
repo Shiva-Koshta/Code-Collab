@@ -16,7 +16,7 @@ describe('initSocket', () => {
     // Mock the 'io' function to return a mock socket instance
     io.mockReturnValue(mockSocket);
 
-    const fakeUrl = 'http://localhost:8080';
+    const fakeUrl = `${process.env.REACT_APP_API_URL}`;
     const fakeOptions = {
       'force new connection': true,
       reconnectionAttempt: 'Infinity',
